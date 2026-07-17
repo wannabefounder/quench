@@ -7,9 +7,9 @@ M5 DONE: OpenAI + Anthropic Admin usage auto-syncs with Keychain credentials, bo
 pagination, 15-minute throttle, stable bucket upserts, isolated failures, and diagnostics status.
 OpenRouter generation metadata imports are supported by ID (no bulk history/content calls); all
 local/API sources have independent race-inclusion controls.
-M6 IN PROGRESS: Chromium MV3 preview + strict native bridge + browser receipt parser/ingestion;
+M6 DONE: Chromium MV3 + strict native bridge + event-driven browser receipt ingestion;
 count-only messages, canonical rewrite, owner-only inbox. Safari is out of scope by user decision.
-Live ChatGPT → bridge → SQLite validated on Mac. Next: live Claude validation and diagnostics.
+Live ChatGPT and no-refresh file-watcher paths validated. M7 current: daily history/streak foundation.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,

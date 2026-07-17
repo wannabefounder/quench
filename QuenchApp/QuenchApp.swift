@@ -89,6 +89,7 @@ final class RaceStore: ObservableObject {
     private var timer: Timer?
     private var needsRefresh = false
     private var credentialObserver: NSObjectProtocol?
+    private var browserReceiptWatcher: BrowserReceiptWatcher?
 
     var regionOptions: [RegionOption] {
         coef.water.regions.map { key, value in
@@ -125,6 +126,9 @@ final class RaceStore: ObservableObject {
             forName: .providerCredentialsChanged, object: nil, queue: .main
         ) { [weak self] _ in
             Task { @MainActor in self?.refresh(forceProviderSync: true) }
+        }
+        browserReceiptWatcher = BrowserReceiptWatcher { [weak self] in
+            Task { @MainActor in self?.refresh() }
         }
         refresh()
         // Day rollover check: once a minute, reset when local midnight passes.

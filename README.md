@@ -21,7 +21,8 @@ M6 has started with a development-preview Chromium companion in [`BrowserExtensi
 It estimates tokens inside ChatGPT/Claude tabs and passes only validated count receipts through a
 local native-messaging bridge. It has no telemetry or network backend, and bridge-side canonical
 rewriting prevents unexpected page fields from reaching disk. ChatGPT and Claude adapters have
-versioned CI fixtures. Safari is intentionally out of scope.
+versioned CI fixtures, and new receipts are ingested while Quench is running without polling or a
+manual refresh. Safari is intentionally out of scope.
 
 ## Build & run (macOS 14+)
 
