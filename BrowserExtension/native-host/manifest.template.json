@@ -1,0 +1,7 @@
+{
+  "name": "app.quench.browser_bridge",
+  "description": "Local count-only bridge for Quench",
+  "path": "__BRIDGE_PATH__",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://__EXTENSION_ID__/"]
+}

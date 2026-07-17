@@ -2,6 +2,22 @@ import XCTest
 @testable import QuenchEngine
 
 final class UsageLogParserTests: XCTestCase {
+    func testBrowserReceiptParsesCountsWithoutContent() throws {
+        let line = Data(#"{"schema_version":1,"id":"abc123","timestamp":"2026-07-18T12:00:00Z","site":"chatgpt.com","model":null,"input_tokens":120,"output_tokens":340}"#.utf8)
+        let event = BrowserReceiptParser.parse(line: line)
+
+        XCTAssertEqual(event?.externalID, "browser:abc123")
+        XCTAssertEqual(event?.source, "browser-extension")
+        XCTAssertEqual(event?.inputTokens, 120)
+        XCTAssertEqual(event?.outputTokens, 340)
+        XCTAssertEqual(event?.accuracyTier, 2)
+    }
+
+    func testBrowserReceiptRejectsUnknownSitesAndEmptyUsage() {
+        XCTAssertNil(BrowserReceiptParser.parse(line: Data(#"{"schema_version":1,"id":"x","timestamp":"2026-07-18T12:00:00Z","site":"example.com","input_tokens":1,"output_tokens":1}"#.utf8)))
+        XCTAssertNil(BrowserReceiptParser.parse(line: Data(#"{"schema_version":1,"id":"x","timestamp":"2026-07-18T12:00:00Z","site":"claude.ai","input_tokens":0,"output_tokens":0}"#.utf8)))
+    }
+
     func testClaudeCodeParsesOnlyUsageMetadataAndIncludesCacheTokens() {
         let line = Data(#"{"type":"assistant","timestamp":"2026-07-18T10:20:30.123Z","message":{"id":"redacted","model":"claude-sonnet-4-5","usage":{"input_tokens":100,"cache_creation_input_tokens":20,"cache_read_input_tokens":30,"output_tokens":40},"content":[{"type":"text","text":"must never be retained"}]}}"#.utf8)
 

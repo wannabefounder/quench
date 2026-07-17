@@ -31,6 +31,13 @@ prompts, responses, local paths, hydration data, or identifiers sent to a Quench
 Every normalized source has a separate local “count in today's race” control. This lets users avoid
 API/local double-counting without deleting retained usage metadata.
 
+The optional browser companion reads rendered message text transiently inside ChatGPT or Claude only
+to estimate token counts. Conversation text never leaves the tab. The extension sends an opaque
+local receipt ID, timestamp, site name, optional model name, and input/output integers through
+Chrome native messaging. The bridge validates and re-encodes those exact fields before storing an
+owner-only local JSONL receipt; unknown fields are discarded. There is no localhost server, trusted
+certificate, Quench cloud relay, remotely downloaded selector code, or extension analytics.
+
 ## Diagnostics and analytics
 
 Quench has no hidden analytics or advertising SDK. Any future diagnostic sharing must be explicit,

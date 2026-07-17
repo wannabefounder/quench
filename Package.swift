@@ -19,7 +19,13 @@ targets.append(.executableTarget(
     exclude: ["Engine"],
     resources: [.copy("Resources/coefficients.json")]
 ))
+targets.append(.executableTarget(
+    name: "QuenchBrowserBridge",
+    dependencies: [],
+    path: "QuenchBrowserBridge"
+))
 products.append(.executable(name: "QuenchApp", targets: ["QuenchApp"]))
+products.append(.executable(name: "QuenchBrowserBridge", targets: ["QuenchBrowserBridge"]))
 #endif
 
 let package = Package(

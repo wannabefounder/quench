@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Quench — AI Water Counter",
+  "version": "0.1.0",
+  "description": "Sends token-count estimates to Quench on this Mac. Never sends conversation text.",
+  "permissions": ["nativeMessaging", "storage"],
+  "host_permissions": ["https://chatgpt.com/*", "https://claude.ai/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [{
+    "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }],
+  "action": { "default_popup": "popup.html", "default_title": "Quench" }
+}

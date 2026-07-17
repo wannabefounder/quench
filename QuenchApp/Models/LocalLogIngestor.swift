@@ -19,8 +19,27 @@ final class LocalLogIngestor {
                        isEnabled: enabledSources.contains("claude-code")),
             ingestTree(home.appendingPathComponent(".codex/sessions"),
                        source: "codex", displayName: "Codex",
-                       isEnabled: enabledSources.contains("codex"))
+                       isEnabled: enabledSources.contains("codex")),
+            ingestSingleFile(
+                home.appendingPathComponent("Library/Application Support/Quench/browser-events.jsonl"),
+                source: "browser-extension", displayName: "Browser Extension",
+                isEnabled: enabledSources.contains("browser-extension"))
         ]
+    }
+
+    private func ingestSingleFile(_ url: URL, source: String, displayName: String,
+                                  isEnabled: Bool) -> LocalSourceStatus {
+        let exists = fileManager.fileExists(atPath: url.path)
+        var errorCount = 0
+        if isEnabled, exists {
+            do { try ingestFile(url, source: source) }
+            catch { errorCount = 1 }
+        }
+        let summary = try? database.sourceEventSummary(source: source)
+        return LocalSourceStatus(source: source, displayName: displayName,
+                                 fileCount: exists ? 1 : 0, eventCount: summary?.count ?? 0,
+                                 errorCount: errorCount, lastEvent: summary?.lastEvent,
+                                 isEnabled: isEnabled)
     }
 
     private func ingestTree(_ root: URL, source: String, displayName: String,
@@ -97,7 +116,10 @@ final class LocalLogIngestor {
                 if let event = ClaudeCodeLogParser.parse(line: line, externalID: externalID) {
                     events.append(event)
                 }
-            } else if let event = codex.parse(line: line, externalID: externalID) {
+            } else if source == "codex", let event = codex.parse(line: line, externalID: externalID) {
+                events.append(event)
+            } else if source == "browser-extension",
+                      let event = BrowserReceiptParser.parse(line: line) {
                 events.append(event)
             }
         }

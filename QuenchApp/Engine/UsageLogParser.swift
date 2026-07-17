@@ -129,3 +129,27 @@ public struct CodexLogParser {
         )
     }
 }
+
+public enum BrowserReceiptParser {
+    /// Parses the canonical count-only receipt written by QuenchBrowserBridge. Unknown fields are
+    /// ignored, but the bridge itself rewrites accepted messages so page content cannot reach disk.
+    public static func parse(line: Data) -> NormalizedUsageEvent? {
+        guard let root = LogJSON.object(line),
+              LogJSON.int(root["schema_version"]) == 1,
+              let id = root["id"] as? String, !id.isEmpty,
+              let timestamp = LogJSON.date(root["timestamp"]),
+              let site = root["site"] as? String,
+              ["chatgpt.com", "claude.ai"].contains(site) else { return nil }
+
+        let input = LogJSON.int(root["input_tokens"]) ?? 0
+        let output = LogJSON.int(root["output_tokens"]) ?? 0
+        guard input >= 0, output >= 0, input > 0 || output > 0 else { return nil }
+        let model = (root["model"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return NormalizedUsageEvent(
+            externalID: "browser:\(id)", timestamp: timestamp, source: "browser-extension",
+            model: model?.isEmpty == false ? model : nil,
+            inputTokens: input, outputTokens: output, accuracyTier: 2
+        )
+    }
+}

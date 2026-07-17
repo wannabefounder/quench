@@ -30,7 +30,7 @@ struct OnboardingView: View {
                 if store.sourceStatuses.isEmpty {
                     HStack {
                         ProgressView().controlSize(.small)
-                        Text("Checking for Claude Code and Codex…")
+                        Text("Checking Claude Code, Codex, and browser receipts…")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

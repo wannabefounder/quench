@@ -3,15 +3,12 @@
 Current milestone: M3 DONE — Claude Code + Codex JSONL ingestion has durable cursors, truncation
 generations, DB dedupe, parser tests, visible source health, and the real bundled coefficients.
 M4 DONE: onboarding, persistent scope/region, accuracy context, source toggles, and diagnostics.
-M5 IN PROGRESS: OpenAI + Anthropic Admin usage now auto-syncs with Keychain credentials, bounded
+M5 DONE: OpenAI + Anthropic Admin usage auto-syncs with Keychain credentials, bounded
 pagination, 15-minute throttle, stable bucket upserts, isolated failures, and diagnostics status.
 OpenRouter generation metadata imports are supported by ID (no bulk history/content calls); all
-local/API sources have independent race-inclusion controls. Next: browser Tier 2 architecture.
-
-Build env: sandbox is Linux/aarch64, Swift 5.10.1. Toolchain must be re-downloaded per session:
-  https://download.swift.org/swift-5.10.1-release/ubuntu2204-aarch64/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04-aarch64.tar.gz
-The mnt fs blocks build writes, so: copy repo to /sessions/<id>/qbuild, run swift build / swift test there.
-Package.swift builds QuenchEngine (pure) everywhere; app+GRDB only on macOS. Full app build = user's Mac.
+local/API sources have independent race-inclusion controls.
+M6 IN PROGRESS: Chromium MV3 preview + strict native bridge + browser receipt parser/ingestion;
+count-only messages, canonical rewrite, owner-only inbox. Next: selector fixtures and Safari target.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,
@@ -31,6 +28,7 @@ Package.swift builds QuenchEngine (pure) everywhere; app+GRDB only on macOS. Ful
 - ProviderUsage.swift + tests — Tier 1 response normalization and pagination cursors.
 - Services/ — Keychain credentials, bounded OpenAI/Anthropic sync, OpenRouter receipt imports.
 - ProviderSyncService + DB v3 — scheduled/forced import, upsert, throttling, sanitized health.
+- BrowserExtension + QuenchBrowserBridge — Tier 2 count-only native messaging preview.
 
 ## TODO / open
 - Bundled coefficients resource is wired into the Swift package; fallback remains for corrupt installs.

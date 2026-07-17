@@ -68,6 +68,12 @@ final class RaceStore: ObservableObject {
             refresh()
         }
     }
+    @Published var browserExtensionEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(browserExtensionEnabled, forKey: "browserExtensionEnabled")
+            refresh()
+        }
+    }
     @Published var countedSources: Set<String> {
         didSet {
             UserDefaults.standard.set(Array(countedSources), forKey: "countedSources")
@@ -111,8 +117,9 @@ final class RaceStore: ObservableObject {
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         claudeCodeEnabled = UserDefaults.standard.object(forKey: "claudeCodeEnabled") as? Bool ?? true
         codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
+        browserExtensionEnabled = UserDefaults.standard.object(forKey: "browserExtensionEnabled") as? Bool ?? true
         countedSources = Set(UserDefaults.standard.stringArray(forKey: "countedSources")
-            ?? ["claude-code", "codex", "openai-api", "anthropic-api", "openrouter-api"])
+            ?? ["claude-code", "codex", "browser-extension", "openai-api", "anthropic-api", "openrouter-api"])
         currentDay = RaceEngine.dayKey(for: Date())
         credentialObserver = NotificationCenter.default.addObserver(
             forName: .providerCredentialsChanged, object: nil, queue: .main
@@ -151,6 +158,7 @@ final class RaceStore: ObservableObject {
         var enabledSources = Set<String>()
         if claudeCodeEnabled { enabledSources.insert("claude-code") }
         if codexEnabled { enabledSources.insert("codex") }
+        if browserExtensionEnabled { enabledSources.insert("browser-extension") }
         let startOfDay = Calendar.current.startOfDay(for: Date())
         let sourcesCountedInRace = countedSources
         Task { [weak self] in

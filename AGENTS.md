@@ -101,7 +101,8 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
    deduplication, source health, and tests.
 4. **M4 — complete:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
 5. **M5 — current:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
-6. **M6:** Chrome/Safari companion extension and private local bridge.
+6. **M6 — current:** Chrome/Safari companion extension and private local bridge. The Chromium MV3
+   preview and native count-only receipt path are implemented; Safari packaging remains.
 7. **M7:** streaks, restrained notifications, history, Wrapped cards, accessibility/localization.
 8. **M8:** signed/notarized distribution, Homebrew cask, launch materials, fiscal sponsorship.
 

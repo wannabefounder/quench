@@ -17,6 +17,11 @@ ID. Its documented API does not provide bulk account history, and Quench never c
 separate stored-content endpoint. Settings independently control which retained sources count in
 the race, making API/local overlap visible and reversible without deleting history.
 
+M6 has started with a development-preview Chromium companion in [`BrowserExtension`](BrowserExtension).
+It estimates tokens inside ChatGPT/Claude tabs and passes only validated count receipts through a
+local native-messaging bridge. It has no telemetry or network backend, and bridge-side canonical
+rewriting prevents unexpected page fields from reaching disk. Safari packaging is still planned.
+
 ## Build & run (macOS 14+)
 
 ```sh
