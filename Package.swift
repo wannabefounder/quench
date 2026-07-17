@@ -16,7 +16,8 @@ targets.append(.executableTarget(
     name: "QuenchApp",
     dependencies: ["QuenchEngine", .product(name: "GRDB", package: "GRDB.swift")],
     path: "QuenchApp",
-    exclude: ["Engine"]
+    exclude: ["Engine"],
+    resources: [.copy("Resources/coefficients.json")]
 ))
 products.append(.executable(name: "QuenchApp", targets: ["QuenchApp"]))
 #endif

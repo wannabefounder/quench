@@ -124,4 +124,16 @@ final class AppDatabase {
             try cursor.save(db)
         }
     }
+
+    func sourceEventSummary(source: String) throws -> (count: Int, lastEvent: Date?) {
+        try dbQueue.read { db in
+            let count = try Int.fetchOne(
+                db, sql: "SELECT COUNT(*) FROM usage_events WHERE source = ?", arguments: [source]
+            ) ?? 0
+            let lastTimestamp = try Int64.fetchOne(
+                db, sql: "SELECT MAX(ts) FROM usage_events WHERE source = ?", arguments: [source]
+            )
+            return (count, lastTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) })
+        }
+    }
 }

@@ -6,7 +6,7 @@ useful without guilt, scientifically honest without false precision, and private
 
 The research source of truth is [`Thirsty-AI-Project-Research-Report.docx`](Thirsty-AI-Project-Research-Report.docx).
 Read it before making product-level decisions. [`METHODOLOGY.md`](METHODOLOGY.md) is the calculation
-contract and [`coefficients.json`](coefficients.json) is the auditable data contract.
+contract and [`coefficients.json`](QuenchApp/Resources/coefficients.json) is the auditable data contract.
 
 ## Product principles
 
@@ -95,9 +95,9 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
 
 1. **M1 — complete:** menu-bar skeleton, race bar, SQLite water logging, local day rollover.
 2. **M2 — complete:** EcoLogits-faithful water engine, open coefficients, methodology, tests.
-3. **M3 — current:** Tier 3 Claude Code + Codex JSONL ingestion, cursors, rotation handling,
+3. **M3 — complete:** Tier 3 Claude Code + Codex JSONL ingestion, cursors, rotation handling,
    deduplication, source health, and tests.
-4. **M4:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
+4. **M4 — current:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
 5. **M5:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
 6. **M6:** Chrome/Safari companion extension and private local bridge.
 7. **M7:** streaks, restrained notifications, history, Wrapped cards, accessibility/localization.

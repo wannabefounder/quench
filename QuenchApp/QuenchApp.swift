@@ -19,6 +19,8 @@ struct QuenchApp: App {
 final class RaceStore: ObservableObject {
     @Published var userMl: Int = 0
     @Published var aiMl: Double = 0     // Standard-mode water from today's AI usage (0 until M3+ sources feed events)
+    @Published var sourceStatuses: [LocalSourceStatus] = []
+    @Published var isRefreshing = false
     let goalMl: Double = 2000
 
     private let coef: Coefficients = RaceStore.loadCoefficients()
@@ -37,7 +39,7 @@ final class RaceStore: ObservableObject {
 
     /// Load bundled coefficients.json; fall back to the built-in defaults if missing/corrupt.
     static func loadCoefficients() -> Coefficients {
-        if let url = Bundle.main.url(forResource: "coefficients", withExtension: "json"),
+        if let url = Bundle.module.url(forResource: "coefficients", withExtension: "json"),
            let data = try? Data(contentsOf: url),
            let c = try? Coefficients.load(from: data) {
             return c
@@ -46,17 +48,21 @@ final class RaceStore: ObservableObject {
     }
 
     func refresh() {
+        guard !isRefreshing else { return }
+        isRefreshing = true
         let database = AppDatabase.shared
         let ingestor = logIngestor
         let coefficients = coef
         DispatchQueue.global(qos: .utility).async { [weak self] in
-            ingestor.ingestAll()
+            let statuses = ingestor.ingestAll()
             let user = (try? database.todayUserMl()) ?? 0
             let samples = (try? database.todayUsageSamples()) ?? []
             let ai = RaceEngine.aiWaterMl(samples, coef: coefficients)
             DispatchQueue.main.async {
                 self?.userMl = user
                 self?.aiMl = ai
+                self?.sourceStatuses = statuses
+                self?.isRefreshing = false
             }
         }
     }

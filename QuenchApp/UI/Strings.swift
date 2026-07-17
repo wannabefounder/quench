@@ -10,6 +10,11 @@ enum Strings {
     static let userAhead = "You're ahead — nice."
     static let aiAhead = "Your AI is ahead. Sip something?"
     static let tied = "Neck and neck."
-    static let estimateNote = "AI number is a hardcoded placeholder (M1)."
+    static let estimateNote = "Estimated locally • no conversation content"
+    static let sources = "AI sources"
+    static let tracking = "Tracking"
+    static let watching = "Watching"
+    static let notFound = "Not found"
+    static let needsAttention = "Needs attention"
     static let quit = "Quit Quench"
 }

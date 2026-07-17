@@ -1,13 +1,13 @@
 import XCTest
 @testable import QuenchEngine
 
-/// Tests load the REAL coefficients.json from the repo root — these numbers are the contract.
+/// Tests load the REAL bundled coefficients.json — these numbers are the contract.
 final class WaterMathTests: XCTestCase {
 
     static let coef: Coefficients = {
         let testDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
         let root = testDir.deletingLastPathComponent()
-        let url = root.appendingPathComponent("coefficients.json")
+        let url = root.appendingPathComponent("QuenchApp/Resources/coefficients.json")
         let data = try! Data(contentsOf: url)
         return try! Coefficients.load(from: data)
     }()

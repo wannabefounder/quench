@@ -16,7 +16,7 @@ methodology, accessibility, translations, research citations, and data-source su
 ## Scientific changes
 
 Coefficient changes must cite a primary source where possible, explain scope and units, preserve
-the historical rationale in Git, and update tests against `coefficients.json`. Quench reports
+the historical rationale in Git, and update tests against the bundled `coefficients.json`. Quench reports
 estimates and ranges; do not imply direct measurement or collapse scope uncertainty into one number.
 
 ## Privacy and security

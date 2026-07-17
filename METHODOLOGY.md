@@ -6,7 +6,7 @@ is not directly observable, so we compute it the way the open-source
 convert that energy to water. We show a **range across three modes** rather than a single number,
 because the honest answer spans an order of magnitude depending on scope and location.
 
-All the numbers live in [`coefficients.json`](coefficients.json) — a versioned, human-readable
+All the numbers live in [`coefficients.json`](QuenchApp/Resources/coefficients.json) — a versioned, human-readable
 file. The app bundles a copy and refreshes it weekly from the public repo, so the estimates can
 be audited and improved by the community without shipping a new app build. That is what keeps the
 math dynamic instead of frozen.
