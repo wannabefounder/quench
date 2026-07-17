@@ -49,4 +49,24 @@ final class RaceEngineTests: XCTestCase {
         XCTAssertEqual(RaceEngine.winner(userMl: 100, aiMl: 2000), "ai")
         XCTAssertEqual(RaceEngine.winner(userMl: 0, aiMl: 0), "tie")
     }
+
+    func testUserWinStreakRequiresConsecutiveWins() {
+        let days = [
+            RaceDayResult(day: "2026-07-18", winner: "user"),
+            RaceDayResult(day: "2026-07-17", winner: "user"),
+            RaceDayResult(day: "2026-07-16", winner: "ai")
+        ]
+        XCTAssertEqual(RaceEngine.userWinStreak(days), 2)
+    }
+
+    func testUserWinStreakStopsAtMissingDayOrTie() {
+        XCTAssertEqual(RaceEngine.userWinStreak([
+            RaceDayResult(day: "2026-07-18", winner: "user"),
+            RaceDayResult(day: "2026-07-16", winner: "user")
+        ]), 1)
+        XCTAssertEqual(RaceEngine.userWinStreak([
+            RaceDayResult(day: "2026-07-18", winner: "tie"),
+            RaceDayResult(day: "2026-07-17", winner: "user")
+        ]), 0)
+    }
 }

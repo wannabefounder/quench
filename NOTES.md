@@ -9,7 +9,7 @@ OpenRouter generation metadata imports are supported by ID (no bulk history/cont
 local/API sources have independent race-inclusion controls.
 M6 DONE: Chromium MV3 + strict native bridge + event-driven browser receipt ingestion;
 count-only messages, canonical rewrite, owner-only inbox. Safari is out of scope by user decision.
-Live ChatGPT and no-refresh file-watcher paths validated. M7 current: daily history/streak foundation.
+Live ChatGPT and no-refresh paths validated. M7: daily history + gap-aware streak foundation shipped.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,

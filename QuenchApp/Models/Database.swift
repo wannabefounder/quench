@@ -111,6 +111,27 @@ final class AppDatabase {
         }
     }
 
+    // MARK: - Daily race history
+
+    func saveDailySummary(day: String, aiMlLow: Double, aiMlMid: Double, aiMlHigh: Double,
+                          userMl: Int, winner: String) throws {
+        try dbQueue.write { db in
+            let summary = DailySummary(day: day, aiMlLow: aiMlLow, aiMlMid: aiMlMid,
+                                       aiMlHigh: aiMlHigh, userMl: userMl, winner: winner)
+            try summary.save(db)
+        }
+    }
+
+    func recentDailySummaries(limit: Int = 14) throws -> [DailySummary] {
+        try dbQueue.read { db in
+            try DailySummary.fetchAll(
+                db,
+                sql: "SELECT * FROM daily_summary ORDER BY day DESC LIMIT ?",
+                arguments: [max(1, min(limit, 366))]
+            )
+        }
+    }
+
     // MARK: - Local usage ingestion
 
     func sourceCursor(path: String) throws -> SourceCursor? {

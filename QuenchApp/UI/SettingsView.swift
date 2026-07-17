@@ -11,10 +11,69 @@ struct SettingsView: View {
                 .tabItem { Label("Estimation", systemImage: "slider.horizontal.3") }
             ProviderSettingsView(model: credentials)
                 .tabItem { Label("Providers", systemImage: "key.fill") }
+            HistorySettingsView(store: store)
+                .tabItem { Label("History", systemImage: "calendar") }
             DiagnosticsView(store: store)
                 .tabItem { Label("Diagnostics", systemImage: "stethoscope") }
         }
         .frame(width: 540, height: 460)
+    }
+}
+
+private struct HistorySettingsView: View {
+    @ObservedObject var store: RaceStore
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Daily race history").font(.headline)
+                        Text("Standard-mode estimates keep winners comparable across days.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Label("\(store.userWinStreak) day streak", systemImage: "flame.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(store.userWinStreak > 0 ? .orange : .secondary)
+                }
+
+                if store.recentHistory.isEmpty {
+                    ContentUnavailableView(
+                        "No race history yet", systemImage: "calendar.badge.clock",
+                        description: Text("Quench will save a private daily summary on this Mac.")
+                    )
+                } else {
+                    ForEach(store.recentHistory) { item in
+                        GroupBox {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(item.day).font(.callout.weight(.semibold))
+                                    Text("You \(item.userMl) mL • AI \(Int(item.aiMl)) mL")
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Label(winnerLabel(item.winner), systemImage: winnerIcon(item.winner))
+                                    .font(.caption.weight(.medium))
+                                    .foregroundStyle(winnerColor(item.winner))
+                            }
+                            .padding(3)
+                        }
+                    }
+                }
+            }
+            .padding(20)
+        }
+    }
+
+    private func winnerLabel(_ winner: String) -> String {
+        switch winner { case "user": "You won"; case "ai": "AI won"; default: "Tie" }
+    }
+    private func winnerIcon(_ winner: String) -> String {
+        switch winner { case "user": "checkmark.circle.fill"; case "ai": "cpu"; default: "equal.circle" }
+    }
+    private func winnerColor(_ winner: String) -> Color {
+        switch winner { case "user": .blue; case "ai": .orange; default: .secondary }
     }
 }
 

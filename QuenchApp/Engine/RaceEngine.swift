@@ -5,6 +5,16 @@ public enum RaceState: String, Equatable {
     case userAhead, aiAhead, tied
 }
 
+public struct RaceDayResult: Equatable {
+    public let day: String
+    public let winner: String
+
+    public init(day: String, winner: String) {
+        self.day = day
+        self.winner = winner
+    }
+}
+
 public enum RaceEngine {
 
     /// 'YYYY-MM-DD' key in the user's local calendar. Day boundary = local midnight.
@@ -49,5 +59,30 @@ public enum RaceEngine {
         case .aiAhead: return "ai"
         case .tied: return "tie"
         }
+    }
+
+    /// Consecutive calendar days, newest first, on which the user won. A tie, AI win, malformed
+    /// date, or missing day ends the streak; this prevents sparse history from inflating it.
+    public static func userWinStreak(_ daysNewestFirst: [RaceDayResult],
+                                     calendar: Calendar = .current) -> Int {
+        var streak = 0
+        var previousDate: Date?
+        for result in daysNewestFirst {
+            guard result.winner == "user", let date = date(fromDayKey: result.day, calendar: calendar)
+            else { break }
+            if let previousDate {
+                guard let expected = calendar.date(byAdding: .day, value: -1, to: previousDate),
+                      calendar.isDate(date, inSameDayAs: expected) else { break }
+            }
+            streak += 1
+            previousDate = date
+        }
+        return streak
+    }
+
+    private static func date(fromDayKey key: String, calendar: Calendar) -> Date? {
+        let parts = key.split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 3 else { return nil }
+        return calendar.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2]))
     }
 }

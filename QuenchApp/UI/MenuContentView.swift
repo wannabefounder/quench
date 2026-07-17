@@ -38,6 +38,13 @@ struct MenuContentView: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
 
+            if store.userWinStreak > 0 {
+                Label("\(store.userWinStreak)-day hydration streak", systemImage: "flame.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.orange)
+                    .accessibilityLabel("Hydration win streak: \(store.userWinStreak) days")
+            }
+
             Button(action: { store.logWater(ml: 250) }) {
                 Label(Strings.logGlass, systemImage: "drop.fill")
                     .frame(maxWidth: .infinity)

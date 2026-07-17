@@ -24,6 +24,10 @@ rewriting prevents unexpected page fields from reaching disk. ChatGPT and Claude
 versioned CI fixtures, and new receipts are ingested while Quench is running without polling or a
 manual refresh. Safari is intentionally out of scope.
 
+M7 has started with private daily race summaries, a gap-aware hydration win streak, and a History
+tab. Historical winners use the Standard water scope so changing the currently displayed scope does
+not make consecutive days incomparable.
+
 ## Build & run (macOS 14+)
 
 ```sh

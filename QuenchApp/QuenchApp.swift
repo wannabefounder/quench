@@ -24,11 +24,21 @@ struct RegionOption: Identifiable, Equatable {
     let label: String
 }
 
+struct DailyRaceHistoryItem: Identifiable, Equatable {
+    let day: String
+    let userMl: Int
+    let aiMl: Double
+    let winner: String
+    var id: String { day }
+}
+
 private struct RefreshPayload: @unchecked Sendable {
     let userMl: Int
     let aiMl: Double
     let sourceStatuses: [LocalSourceStatus]
     let providerStatuses: [ProviderSyncStatus]
+    let streak: Int
+    let history: [DailyRaceHistoryItem]
 }
 
 /// Observable state for the daily race. AI water is computed by WaterMath from today's usage events.
@@ -39,6 +49,8 @@ final class RaceStore: ObservableObject {
     @Published var sourceStatuses: [LocalSourceStatus] = []
     @Published var providerSyncStatuses: [ProviderSyncStatus] = []
     @Published var isRefreshing = false
+    @Published var userWinStreak = 0
+    @Published var recentHistory: [DailyRaceHistoryItem] = []
     @Published var waterMode: WaterMode {
         didSet {
             UserDefaults.standard.set(waterMode.rawValue, forKey: "waterMode")
@@ -173,16 +185,38 @@ final class RaceStore: ObservableObject {
                 )
                 let user = (try? database.todayUserMl()) ?? 0
                 let samples = (try? database.todayUsageSamples(includedSources: sourcesCountedInRace)) ?? []
+                let low = RaceEngine.aiWaterMl(samples, mode: .conservative,
+                                               region: selectedRegion, coef: coefficients)
+                let standard = RaceEngine.aiWaterMl(samples, mode: .standard,
+                                                    region: selectedRegion, coef: coefficients)
+                let high = RaceEngine.aiWaterMl(samples, mode: .full,
+                                                region: selectedRegion, coef: coefficients)
                 let ai = RaceEngine.aiWaterMl(samples, mode: selectedMode,
                                               region: selectedRegion, coef: coefficients)
+                let day = RaceEngine.dayKey(for: Date())
+                try? database.saveDailySummary(
+                    day: day, aiMlLow: low, aiMlMid: standard, aiMlHigh: high,
+                    userMl: user, winner: RaceEngine.winner(userMl: Double(user), aiMl: standard)
+                )
+                let summaries = (try? database.recentDailySummaries()) ?? []
+                let streak = RaceEngine.userWinStreak(summaries.map {
+                    RaceDayResult(day: $0.day, winner: $0.winner ?? "tie")
+                })
+                let history = summaries.map {
+                    DailyRaceHistoryItem(day: $0.day, userMl: $0.userMl ?? 0,
+                                         aiMl: $0.aiMlMid ?? 0, winner: $0.winner ?? "tie")
+                }
                 return RefreshPayload(userMl: user, aiMl: ai, sourceStatuses: statuses,
-                                      providerStatuses: providerStatuses)
+                                      providerStatuses: providerStatuses, streak: streak,
+                                      history: history)
             }.value
             guard let self else { return }
             userMl = payload.userMl
             aiMl = payload.aiMl
             sourceStatuses = payload.sourceStatuses
             providerSyncStatuses = payload.providerStatuses
+            userWinStreak = payload.streak
+            recentHistory = payload.history
             isRefreshing = false
             if needsRefresh {
                 needsRefresh = false
