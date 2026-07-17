@@ -1,6 +1,10 @@
 import Foundation
 import QuenchEngine
 
+extension Notification.Name {
+    static let providerCredentialsChanged = Notification.Name("providerCredentialsChanged")
+}
+
 enum ProviderCredentialState: Equatable {
     case disconnected
     case saved
@@ -46,6 +50,7 @@ final class ProviderCredentialsModel: ObservableObject {
                 let start = Calendar.current.startOfDay(for: Date())
                 let page = try await connector.fetchPage(startingAt: start, page: nil)
                 states[provider] = .verified(eventCount: page.events.count)
+                NotificationCenter.default.post(name: .providerCredentialsChanged, object: nil)
             } catch {
                 states[provider] = .failed(error.localizedDescription)
             }
@@ -56,6 +61,7 @@ final class ProviderCredentialsModel: ObservableObject {
         do {
             try store.delete(for: provider)
             states[provider] = .disconnected
+            NotificationCenter.default.post(name: .providerCredentialsChanged, object: nil)
         } catch {
             states[provider] = .failed(error.localizedDescription)
         }

@@ -55,6 +55,23 @@ struct SourceCursor: Codable, FetchableRecord, PersistableRecord {
     }
 }
 
+struct ProviderSyncRecord: Codable, FetchableRecord, PersistableRecord {
+    static let databaseTableName = "provider_sync_state"
+    var provider: String
+    var lastAttemptTs: Int64?
+    var lastSuccessTs: Int64?
+    var lastError: String?
+    var importedEvents: Int
+
+    enum CodingKeys: String, CodingKey {
+        case provider
+        case lastAttemptTs = "last_attempt_ts"
+        case lastSuccessTs = "last_success_ts"
+        case lastError = "last_error"
+        case importedEvents = "imported_events"
+    }
+}
+
 struct DailySummary: Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "daily_summary"
     var day: String

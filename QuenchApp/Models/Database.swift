@@ -62,6 +62,15 @@ final class AppDatabase {
                 table.column("cumulative_output_tokens", .integer).notNull().defaults(to: 0)
             }
         }
+        m.registerMigration("v3-provider-sync") { db in
+            try db.create(table: "provider_sync_state") { table in
+                table.column("provider", .text).primaryKey()
+                table.column("last_attempt_ts", .integer)
+                table.column("last_success_ts", .integer)
+                table.column("last_error", .text)
+                table.column("imported_events", .integer).notNull().defaults(to: 0)
+            }
+        }
         return m
     }
 
@@ -134,6 +143,52 @@ final class AppDatabase {
                 db, sql: "SELECT MAX(ts) FROM usage_events WHERE source = ?", arguments: [source]
             )
             return (count, lastTimestamp.map { Date(timeIntervalSince1970: TimeInterval($0)) })
+        }
+    }
+
+    // MARK: - Provider usage sync
+
+    func providerSyncRecord(_ provider: UsageProvider) throws -> ProviderSyncRecord? {
+        try dbQueue.read { db in try ProviderSyncRecord.fetchOne(db, key: provider.rawValue) }
+    }
+
+    func commitProviderSync(provider: UsageProvider, events: [NormalizedUsageEvent], at date: Date) throws {
+        try dbQueue.write { db in
+            for event in events {
+                try db.execute(sql: """
+                    INSERT INTO usage_events
+                      (ts, source, model, input_tokens, output_tokens, accuracy_tier, external_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(external_id) DO UPDATE SET
+                      ts = excluded.ts,
+                      source = excluded.source,
+                      model = excluded.model,
+                      input_tokens = excluded.input_tokens,
+                      output_tokens = excluded.output_tokens,
+                      accuracy_tier = excluded.accuracy_tier
+                    """, arguments: [
+                        Int64(event.timestamp.timeIntervalSince1970), event.source, event.model,
+                        event.inputTokens, event.outputTokens, event.accuracyTier, event.externalID
+                    ])
+            }
+            let timestamp = Int64(date.timeIntervalSince1970)
+            let record = ProviderSyncRecord(provider: provider.rawValue,
+                                            lastAttemptTs: timestamp,
+                                            lastSuccessTs: timestamp,
+                                            lastError: nil,
+                                            importedEvents: events.count)
+            try record.save(db)
+        }
+    }
+
+    func recordProviderSyncFailure(provider: UsageProvider, message: String, at date: Date) throws {
+        try dbQueue.write { db in
+            var record = try ProviderSyncRecord.fetchOne(db, key: provider.rawValue)
+                ?? ProviderSyncRecord(provider: provider.rawValue, lastAttemptTs: nil,
+                                      lastSuccessTs: nil, lastError: nil, importedEvents: 0)
+            record.lastAttemptTs = Int64(date.timeIntervalSince1970)
+            record.lastError = message
+            try record.save(db)
         }
     }
 }

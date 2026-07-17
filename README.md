@@ -10,7 +10,8 @@ make every estimate's assumptions and collection state visible.
 
 Optional OpenAI and Anthropic organization connectors now have Keychain-only Admin credential
 storage, documented metadata-only verification, pagination-aware clients, and tested response
-normalization. Automatic scheduled import is the next M5 increment.
+normalization. Connected providers sync automatically at most every 15 minutes; manual diagnostics
+refresh can force a sync, and changing provider buckets are updated without double-counting.
 
 ## Build & run (macOS 14+)
 

@@ -22,6 +22,10 @@ Provider Admin API credentials are stored in macOS Keychain with device-only, un
 accessibility. They never enter Quench's SQLite database, UserDefaults, diagnostic logs, or
 telemetry, and Quench never reloads a saved key into a visible text field.
 
+When a provider is connected, Quench requests organization token totals grouped by model from that
+provider. The request includes a time range and pagination cursor when needed. It does not include
+prompts, responses, local paths, hydration data, or identifiers sent to a Quench-operated server.
+
 ## Diagnostics and analytics
 
 Quench has no hidden analytics or advertising SDK. Any future diagnostic sharing must be explicit,

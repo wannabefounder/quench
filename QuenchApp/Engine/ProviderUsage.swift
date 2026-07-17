@@ -15,16 +15,48 @@ public struct ProviderUsagePage: Equatable {
     }
 }
 
+public enum ProviderPaginationError: LocalizedError, Equatable {
+    case repeatedCursor
+    case pageLimit
+
+    public var errorDescription: String? {
+        switch self {
+        case .repeatedCursor: "The provider returned a repeated pagination cursor."
+        case .pageLimit: "The provider response exceeded Quench's safe pagination limit."
+        }
+    }
+}
+
+public struct ProviderPaginationGuard {
+    private let maxPages: Int
+    private var pageCount = 0
+    private var seenCursors = Set<String>()
+
+    public init(maxPages: Int) {
+        self.maxPages = max(1, maxPages)
+    }
+
+    public mutating func accept(nextPage: String?) throws {
+        pageCount += 1
+        if let nextPage, !seenCursors.insert(nextPage).inserted {
+            throw ProviderPaginationError.repeatedCursor
+        }
+        if pageCount >= maxPages, nextPage != nil {
+            throw ProviderPaginationError.pageLimit
+        }
+    }
+}
+
 public enum ProviderUsageParser {
     public static func openAI(_ data: Data) throws -> ProviderUsagePage {
         let response = try JSONDecoder().decode(OpenAIResponse.self, from: data)
         var events: [NormalizedUsageEvent] = []
         for bucket in response.data {
-            for (index, result) in bucket.results.enumerated() {
+            for result in bucket.results {
                 guard result.inputTokens > 0 || result.outputTokens > 0 else { continue }
                 let model = result.model ?? "unknown-openai-model"
                 events.append(NormalizedUsageEvent(
-                    externalID: "openai:\(bucket.startTime):\(bucket.endTime):\(model):\(index)",
+                    externalID: "openai:\(bucket.startTime):\(bucket.endTime):\(model)",
                     timestamp: Date(timeIntervalSince1970: TimeInterval(bucket.startTime)),
                     source: "openai-api",
                     model: result.model,
@@ -43,14 +75,14 @@ public enum ProviderUsageParser {
         var events: [NormalizedUsageEvent] = []
         for bucket in response.data {
             guard let timestamp = parseDate(bucket.startingAt) else { continue }
-            for (index, result) in bucket.results.enumerated() {
+            for result in bucket.results {
                 let cacheCreation = (result.cacheCreation?.ephemeral1hInputTokens ?? 0)
                     + (result.cacheCreation?.ephemeral5mInputTokens ?? 0)
                 let input = result.uncachedInputTokens + result.cacheReadInputTokens + cacheCreation
                 guard input > 0 || result.outputTokens > 0 else { continue }
                 let model = result.model ?? "unknown-anthropic-model"
                 events.append(NormalizedUsageEvent(
-                    externalID: "anthropic:\(bucket.startingAt):\(bucket.endingAt):\(model):\(index)",
+                    externalID: "anthropic:\(bucket.startingAt):\(bucket.endingAt):\(model)",
                     timestamp: timestamp,
                     source: "anthropic-api",
                     model: result.model,

@@ -20,6 +20,15 @@ final class ProviderUsageTests: XCTestCase {
         XCTAssertNil(try ProviderUsageParser.openAI(data).nextPage)
     }
 
+    func testChangingProviderBucketKeepsStableExternalIDForUpsert() throws {
+        let first = Data(#"{"data":[{"start_time":1763452800,"end_time":1763456400,"results":[{"input_tokens":100,"output_tokens":20,"model":"gpt-5"}]}],"has_more":false,"next_page":null}"#.utf8)
+        let updated = Data(#"{"data":[{"start_time":1763452800,"end_time":1763456400,"results":[{"input_tokens":180,"output_tokens":45,"model":"gpt-5"}]}],"has_more":false,"next_page":null}"#.utf8)
+        let a = try ProviderUsageParser.openAI(first).events[0]
+        let b = try ProviderUsageParser.openAI(updated).events[0]
+        XCTAssertEqual(a.externalID, b.externalID)
+        XCTAssertNotEqual(a.inputTokens, b.inputTokens)
+    }
+
     func testAnthropicIncludesEveryInputTokenClass() throws {
         let data = Data(#"{"data":[{"starting_at":"2026-07-18T00:00:00Z","ending_at":"2026-07-18T01:00:00Z","results":[{"uncached_input_tokens":1500,"cache_creation":{"ephemeral_1h_input_tokens":1000,"ephemeral_5m_input_tokens":500},"cache_read_input_tokens":200,"output_tokens":500,"model":"claude-sonnet-4"}]}],"has_more":false,"next_page":null}"#.utf8)
         let page = try ProviderUsageParser.anthropic(data)
@@ -35,5 +44,21 @@ final class ProviderUsageTests: XCTestCase {
     func testMalformedProviderResponsesThrow() {
         XCTAssertThrowsError(try ProviderUsageParser.openAI(Data("{}".utf8)))
         XCTAssertThrowsError(try ProviderUsageParser.anthropic(Data("not-json".utf8)))
+    }
+
+    func testPaginationRejectsRepeatedCursor() throws {
+        var guardrail = ProviderPaginationGuard(maxPages: 10)
+        try guardrail.accept(nextPage: "page_2")
+        XCTAssertThrowsError(try guardrail.accept(nextPage: "page_2")) { error in
+            XCTAssertEqual(error as? ProviderPaginationError, .repeatedCursor)
+        }
+    }
+
+    func testPaginationStopsAtConfiguredLimit() throws {
+        var guardrail = ProviderPaginationGuard(maxPages: 2)
+        try guardrail.accept(nextPage: "page_2")
+        XCTAssertThrowsError(try guardrail.accept(nextPage: "page_3")) { error in
+            XCTAssertEqual(error as? ProviderPaginationError, .pageLimit)
+        }
     }
 }

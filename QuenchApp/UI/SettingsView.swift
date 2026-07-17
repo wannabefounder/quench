@@ -51,6 +51,10 @@ private struct ProviderSettingsView: View {
                       systemImage: "lock.shield")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Label("If the same API traffic is also present in a local tool log, disable one overlapping source to avoid double-counting.",
+                      systemImage: "exclamationmark.triangle")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             .padding(20)
         }
@@ -187,6 +191,7 @@ private struct DiagnosticsView: View {
     @ObservedObject var store: RaceStore
 
     var body: some View {
+        ScrollView {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
@@ -197,7 +202,7 @@ private struct DiagnosticsView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Button(action: store.refresh) {
+                Button(action: { store.refresh(forceProviderSync: true) }) {
                     if store.isRefreshing {
                         ProgressView().controlSize(.small)
                     } else {
@@ -216,7 +221,12 @@ private struct DiagnosticsView: View {
                 }
             }
 
-            Spacer()
+            Text("Provider sync")
+                .font(.headline)
+            ForEach(store.providerSyncStatuses) { status in
+                ProviderSyncCard(status: status)
+            }
+
             Divider()
             HStack {
                 Label("Methodology \(store.coefficientsVersion)", systemImage: "function")
@@ -227,6 +237,57 @@ private struct DiagnosticsView: View {
             .foregroundStyle(.secondary)
         }
         .padding(20)
+        }
+    }
+}
+
+private struct ProviderSyncCard: View {
+    let status: ProviderSyncStatus
+
+    var body: some View {
+        GroupBox {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .foregroundStyle(color)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(providerName).font(.caption.weight(.semibold))
+                    Text(detail).font(.caption2).foregroundStyle(.secondary)
+                }
+                Spacer()
+                if let success = status.lastSuccess {
+                    VStack(alignment: .trailing, spacing: 1) {
+                        Text("Last synced").font(.caption2).foregroundStyle(.secondary)
+                        Text(success, style: .relative).font(.caption.weight(.medium))
+                    }
+                }
+            }
+            .padding(4)
+        }
+    }
+
+    private var providerName: String {
+        status.provider == .openAI ? "OpenAI" : "Anthropic"
+    }
+    private var detail: String {
+        switch status.state {
+        case .notConfigured: "Not configured • add an Admin key in Providers"
+        case .synced: "\(status.importedEvents) model buckets imported"
+        case .failed: status.message ?? "Sync failed"
+        }
+    }
+    private var icon: String {
+        switch status.state {
+        case .notConfigured: "minus.circle"
+        case .synced: "checkmark.circle.fill"
+        case .failed: "exclamationmark.triangle.fill"
+        }
+    }
+    private var color: Color {
+        switch status.state {
+        case .notConfigured: .secondary
+        case .synced: .green
+        case .failed: .orange
+        }
     }
 }
 

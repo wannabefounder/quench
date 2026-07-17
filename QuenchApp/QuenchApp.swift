@@ -24,11 +24,20 @@ struct RegionOption: Identifiable, Equatable {
     let label: String
 }
 
+private struct RefreshPayload: @unchecked Sendable {
+    let userMl: Int
+    let aiMl: Double
+    let sourceStatuses: [LocalSourceStatus]
+    let providerStatuses: [ProviderSyncStatus]
+}
+
 /// Observable state for the daily race. AI water is computed by WaterMath from today's usage events.
+@MainActor
 final class RaceStore: ObservableObject {
     @Published var userMl: Int = 0
     @Published var aiMl: Double = 0     // Standard-mode water from today's AI usage (0 until M3+ sources feed events)
     @Published var sourceStatuses: [LocalSourceStatus] = []
+    @Published var providerSyncStatuses: [ProviderSyncStatus] = []
     @Published var isRefreshing = false
     @Published var waterMode: WaterMode {
         didSet {
@@ -63,9 +72,11 @@ final class RaceStore: ObservableObject {
 
     private let coef: Coefficients
     private let logIngestor = LocalLogIngestor()
+    private let providerSync = ProviderSyncService()
     private var currentDay: String
     private var timer: Timer?
     private var needsRefresh = false
+    private var credentialObserver: NSObjectProtocol?
 
     var regionOptions: [RegionOption] {
         coef.water.regions.map { key, value in
@@ -95,10 +106,15 @@ final class RaceStore: ObservableObject {
         claudeCodeEnabled = UserDefaults.standard.object(forKey: "claudeCodeEnabled") as? Bool ?? true
         codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
         currentDay = RaceEngine.dayKey(for: Date())
+        credentialObserver = NotificationCenter.default.addObserver(
+            forName: .providerCredentialsChanged, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.refresh(forceProviderSync: true) }
+        }
         refresh()
         // Day rollover check: once a minute, reset when local midnight passes.
         timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            self?.checkRollover()
+            Task { @MainActor in self?.checkRollover() }
         }
     }
 
@@ -112,7 +128,7 @@ final class RaceStore: ObservableObject {
         return .fallback
     }
 
-    func refresh() {
+    func refresh(forceProviderSync: Bool = false) {
         guard !isRefreshing else {
             needsRefresh = true
             return
@@ -120,27 +136,36 @@ final class RaceStore: ObservableObject {
         isRefreshing = true
         let database = AppDatabase.shared
         let ingestor = logIngestor
+        let providerSynchronizer = providerSync
         let coefficients = coef
         let selectedMode = waterMode
         let selectedRegion = region
         var enabledSources = Set<String>()
         if claudeCodeEnabled { enabledSources.insert("claude-code") }
         if codexEnabled { enabledSources.insert("codex") }
-        DispatchQueue.global(qos: .utility).async { [weak self] in
-            let statuses = ingestor.ingestAll(enabledSources: enabledSources)
-            let user = (try? database.todayUserMl()) ?? 0
-            let samples = (try? database.todayUsageSamples()) ?? []
-            let ai = RaceEngine.aiWaterMl(samples, mode: selectedMode,
-                                          region: selectedRegion, coef: coefficients)
-            DispatchQueue.main.async {
-                self?.userMl = user
-                self?.aiMl = ai
-                self?.sourceStatuses = statuses
-                self?.isRefreshing = false
-                if self?.needsRefresh == true {
-                    self?.needsRefresh = false
-                    self?.refresh()
-                }
+        let startOfDay = Calendar.current.startOfDay(for: Date())
+        Task { [weak self] in
+            let payload = await Task.detached(priority: .utility) {
+                let statuses = ingestor.ingestAll(enabledSources: enabledSources)
+                let providerStatuses = await providerSynchronizer.syncAll(
+                    startingAt: startOfDay, force: forceProviderSync
+                )
+                let user = (try? database.todayUserMl()) ?? 0
+                let samples = (try? database.todayUsageSamples()) ?? []
+                let ai = RaceEngine.aiWaterMl(samples, mode: selectedMode,
+                                              region: selectedRegion, coef: coefficients)
+                return RefreshPayload(userMl: user, aiMl: ai, sourceStatuses: statuses,
+                                      providerStatuses: providerStatuses)
+            }.value
+            guard let self else { return }
+            userMl = payload.userMl
+            aiMl = payload.aiMl
+            sourceStatuses = payload.sourceStatuses
+            providerSyncStatuses = payload.providerStatuses
+            isRefreshing = false
+            if needsRefresh {
+                needsRefresh = false
+                refresh()
             }
         }
     }
