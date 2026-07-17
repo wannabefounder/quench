@@ -37,6 +37,12 @@ public enum RaceEngine {
         return min(max(aiMl / scale, 0), 1)
     }
 
+    /// Today's AI water (mL) from the day's usage events. Standard mode by default (Section 7).
+    public static func aiWaterMl(_ samples: [UsageSample], mode: WaterMode = .standard,
+                                 region: String? = nil, coef: Coefficients) -> Double {
+        WaterMath.totalWaterMl(samples, mode: mode, region: region, coef: coef)
+    }
+
     public static func winner(userMl: Double, aiMl: Double) -> String {
         switch state(userMl: userMl, aiMl: aiMl) {
         case .userAhead: return "user"

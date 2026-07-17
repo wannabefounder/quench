@@ -1,0 +1,64 @@
+{
+  "version": "2026.07",
+  "methodology": "METHODOLOGY.md",
+  "sources_note": "Water math mirrors the EcoLogits methodology (ecologits.ai): energy is estimated per model, then converted to water with WCF = E_server x [WUE_onsite + PUE x WUE_offsite] (Li et al. 2025). Per-model energy is calibrated to the 'How Hungry is AI?' benchmark of 30 models (arXiv:2505.09598), cross-checked against Altman 2025 (0.34 Wh/query), Google Gemini 2025 (0.24 Wh / 0.26 mL), UC Riverside (arXiv:2304.03271), and Epoch AI. Every number is an estimate; the three modes are the honest range, not a single truth.",
+
+  "energy": {
+    "_note": "Facility-level energy in Wh (PUE already included). Per request: fixed_wh + (input_tokens/1000)*input + (output_tokens/1000)*output. Calibrated so a short GPT-4o query (100 in / 300 out) ~= 0.34 Wh and a long one (10k in / 1.5k out) ~= 1.8 Wh, matching the benchmark.",
+    "wh_per_1k_tokens": {
+      "default":          { "fixed_wh": 0.08, "input": 0.05, "output": 0.90 },
+      "gpt-4o":           { "fixed_wh": 0.08, "input": 0.05, "output": 0.85 },
+      "gpt-4o-mini":      { "fixed_wh": 0.05, "input": 0.02, "output": 0.22 },
+      "gpt-4.1-nano":     { "fixed_wh": 0.03, "input": 0.01, "output": 0.12 },
+      "gpt-5":            { "fixed_wh": 0.10, "input": 0.06, "output": 1.10 },
+      "o3":               { "fixed_wh": 0.30, "input": 0.10, "output": 26.0 },
+      "claude-sonnet":    { "fixed_wh": 0.10, "input": 0.05, "output": 3.50 },
+      "claude-opus":      { "fixed_wh": 0.15, "input": 0.08, "output": 6.00 },
+      "claude-haiku":     { "fixed_wh": 0.04, "input": 0.02, "output": 0.50 },
+      "gemini":           { "fixed_wh": 0.05, "input": 0.03, "output": 0.60 },
+      "deepseek-r1":      { "fixed_wh": 0.30, "input": 0.10, "output": 22.0 },
+      "llama-405b":       { "fixed_wh": 0.15, "input": 0.08, "output": 13.6 },
+      "small-open-model": { "fixed_wh": 0.02, "input": 0.01, "output": 0.10 }
+    },
+    "param_fallback": {
+      "_note": "EcoLogits GPU energy model for models NOT in the table above: f_E(P,B) = alpha * e^(beta*B) * P_active + gamma, Wh per output token, B = batch size. Multiply by system_overhead to reach facility energy, then *1000 for Wh/1k. P_active in billions of ACTIVE parameters (dense: total; MoE: total / active experts).",
+      "alpha": 1.17e-6,
+      "beta": -1.12e-2,
+      "gamma": 4.05e-5,
+      "batch": 64,
+      "system_overhead": 12.0,
+      "model_active_params_b": {
+        "gpt-4o": 50, "claude-sonnet": 70, "claude-opus": 200,
+        "llama-405b": 405, "deepseek-r1": 37, "gemini": 40
+      }
+    }
+  },
+
+  "water": {
+    "_note": "WCF per mode. E in kWh; factors are L/kWh (== mL/Wh). conservative = on-site cooling only (Scope 1, what companies report ~10-15% of total). standard = + electricity-generation water (Scope 2, ~70-85%). full = + embodied/lifecycle share (Scope 3).",
+    "default_provider": "default",
+    "default_region": "global",
+    "default_mode": "standard",
+    "embodied_fraction": 0.12,
+    "providers": {
+      "default":   { "wue_onsite": 0.40, "pue": 1.20 },
+      "openai":    { "wue_onsite": 0.30, "pue": 1.20 },
+      "anthropic": { "wue_onsite": 0.55, "pue": 1.12 },
+      "google":    { "wue_onsite": 0.99, "pue": 1.10 },
+      "deepseek":  { "wue_onsite": 1.20, "pue": 1.25 },
+      "meta":      { "wue_onsite": 0.30, "pue": 1.10 }
+    },
+    "regions": {
+      "global":  { "wue_offsite": 3.00, "label": "Global average" },
+      "us_avg":  { "wue_offsite": 3.14, "label": "US average grid" },
+      "us_west": { "wue_offsite": 5.00, "label": "US West (arid)" },
+      "india":   { "wue_offsite": 5.50, "label": "India (water-stressed grid)" },
+      "china":   { "wue_offsite": 6.02, "label": "China grid" },
+      "eu":      { "wue_offsite": 1.50, "label": "EU average grid" },
+      "nordics": { "wue_offsite": 0.60, "label": "Nordics (hydro/low-water)" }
+    }
+  },
+
+  "message_fallback": { "avg_input_tokens": 300, "avg_output_tokens": 350 },
+  "minutes_fallback": { "messages_per_minute": 0.8 }
+}

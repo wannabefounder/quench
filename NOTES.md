@@ -1,25 +1,26 @@
 # NOTES (agent scratchpad, ≤40 lines)
 
-Current milestone: M1 DONE (Linux-verifiable parts green; needs one human check on a Mac).
-Next: M2 — coefficients.json + WaterMath + RaceEngine expansion + ≥12 unit tests.
+Current milestone: M2 DONE (engine + tests green on Linux). Next: M3 — Tier 3 log parsing
+(Claude Code + Codex JSONL watchers, dedupe, byte offsets).
 
-Build env: sandbox is Linux/aarch64. Swift 5.10.1 toolchain at
-/sessions/inspiring-peaceful-bell/toolchain/swift-5.10.1-RELEASE-ubuntu22.04-aarch64/usr/bin
-Build cmd: swift build --scratch-path /sessions/inspiring-peaceful-bell/build (mnt fs can't host .build)
-Package.swift conditionally includes GRDB + QuenchApp target only when evaluated on macOS,
-so Linux builds/tests QuenchEngine only. Full app build happens on the user's Mac.
+Build env: sandbox is Linux/aarch64, Swift 5.10.1. Toolchain must be re-downloaded per session:
+  https://download.swift.org/swift-5.10.1-release/ubuntu2204-aarch64/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04-aarch64.tar.gz
+The mnt fs blocks build writes, so: copy repo to /sessions/<id>/qbuild, run swift build / swift test there.
+Package.swift builds QuenchEngine (pure) everywhere; app+GRDB only on macOS. Full app build = user's Mac.
 
 ## Files
-- Package.swift — conditional manifest (engine everywhere, app+GRDB on macOS)
-- QuenchApp/QuenchApp.swift — @main MenuBarExtra + RaceStore (60s rollover timer)
-- QuenchApp/Engine/RaceEngine.swift — pure: dayKey, race state (10% tie band), bar fractions
-- QuenchApp/Models/Records.swift — WaterEntry/UsageEvent/DailySummary GRDB records
-- QuenchApp/Models/Database.swift — DB at ~/Library/Application Support/Quench/, v1 migration, logWater, todayUserMl
-- QuenchApp/UI/Strings.swift — all user-visible strings
-- QuenchApp/UI/RaceBarView.swift — blue fill + orange AI marker
-- QuenchApp/UI/MenuContentView.swift — totals, bar, +250 ml button, quit
-- QuenchTests/RaceEngineTests.swift — 6 tests (day key, rollover, DST, states, fractions)
+- coefficients.json — FULL EcoLogits-style data: per-model energy (facility Wh), param fallback,
+  per-provider WUE/PUE, per-region grid water, 3 modes. Calibrated to arXiv:2505.09598.
+- METHODOLOGY.md — water-math write-up (sources cited). CLAUDE.md — records Section 6 override.
+- QuenchApp/Engine/WaterMath.swift — PURE: UsageSample, WaterMode, Coefficients(Decodable),
+  energyWh, waterMl, waterRange, totalWaterMl, model/provider mapping, EcoLogits param formula.
+- QuenchApp/Engine/RaceEngine.swift — race state + aiWaterMl() wrapper.
+- QuenchApp/Models/Database.swift — added todayUsageSamples() (usage_events -> [UsageSample]).
+- QuenchApp/QuenchApp.swift — RaceStore loads coefficients + computes aiMl via WaterMath.
+- QuenchTests/WaterMathTests.swift — 20 tests vs real JSON. RaceEngineTests.swift — 6 tests.
 
-## TODO
-- M1 manual check on Mac: launch, icon, log updates bar, survives restart (user to confirm)
-- M1 AI side hardcoded at 800 ml — replaced in M2
+## TODO / open
+- coefficients.json must be added as a bundle resource in the Xcode app target (fallback exists if missing).
+- M1 manual check on Mac still pending (launch/icon/log/restart).
+- M2 Mac check: debug pane showing computed mL for a sample event (engine verified on Linux).
+- gpt-4o-mini output coef set below gpt-4o by size-prior (benchmark's mini figure looked anomalous).

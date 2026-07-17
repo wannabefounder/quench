@@ -15,12 +15,13 @@ struct QuenchApp: App {
     }
 }
 
-/// Observable state for the daily race. M1: AI side is hardcoded.
+/// Observable state for the daily race. AI water is computed by WaterMath from today's usage events.
 final class RaceStore: ObservableObject {
     @Published var userMl: Int = 0
-    let aiMl: Double = 800          // M1 placeholder; WaterMath takes over in M2
+    @Published var aiMl: Double = 0     // Standard-mode water from today's AI usage (0 until M3+ sources feed events)
     let goalMl: Double = 2000
 
+    private let coef: Coefficients = RaceStore.loadCoefficients()
     private var currentDay: String
     private var timer: Timer?
 
@@ -33,8 +34,20 @@ final class RaceStore: ObservableObject {
         }
     }
 
+    /// Load bundled coefficients.json; fall back to the built-in defaults if missing/corrupt.
+    static func loadCoefficients() -> Coefficients {
+        if let url = Bundle.main.url(forResource: "coefficients", withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let c = try? Coefficients.load(from: data) {
+            return c
+        }
+        return .fallback
+    }
+
     func refresh() {
         userMl = (try? AppDatabase.shared.todayUserMl()) ?? 0
+        let samples = (try? AppDatabase.shared.todayUsageSamples()) ?? []
+        aiMl = RaceEngine.aiWaterMl(samples, coef: coef)
     }
 
     func logWater(ml: Int) {
