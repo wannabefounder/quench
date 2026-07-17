@@ -24,7 +24,13 @@ private struct BrowserReceipt: Codable {
             && inputTokens + outputTokens > 0
             && inputTokens <= 50_000_000 && outputTokens <= 50_000_000
             && (model?.count ?? 0) <= 200
-            && ISO8601DateFormatter().date(from: timestamp) != nil
+            && Self.parseTimestamp(timestamp) != nil
+    }
+
+    private static func parseTimestamp(_ raw: String) -> Date? {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return fractional.date(from: raw) ?? ISO8601DateFormatter().date(from: raw)
     }
 }
 

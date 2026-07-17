@@ -1,8 +1,7 @@
 (() => {
   const site = location.hostname;
-  const selectors = site === "chatgpt.com"
-    ? { user: '[data-message-author-role="user"]', assistant: '[data-message-author-role="assistant"]' }
-    : { user: '[data-testid="user-message"]', assistant: '[data-testid="assistant-message"]' };
+  const adapter = globalThis.QuenchSiteAdapters.forHost(site);
+  if (!adapter) return;
   const sentKey = "quench-sent-receipts-v1";
   const sent = new Set(JSON.parse(sessionStorage.getItem(sentKey) || "[]"));
   let scanning = false;
@@ -11,7 +10,7 @@
   let baselineAssistantCount;
 
   // Text is read transiently in this page process only. Only the resulting integer leaves the tab.
-  const estimateTokens = (node) => Math.max(1, Math.ceil((node.innerText || "").length / 4));
+  const estimateTokens = (node) => globalThis.QuenchSiteAdapters.estimateTokens(node.innerText || "");
 
   async function stableID(assistantIndex) {
     const localKey = `${site}|${location.pathname}|${assistantIndex}`;
@@ -23,8 +22,11 @@
     if (scanning) return;
     scanning = true;
     try {
-      const users = [...document.querySelectorAll(selectors.user)];
-      const assistants = [...document.querySelectorAll(selectors.assistant)];
+      const messages = [...document.querySelectorAll(adapter.candidateSelector)]
+        .map((node) => ({ node, role: globalThis.QuenchSiteAdapters.roleForElement(site, node) }))
+        .filter((message) => message.role);
+      const users = messages.filter((message) => message.role === "user").map((message) => message.node);
+      const assistants = messages.filter((message) => message.role === "assistant").map((message) => message.node);
       if (conversationPath !== location.pathname || baselineAssistantCount === undefined) {
         // Existing history may be days or months old. Baseline it instead of turning a reopened
         // conversation into today's usage; only assistant turns completed after this point count.

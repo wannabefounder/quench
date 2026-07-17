@@ -8,7 +8,7 @@
   "background": { "service_worker": "background.js" },
   "content_scripts": [{
     "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
-    "js": ["content.js"],
+    "js": ["site-adapters.js", "content.js"],
     "run_at": "document_idle"
   }],
   "action": { "default_popup": "popup.html", "default_title": "Quench" }

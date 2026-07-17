@@ -20,7 +20,8 @@ the race, making API/local overlap visible and reversible without deleting histo
 M6 has started with a development-preview Chromium companion in [`BrowserExtension`](BrowserExtension).
 It estimates tokens inside ChatGPT/Claude tabs and passes only validated count receipts through a
 local native-messaging bridge. It has no telemetry or network backend, and bridge-side canonical
-rewriting prevents unexpected page fields from reaching disk. Safari packaging is still planned.
+rewriting prevents unexpected page fields from reaching disk. ChatGPT and Claude adapters have
+versioned CI fixtures. Safari is intentionally out of scope.
 
 ## Build & run (macOS 14+)
 

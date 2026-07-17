@@ -10,9 +10,11 @@ permissions:
 
 jobs:
   test:
-    name: Swift tests
+    name: Core and browser tests
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v6
       - name: Test
         run: swift test
+      - name: Browser adapter fixtures
+        run: node BrowserExtension/tests/site-adapters.test.js

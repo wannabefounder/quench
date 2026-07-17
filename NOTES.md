@@ -8,7 +8,8 @@ pagination, 15-minute throttle, stable bucket upserts, isolated failures, and di
 OpenRouter generation metadata imports are supported by ID (no bulk history/content calls); all
 local/API sources have independent race-inclusion controls.
 M6 IN PROGRESS: Chromium MV3 preview + strict native bridge + browser receipt parser/ingestion;
-count-only messages, canonical rewrite, owner-only inbox. Next: selector fixtures and Safari target.
+count-only messages, canonical rewrite, owner-only inbox. Safari is out of scope by user decision.
+Next: live Chromium validation and resilient selector diagnostics.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,

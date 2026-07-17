@@ -39,7 +39,7 @@ contract and [`coefficients.json`](QuenchApp/Resources/coefficients.json) is the
   metadata receipts by known ID; exact tokens where available. OpenRouter has no documented bulk
   history endpoint and Quench must never call its stored-content endpoint. Credentials belong in
   Keychain, never SQLite, logs, fixtures, or source control.
-- **Tier 2 — browser extension:** ChatGPT/Claude counts and token estimates via Chrome/Safari;
+- **Tier 2 — browser extension:** ChatGPT/Claude counts and token estimates via Chromium browsers;
   transmit counts only, never prompts or responses.
 - **Tier 3 — local logs:** Claude Code, Codex, Gemini CLI, and similar JSONL sources; fully offline,
   byte-offset/cursor based, idempotent, and resilient to truncation/rotation.
@@ -100,9 +100,10 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
 3. **M3 — complete:** Tier 3 Claude Code + Codex JSONL ingestion, cursors, rotation handling,
    deduplication, source health, and tests.
 4. **M4 — complete:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
-5. **M5 — current:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
-6. **M6 — current:** Chrome/Safari companion extension and private local bridge. The Chromium MV3
-   preview and native count-only receipt path are implemented; Safari packaging remains.
+5. **M5 — complete:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
+6. **M6 — current:** Chromium companion extension and private local bridge. The Chromium MV3
+   preview and native count-only receipt path are implemented. **Safari is intentionally out of
+   scope per the user's decision on 2026-07-18.**
 7. **M7:** streaks, restrained notifications, history, Wrapped cards, accessibility/localization.
 8. **M8:** signed/notarized distribution, Homebrew cask, launch materials, fiscal sponsorship.
 

@@ -1,0 +1,9 @@
+[
+  { "site": "chatgpt.com", "attributes": { "data-message-author-role": "user" }, "role": "user" },
+  { "site": "chatgpt.com", "attributes": { "data-message-author-role": "assistant" }, "role": "assistant" },
+  { "site": "chatgpt.com", "attributes": { "data-message-author-role": "tool" }, "role": null },
+  { "site": "claude.ai", "attributes": { "data-testid": "user-message" }, "role": "user" },
+  { "site": "claude.ai", "attributes": { "data-is-streaming": "false" }, "role": "assistant" },
+  { "site": "claude.ai", "attributes": { "data-message-author": "assistant" }, "role": "assistant" },
+  { "site": "claude.ai", "attributes": { "data-is-streaming": "true" }, "role": null }
+]

@@ -18,3 +18,8 @@ that file incrementally with the same cursor and deduplication guarantees as its
 
 Selector breakage is expected as vendor UIs change. Selector updates must be reviewed and shipped in
 this repository; Quench does not download remote code or selectors.
+
+Run `node BrowserExtension/tests/site-adapters.test.js` from the repository root to verify the
+versioned ChatGPT and Claude selector contracts. These fixtures also run in GitHub Actions.
+
+This companion targets Chromium browsers. Safari packaging is intentionally out of scope.
