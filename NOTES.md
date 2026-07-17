@@ -2,7 +2,8 @@
 
 Current milestone: M3 DONE — Claude Code + Codex JSONL ingestion has durable cursors, truncation
 generations, DB dedupe, parser tests, visible source health, and the real bundled coefficients.
-Next: M4 settings/onboarding, accuracy labels, region/mode controls, diagnostics.
+M4 IN PROGRESS: persistent scope + region controls, active-assumption label, and native Settings
+window implemented. Next: first-run onboarding and a deeper diagnostics view.
 
 Build env: sandbox is Linux/aarch64, Swift 5.10.1. Toolchain must be re-downloaded per session:
   https://download.swift.org/swift-5.10.1-release/ubuntu2204-aarch64/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04-aarch64.tar.gz

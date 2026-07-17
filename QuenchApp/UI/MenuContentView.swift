@@ -15,6 +15,10 @@ struct MenuContentView: View {
             }
             .font(.system(.body, design: .rounded).weight(.semibold))
 
+            Text("\(store.waterMode.displayName) • \(store.selectedRegionLabel)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+
             RaceBarView(userMl: Double(store.userMl), aiMl: store.aiMl, goalMl: store.goalMl)
 
             Text(statusLine)
@@ -52,6 +56,11 @@ struct MenuContentView: View {
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
                 Spacer()
+                SettingsLink {
+                    Image(systemName: "gearshape")
+                }
+                .buttonStyle(.plain)
+                .help(Strings.settings)
                 Button(Strings.quit) { NSApp.terminate(nil) }
                     .buttonStyle(.plain)
                     .font(.caption)

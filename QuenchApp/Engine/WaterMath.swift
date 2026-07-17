@@ -25,7 +25,7 @@ public struct UsageSample: Equatable {
 
 /// conservative = on-site cooling only (Scope 1). standard = + electricity generation (Scope 2).
 /// full = + embodied/lifecycle share (Scope 3). These are the honest range, not one "true" number.
-public enum WaterMode: String, CaseIterable { case conservative, standard, full }
+public enum WaterMode: String, CaseIterable, Hashable { case conservative, standard, full }
 
 // MARK: - Coefficients (decoded from coefficients.json)
 
