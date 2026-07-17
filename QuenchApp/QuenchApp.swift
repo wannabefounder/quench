@@ -22,6 +22,7 @@ final class RaceStore: ObservableObject {
     let goalMl: Double = 2000
 
     private let coef: Coefficients = RaceStore.loadCoefficients()
+    private let logIngestor = LocalLogIngestor()
     private var currentDay: String
     private var timer: Timer?
 
@@ -45,9 +46,19 @@ final class RaceStore: ObservableObject {
     }
 
     func refresh() {
-        userMl = (try? AppDatabase.shared.todayUserMl()) ?? 0
-        let samples = (try? AppDatabase.shared.todayUsageSamples()) ?? []
-        aiMl = RaceEngine.aiWaterMl(samples, coef: coef)
+        let database = AppDatabase.shared
+        let ingestor = logIngestor
+        let coefficients = coef
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            ingestor.ingestAll()
+            let user = (try? database.todayUserMl()) ?? 0
+            let samples = (try? database.todayUsageSamples()) ?? []
+            let ai = RaceEngine.aiWaterMl(samples, coef: coefficients)
+            DispatchQueue.main.async {
+                self?.userMl = user
+                self?.aiMl = ai
+            }
+        }
     }
 
     func logWater(ml: Int) {

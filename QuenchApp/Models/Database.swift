@@ -46,6 +46,22 @@ final class AppDatabase {
                 CREATE INDEX idx_water_ts ON water_entries(ts);
                 """)
         }
+        m.registerMigration("v2-local-log-ingestion") { db in
+            try db.alter(table: "usage_events") { table in
+                table.add(column: "external_id", .text)
+            }
+            try db.create(index: "idx_usage_external_id", on: "usage_events",
+                          columns: ["external_id"], unique: true)
+            try db.create(table: "source_cursors") { table in
+                table.column("path", .text).primaryKey()
+                table.column("source", .text).notNull()
+                table.column("byte_offset", .integer).notNull()
+                table.column("generation", .integer).notNull().defaults(to: 0)
+                table.column("last_model", .text)
+                table.column("cumulative_input_tokens", .integer).notNull().defaults(to: 0)
+                table.column("cumulative_output_tokens", .integer).notNull().defaults(to: 0)
+            }
+        }
         return m
     }
 
@@ -82,6 +98,30 @@ final class AppDatabase {
                             outputTokens: $0.outputTokens, messageCount: $0.messageCount,
                             minutesActive: $0.minutesActive)
             }
+        }
+    }
+
+    // MARK: - Local usage ingestion
+
+    func sourceCursor(path: String) throws -> SourceCursor? {
+        try dbQueue.read { db in try SourceCursor.fetchOne(db, key: path) }
+    }
+
+    /// Insert normalized metadata and advance its file cursor atomically. Duplicate external IDs
+    /// are ignored, making restarts and rescans safe.
+    func commitIngestion(events: [NormalizedUsageEvent], cursor: SourceCursor) throws {
+        try dbQueue.write { db in
+            for event in events {
+                try db.execute(sql: """
+                    INSERT OR IGNORE INTO usage_events
+                      (ts, source, model, input_tokens, output_tokens, accuracy_tier, external_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, arguments: [
+                        Int64(event.timestamp.timeIntervalSince1970), event.source, event.model,
+                        event.inputTokens, event.outputTokens, event.accuracyTier, event.externalID
+                    ])
+            }
+            try cursor.save(db)
         }
     }
 }

@@ -21,6 +21,7 @@ struct UsageEvent: Codable, FetchableRecord, MutablePersistableRecord {
     var messageCount: Int?
     var minutesActive: Double?
     var accuracyTier: Int
+    var externalID: String?
 
     enum CodingKeys: String, CodingKey {
         case id, ts, source, model
@@ -29,9 +30,29 @@ struct UsageEvent: Codable, FetchableRecord, MutablePersistableRecord {
         case messageCount = "message_count"
         case minutesActive = "minutes_active"
         case accuracyTier = "accuracy_tier"
+        case externalID = "external_id"
     }
 
     mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
+}
+
+struct SourceCursor: Codable, FetchableRecord, PersistableRecord {
+    static let databaseTableName = "source_cursors"
+    var path: String
+    var source: String
+    var byteOffset: Int64
+    var generation: Int
+    var lastModel: String?
+    var cumulativeInputTokens: Int
+    var cumulativeOutputTokens: Int
+
+    enum CodingKeys: String, CodingKey {
+        case path, source, generation
+        case byteOffset = "byte_offset"
+        case lastModel = "last_model"
+        case cumulativeInputTokens = "cumulative_input_tokens"
+        case cumulativeOutputTokens = "cumulative_output_tokens"
+    }
 }
 
 struct DailySummary: Codable, FetchableRecord, PersistableRecord {
