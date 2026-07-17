@@ -15,6 +15,16 @@ public struct RaceDayResult: Equatable {
     }
 }
 
+public struct HydrationStreak: Equatable {
+    public let winDays: Int
+    public let freezeDaysUsed: Int
+
+    public init(winDays: Int, freezeDaysUsed: Int) {
+        self.winDays = winDays
+        self.freezeDaysUsed = freezeDaysUsed
+    }
+}
+
 public enum RaceEngine {
 
     /// 'YYYY-MM-DD' key in the user's local calendar. Day boundary = local midnight.
@@ -78,6 +88,37 @@ public enum RaceEngine {
             previousDate = date
         }
         return streak
+    }
+
+    /// A motivational streak that can bridge a limited number of days with no saved summary.
+    /// An explicit AI win or tie still ends the streak. Today's unfinished result is ignored so a
+    /// morning deficit does not erase a completed streak before the day is over.
+    public static func hydrationStreak(_ daysNewestFirst: [RaceDayResult], asOf now: Date = Date(),
+                                       availableFreezeDays: Int = 1,
+                                       calendar: Calendar = .current) -> HydrationStreak {
+        let today = dayKey(for: now, calendar: calendar)
+        var results = daysNewestFirst
+        if let first = results.first, first.day == today, first.winner != "user" {
+            results.removeFirst()
+        }
+
+        var wins = 0
+        var freezes = 0
+        var previousDate: Date?
+        for result in results {
+            guard result.winner == "user", let date = date(fromDayKey: result.day, calendar: calendar)
+            else { break }
+            if let previousDate {
+                let gap = calendar.dateComponents([.day], from: date, to: previousDate).day ?? 0
+                guard gap >= 1 else { break }
+                let missingDays = gap - 1
+                guard freezes + missingDays <= max(0, availableFreezeDays) else { break }
+                freezes += missingDays
+            }
+            wins += 1
+            previousDate = date
+        }
+        return HydrationStreak(winDays: wins, freezeDaysUsed: freezes)
     }
 
     private static func date(fromDayKey key: String, calendar: Calendar) -> Date? {

@@ -37,8 +37,9 @@ private struct RefreshPayload: @unchecked Sendable {
     let aiMl: Double
     let sourceStatuses: [LocalSourceStatus]
     let providerStatuses: [ProviderSyncStatus]
-    let streak: Int
+    let streak: HydrationStreak
     let history: [DailyRaceHistoryItem]
+    let thirstiestModel: ModelWaterTotal?
 }
 
 /// Observable state for the daily race. AI water is computed by WaterMath from today's usage events.
@@ -50,6 +51,8 @@ final class RaceStore: ObservableObject {
     @Published var providerSyncStatuses: [ProviderSyncStatus] = []
     @Published var isRefreshing = false
     @Published var userWinStreak = 0
+    @Published var streakFreezeDaysUsed = 0
+    @Published var thirstiestModel: ModelWaterTotal?
     @Published var recentHistory: [DailyRaceHistoryItem] = []
     @Published private(set) var gentleNotificationsEnabled: Bool
     @Published var waterMode: WaterMode {
@@ -202,24 +205,34 @@ final class RaceStore: ObservableObject {
                     userMl: user, winner: RaceEngine.winner(userMl: Double(user), aiMl: standard)
                 )
                 let summaries = (try? database.recentDailySummaries()) ?? []
-                let streak = RaceEngine.userWinStreak(summaries.map {
+                let streak = RaceEngine.hydrationStreak(summaries.map {
                     RaceDayResult(day: $0.day, winner: $0.winner ?? "tie")
                 })
+                let weekStart = Calendar.current.date(byAdding: .day, value: -6, to: startOfDay)
+                    ?? startOfDay
+                let weeklySamples = (try? database.usageSamples(
+                    since: weekStart, includedSources: sourcesCountedInRace
+                )) ?? []
+                let thirstiestModel = HistoryInsights.thirstiestModel(
+                    weeklySamples, region: selectedRegion, coef: coefficients
+                )
                 let history = summaries.map {
                     DailyRaceHistoryItem(day: $0.day, userMl: $0.userMl ?? 0,
                                          aiMl: $0.aiMlMid ?? 0, winner: $0.winner ?? "tie")
                 }
                 return RefreshPayload(userMl: user, aiMl: ai, sourceStatuses: statuses,
                                       providerStatuses: providerStatuses, streak: streak,
-                                      history: history)
+                                      history: history, thirstiestModel: thirstiestModel)
             }.value
             guard let self else { return }
             userMl = payload.userMl
             aiMl = payload.aiMl
             sourceStatuses = payload.sourceStatuses
             providerSyncStatuses = payload.providerStatuses
-            userWinStreak = payload.streak
+            userWinStreak = payload.streak.winDays
+            streakFreezeDaysUsed = payload.streak.freezeDaysUsed
             recentHistory = payload.history
+            thirstiestModel = payload.thirstiestModel
             if gentleNotificationsEnabled {
                 Task { await self.notificationService?.consider(
                     userMl: payload.userMl, aiMl: payload.aiMl

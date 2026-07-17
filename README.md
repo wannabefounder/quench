@@ -26,7 +26,9 @@ manual refresh. Safari is intentionally out of scope.
 
 M7 has started with private daily race summaries, a gap-aware hydration win streak, and a History
 tab. Historical winners use the Standard water scope so changing the currently displayed scope does
-not make consecutive days incomparable. Optional hydration nudges are passive and silent, limited
+not make consecutive days incomparable. One automatic grace-day freeze can bridge a missing day but
+never an explicit loss, and the weekly Thirst Index identifies the model with the largest estimated
+water footprint. Optional hydration nudges are passive and silent, limited
 to two daytime reminders when AI is meaningfully ahead. They remain off until the user explicitly
 enables them. Shift-Command-D logs a 250 mL glass while the menu is open.
 Notifications require a packaged macOS application; raw `swift run` development launches safely

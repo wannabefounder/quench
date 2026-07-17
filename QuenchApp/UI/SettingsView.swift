@@ -38,6 +38,23 @@ private struct HistorySettingsView: View {
                         .foregroundStyle(store.userWinStreak > 0 ? .orange : .secondary)
                 }
 
+                HStack(spacing: 12) {
+                    if let model = store.thirstiestModel {
+                        Label("Weekly Thirst Index: \(model.model) • \(Int(model.waterMl)) mL",
+                              systemImage: "drop.triangle.fill")
+                            .accessibilityLabel("Weekly thirstiest AI model: \(model.model), \(Int(model.waterMl)) milliliters")
+                    } else {
+                        Label("Weekly Thirst Index: waiting for usage", systemImage: "drop.triangle")
+                    }
+                    Spacer()
+                    if store.streakFreezeDaysUsed > 0 {
+                        Label("Freeze protected \(store.streakFreezeDaysUsed) day",
+                              systemImage: "snowflake")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
                 if store.recentHistory.isEmpty {
                     ContentUnavailableView(
                         "No race history yet", systemImage: "calendar.badge.clock",

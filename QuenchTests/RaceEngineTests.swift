@@ -69,4 +69,30 @@ final class RaceEngineTests: XCTestCase {
             RaceDayResult(day: "2026-07-17", winner: "user")
         ]), 0)
     }
+
+    func testHydrationStreakUsesOneFreezeForMissingDay() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Kolkata")!
+        let now = DateComponents(calendar: calendar, year: 2026, month: 7, day: 18, hour: 9).date!
+        XCTAssertEqual(RaceEngine.hydrationStreak([
+            RaceDayResult(day: "2026-07-18", winner: "ai"), // unfinished today is ignored
+            RaceDayResult(day: "2026-07-17", winner: "user"),
+            RaceDayResult(day: "2026-07-15", winner: "user")
+        ], asOf: now, calendar: calendar), HydrationStreak(winDays: 2, freezeDaysUsed: 1))
+    }
+
+    func testHydrationStreakNeverFreezesExplicitLossOrTwoMissingDays() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Kolkata")!
+        let now = DateComponents(calendar: calendar, year: 2026, month: 7, day: 18).date!
+        XCTAssertEqual(RaceEngine.hydrationStreak([
+            RaceDayResult(day: "2026-07-18", winner: "user"),
+            RaceDayResult(day: "2026-07-17", winner: "ai"),
+            RaceDayResult(day: "2026-07-16", winner: "user")
+        ], asOf: now, calendar: calendar), HydrationStreak(winDays: 1, freezeDaysUsed: 0))
+        XCTAssertEqual(RaceEngine.hydrationStreak([
+            RaceDayResult(day: "2026-07-18", winner: "user"),
+            RaceDayResult(day: "2026-07-15", winner: "user")
+        ], asOf: now, calendar: calendar), HydrationStreak(winDays: 1, freezeDaysUsed: 0))
+    }
 }

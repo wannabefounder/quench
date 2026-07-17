@@ -100,6 +100,15 @@ final class AppDatabase {
     func todayUsageSamples(includedSources: Set<String>? = nil,
                            now: Date = Date(), calendar: Calendar = .current) throws -> [UsageSample] {
         let startTs = Int64(calendar.startOfDay(for: now).timeIntervalSince1970)
+        return try usageSamples(since: startTs, includedSources: includedSources)
+    }
+
+    func usageSamples(since date: Date, includedSources: Set<String>? = nil) throws -> [UsageSample] {
+        try usageSamples(since: Int64(date.timeIntervalSince1970), includedSources: includedSources)
+    }
+
+    private func usageSamples(since startTs: Int64,
+                              includedSources: Set<String>?) throws -> [UsageSample] {
         return try dbQueue.read { db in
             let rows = try UsageEvent.fetchAll(
                 db, sql: "SELECT * FROM usage_events WHERE ts >= ?", arguments: [startTs])
