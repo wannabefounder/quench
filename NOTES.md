@@ -2,8 +2,8 @@
 
 Current milestone: M3 DONE — Claude Code + Codex JSONL ingestion has durable cursors, truncation
 generations, DB dedupe, parser tests, visible source health, and the real bundled coefficients.
-M4 IN PROGRESS: persistent scope + region controls, active-assumption label, and native Settings
-window implemented. Next: first-run onboarding and a deeper diagnostics view.
+M4 DONE: onboarding, persistent scope/region, accuracy context, source toggles, and diagnostics.
+Next: M5 Tier 1 provider usage connectors with credentials isolated in macOS Keychain.
 
 Build env: sandbox is Linux/aarch64, Swift 5.10.1. Toolchain must be re-downloaded per session:
   https://download.swift.org/swift-5.10.1-release/ubuntu2204-aarch64/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04-aarch64.tar.gz
@@ -23,6 +23,8 @@ Package.swift builds QuenchEngine (pure) everywhere; app+GRDB only on macOS. Ful
 - UsageLogParser.swift + UsageLogParserTests.swift — metadata-only Claude/Codex parsers.
 - LocalLogIngestor.swift + DB v2 — byte cursors, rotation generations, unique external IDs.
 - Menu source rows — privacy-safe Tracking/Watching/Not found/Needs attention states.
+- SourceHealth.swift + tests — pure state rules including Disabled; no paths cross into UI.
+- OnboardingView + Settings diagnostics — counts, last activity, methodology version, refresh.
 
 ## TODO / open
 - Bundled coefficients resource is wired into the Swift package; fallback remains for corrupt installs.

@@ -97,8 +97,8 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
 2. **M2 — complete:** EcoLogits-faithful water engine, open coefficients, methodology, tests.
 3. **M3 — complete:** Tier 3 Claude Code + Codex JSONL ingestion, cursors, rotation handling,
    deduplication, source health, and tests.
-4. **M4 — current:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
-5. **M5:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
+4. **M4 — complete:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
+5. **M5 — current:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
 6. **M6:** Chrome/Safari companion extension and private local bridge.
 7. **M7:** streaks, restrained notifications, history, Wrapped cards, accessibility/localization.
 8. **M8:** signed/notarized distribution, Homebrew cask, launch materials, fiscal sponsorship.

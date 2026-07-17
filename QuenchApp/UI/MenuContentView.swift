@@ -5,6 +5,19 @@ struct MenuContentView: View {
     @ObservedObject var store: RaceStore
 
     var body: some View {
+        Group {
+            if store.hasCompletedOnboarding {
+                dashboard
+            } else {
+                OnboardingView(store: store)
+            }
+        }
+        .padding(14)
+        .frame(width: 300)
+        .onAppear { store.refresh() }
+    }
+
+    private var dashboard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("\(store.userMl) \(Strings.mlSuffix)", systemImage: "person.fill")
@@ -67,9 +80,6 @@ struct MenuContentView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(14)
-        .frame(width: 280)
-        .onAppear { store.refresh() }
     }
 
     private var statusLine: String {
@@ -81,7 +91,7 @@ struct MenuContentView: View {
     }
 }
 
-private struct SourceStatusRow: View {
+struct SourceStatusRow: View {
     let source: LocalSourceStatus
 
     var body: some View {
@@ -106,6 +116,7 @@ private struct SourceStatusRow: View {
 
     private var stateLabel: String {
         switch source.state {
+        case .disabled: Strings.disabled
         case .tracking: Strings.tracking
         case .watching: Strings.watching
         case .notFound: Strings.notFound
@@ -115,6 +126,7 @@ private struct SourceStatusRow: View {
 
     private var icon: String {
         switch source.state {
+        case .disabled: "pause.circle"
         case .tracking: "checkmark.circle.fill"
         case .watching: "eye.circle"
         case .notFound: "minus.circle"
@@ -124,6 +136,7 @@ private struct SourceStatusRow: View {
 
     private var color: Color {
         switch source.state {
+        case .disabled: .secondary
         case .tracking: .green
         case .watching: .blue
         case .notFound: .secondary
@@ -132,6 +145,7 @@ private struct SourceStatusRow: View {
     }
 
     private var detail: String {
+        if !source.isEnabled { return "Turn on in Settings" }
         if source.eventCount > 0 { return "\(source.eventCount) usage events" }
         if source.fileCount > 0 { return "\(source.fileCount) log files found" }
         return "No supported local logs"

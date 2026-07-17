@@ -1,24 +1,6 @@
 import Foundation
 import QuenchEngine
 
-struct LocalSourceStatus: Identifiable, Equatable {
-    enum State { case tracking, watching, notFound, needsAttention }
-
-    let source: String
-    let displayName: String
-    let fileCount: Int
-    let eventCount: Int
-    let errorCount: Int
-    let lastEvent: Date?
-
-    var id: String { source }
-    var state: State {
-        if errorCount > 0 { return .needsAttention }
-        if fileCount == 0 { return .notFound }
-        return eventCount > 0 ? .tracking : .watching
-    }
-}
-
 /// Incrementally reads privacy-safe usage metadata from supported local JSONL logs.
 final class LocalLogIngestor {
     private let database: AppDatabase
@@ -29,17 +11,26 @@ final class LocalLogIngestor {
         self.fileManager = fileManager
     }
 
-    func ingestAll() -> [LocalSourceStatus] {
+    func ingestAll(enabledSources: Set<String>) -> [LocalSourceStatus] {
         let home = fileManager.homeDirectoryForCurrentUser
         return [
             ingestTree(home.appendingPathComponent(".claude/projects"),
-                       source: "claude-code", displayName: "Claude Code"),
+                       source: "claude-code", displayName: "Claude Code",
+                       isEnabled: enabledSources.contains("claude-code")),
             ingestTree(home.appendingPathComponent(".codex/sessions"),
-                       source: "codex", displayName: "Codex")
+                       source: "codex", displayName: "Codex",
+                       isEnabled: enabledSources.contains("codex"))
         ]
     }
 
-    private func ingestTree(_ root: URL, source: String, displayName: String) -> LocalSourceStatus {
+    private func ingestTree(_ root: URL, source: String, displayName: String,
+                            isEnabled: Bool) -> LocalSourceStatus {
+        if !isEnabled {
+            let summary = try? database.sourceEventSummary(source: source)
+            return LocalSourceStatus(source: source, displayName: displayName, fileCount: 0,
+                                     eventCount: summary?.count ?? 0, errorCount: 0,
+                                     lastEvent: summary?.lastEvent, isEnabled: false)
+        }
         var fileCount = 0
         var errorCount = 0
         guard let enumerator = fileManager.enumerator(

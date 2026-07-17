@@ -42,6 +42,23 @@ final class RaceStore: ObservableObject {
             refresh()
         }
     }
+    @Published var hasCompletedOnboarding: Bool {
+        didSet {
+            UserDefaults.standard.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding")
+        }
+    }
+    @Published var claudeCodeEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(claudeCodeEnabled, forKey: "claudeCodeEnabled")
+            refresh()
+        }
+    }
+    @Published var codexEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(codexEnabled, forKey: "codexEnabled")
+            refresh()
+        }
+    }
     let goalMl: Double = 2000
 
     private let coef: Coefficients
@@ -64,6 +81,8 @@ final class RaceStore: ObservableObject {
         regionOptions.first(where: { $0.id == region })?.label ?? region
     }
 
+    var coefficientsVersion: String { coef.version }
+
     init() {
         let coefficients = RaceStore.loadCoefficients()
         coef = coefficients
@@ -72,6 +91,9 @@ final class RaceStore: ObservableObject {
         let savedRegion = UserDefaults.standard.string(forKey: "region")
         region = coefficients.water.regions[savedRegion ?? ""] != nil
             ? savedRegion! : coefficients.water.default_region
+        hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+        claudeCodeEnabled = UserDefaults.standard.object(forKey: "claudeCodeEnabled") as? Bool ?? true
+        codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
         currentDay = RaceEngine.dayKey(for: Date())
         refresh()
         // Day rollover check: once a minute, reset when local midnight passes.
@@ -101,8 +123,11 @@ final class RaceStore: ObservableObject {
         let coefficients = coef
         let selectedMode = waterMode
         let selectedRegion = region
+        var enabledSources = Set<String>()
+        if claudeCodeEnabled { enabledSources.insert("claude-code") }
+        if codexEnabled { enabledSources.insert("codex") }
         DispatchQueue.global(qos: .utility).async { [weak self] in
-            let statuses = ingestor.ingestAll()
+            let statuses = ingestor.ingestAll(enabledSources: enabledSources)
             let user = (try? database.todayUserMl()) ?? 0
             let samples = (try? database.todayUsageSamples()) ?? []
             let ai = RaceEngine.aiWaterMl(samples, mode: selectedMode,
@@ -122,6 +147,11 @@ final class RaceStore: ObservableObject {
 
     func logWater(ml: Int) {
         try? AppDatabase.shared.logWater(ml: ml)
+        refresh()
+    }
+
+    func completeOnboarding() {
+        hasCompletedOnboarding = true
         refresh()
     }
 

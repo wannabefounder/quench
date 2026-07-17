@@ -17,5 +17,6 @@ enum Strings {
     static let notFound = "Not found"
     static let needsAttention = "Needs attention"
     static let settings = "Settings"
+    static let disabled = "Disabled"
     static let quit = "Quit Quench"
 }
