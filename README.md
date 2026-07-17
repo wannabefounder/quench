@@ -2,7 +2,7 @@
 
 A free, open-source macOS menu-bar app that races your daily water intake against the water your AI usage "drinks" in data centers. Privacy-first: local by default, with explicit provider connections.
 
-**Status: M4 complete; M5 in progress.** The menu-bar race and local water log are backed by an
+**Status: M6 complete; M7 in progress.** The menu-bar race and local water log are backed by an
 EcoLogits-faithful estimation engine with open coefficients. Private Claude Code and Codex log
 ingestion includes durable cursors, deduplication, rotation handling, and visible source health.
 First-run onboarding, per-source privacy controls, diagnostics, and persistent scope/region settings
@@ -26,7 +26,11 @@ manual refresh. Safari is intentionally out of scope.
 
 M7 has started with private daily race summaries, a gap-aware hydration win streak, and a History
 tab. Historical winners use the Standard water scope so changing the currently displayed scope does
-not make consecutive days incomparable.
+not make consecutive days incomparable. Optional hydration nudges are passive and silent, limited
+to two daytime reminders when AI is meaningfully ahead. They remain off until the user explicitly
+enables them. Shift-Command-D logs a 250 mL glass while the menu is open.
+Notifications require a packaged macOS application; raw `swift run` development launches safely
+leave them unavailable.
 
 ## Build & run (macOS 14+)
 

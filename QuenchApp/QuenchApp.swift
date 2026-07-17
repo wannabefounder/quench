@@ -51,6 +51,7 @@ final class RaceStore: ObservableObject {
     @Published var isRefreshing = false
     @Published var userWinStreak = 0
     @Published var recentHistory: [DailyRaceHistoryItem] = []
+    @Published private(set) var gentleNotificationsEnabled: Bool
     @Published var waterMode: WaterMode {
         didSet {
             UserDefaults.standard.set(waterMode.rawValue, forKey: "waterMode")
@@ -97,6 +98,7 @@ final class RaceStore: ObservableObject {
     private let coef: Coefficients
     private let logIngestor = LocalLogIngestor()
     private let providerSync = ProviderSyncService()
+    private let notificationService = HydrationNotificationService.makeIfAvailable()
     private var currentDay: String
     private var timer: Timer?
     private var needsRefresh = false
@@ -131,6 +133,7 @@ final class RaceStore: ObservableObject {
         claudeCodeEnabled = UserDefaults.standard.object(forKey: "claudeCodeEnabled") as? Bool ?? true
         codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
         browserExtensionEnabled = UserDefaults.standard.object(forKey: "browserExtensionEnabled") as? Bool ?? true
+        gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
         countedSources = Set(UserDefaults.standard.stringArray(forKey: "countedSources")
             ?? ["claude-code", "codex", "browser-extension", "openai-api", "anthropic-api", "openrouter-api"])
         currentDay = RaceEngine.dayKey(for: Date())
@@ -217,6 +220,11 @@ final class RaceStore: ObservableObject {
             providerSyncStatuses = payload.providerStatuses
             userWinStreak = payload.streak
             recentHistory = payload.history
+            if gentleNotificationsEnabled {
+                Task { await self.notificationService?.consider(
+                    userMl: payload.userMl, aiMl: payload.aiMl
+                ) }
+            }
             isRefreshing = false
             if needsRefresh {
                 needsRefresh = false
@@ -233,6 +241,27 @@ final class RaceStore: ObservableObject {
                 else { self.countedSources.remove(source) }
             }
         )
+    }
+
+    var gentleNotificationsBinding: Binding<Bool> {
+        Binding(
+            get: { self.gentleNotificationsEnabled },
+            set: { self.setGentleNotificationsEnabled($0) }
+        )
+    }
+
+    private func setGentleNotificationsEnabled(_ enabled: Bool) {
+        if !enabled {
+            gentleNotificationsEnabled = false
+            UserDefaults.standard.set(false, forKey: "gentleNotificationsEnabled")
+            return
+        }
+        Task {
+            let granted = await notificationService?.requestPermission() ?? false
+            gentleNotificationsEnabled = granted
+            UserDefaults.standard.set(granted, forKey: "gentleNotificationsEnabled")
+            if granted { refresh() }
+        }
     }
 
     func logWater(ml: Int) {

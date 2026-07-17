@@ -51,6 +51,8 @@ struct MenuContentView: View {
             }
             .controlSize(.large)
             .buttonStyle(.borderedProminent)
+            .keyboardShortcut("d", modifiers: [.command, .shift])
+            .help("Log 250 mL (Shift-Command-D while the menu is open)")
 
             Divider()
 

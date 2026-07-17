@@ -38,6 +38,10 @@ Chrome native messaging. The bridge validates and re-encodes those exact fields 
 owner-only local JSONL receipt; unknown fields are discarded. There is no localhost server, trusted
 certificate, Quench cloud relay, remotely downloaded selector code, or extension analytics.
 
+Hydration notifications are off by default and require explicit macOS permission. Quench stores only
+the local day, reminder count, and last-reminder time needed to enforce its daily cap and cooldown.
+Notification content contains a rounded hydration gap, never conversation or provider content.
+
 ## Diagnostics and analytics
 
 Quench has no hidden analytics or advertising SDK. Any future diagnostic sharing must be explicit,

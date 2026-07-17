@@ -291,6 +291,13 @@ private struct GeneralSettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section("Gentle nudges") {
+                Toggle("Hydration notifications", isOn: store.gentleNotificationsBinding)
+                Text("Opt-in, passive, and silent. At most two per day between 10:00 and 18:00, only when AI is at least 250 mL ahead. macOS Focus settings remain in control.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Local sources") {
                 Toggle("Claude Code", isOn: $store.claudeCodeEnabled)
                 Toggle("Codex", isOn: $store.codexEnabled)
