@@ -19,6 +19,27 @@ Run the engine tests (these also run on Linux):
 swift test
 ```
 
+### Build troubleshooting
+
+If the repository was moved or copied and Swift reports that a precompiled header uses an old
+`ModuleCache` path, discard only the generated package artifacts and rebuild:
+
+```sh
+swift package clean
+swift run QuenchApp
+```
+
+If the next error says the macOS SDK is not supported by the installed Swift compiler or that
+`SwiftShims` is missing, the active Apple Command Line Tools and SDK revisions do not match. Update
+Command Line Tools/Xcode for the durable fix. As a temporary workaround, select a compatible SDK
+already installed on the Mac. For example, on a machine that has `MacOSX15.4.sdk`:
+
+```sh
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk swift run QuenchApp
+```
+
+The SDK override is a local development workaround, not a Quench runtime requirement.
+
 ## Layout
 
 - `QuenchApp/Engine/` — pure logic (no SwiftUI, no DB), fully unit-tested

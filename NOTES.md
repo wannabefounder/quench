@@ -25,5 +25,6 @@ Package.swift builds QuenchEngine (pure) everywhere; app+GRDB only on macOS. Ful
 - coefficients.json must be added as a bundle resource in the Xcode app target (fallback exists if missing).
 - M1 manual check on Mac still pending (launch/icon/log/restart).
 - M2 Mac check: debug pane showing computed mL for a sample event (engine verified on Linux).
-- Local Apple CLI toolchain currently mismatches its macOS SDK; full `swift test` needs repaired Xcode/CLT.
+- This Mac's default CLT SDK alias (26.2) mismatches its Swift compiler build. App builds with the
+  installed MacOSX15.4 SDK; README documents cache cleanup and the temporary SDKROOT workaround.
 - gpt-4o-mini output coef set below gpt-4o by size-prior (benchmark's mini figure looked anomalous).
