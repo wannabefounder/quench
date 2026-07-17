@@ -2,11 +2,15 @@
 
 A free, open-source macOS menu-bar app that races your daily water intake against the water your AI usage "drinks" in data centers. 100% private — everything stays on your device.
 
-**Status: M4 complete; M5 next.** The menu-bar race and local water log are backed by an
+**Status: M4 complete; M5 in progress.** The menu-bar race and local water log are backed by an
 EcoLogits-faithful estimation engine with open coefficients. Private Claude Code and Codex log
 ingestion includes durable cursors, deduplication, rotation handling, and visible source health.
 First-run onboarding, per-source privacy controls, diagnostics, and persistent scope/region settings
 make every estimate's assumptions and collection state visible.
+
+Optional OpenAI and Anthropic organization connectors now have Keychain-only Admin credential
+storage, documented metadata-only verification, pagination-aware clients, and tested response
+normalization. Automatic scheduled import is the next M5 increment.
 
 ## Build & run (macOS 14+)
 

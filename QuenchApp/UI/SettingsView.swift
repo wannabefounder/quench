@@ -3,15 +3,136 @@ import QuenchEngine
 
 struct SettingsView: View {
     @ObservedObject var store: RaceStore
+    @StateObject private var credentials = ProviderCredentialsModel()
 
     var body: some View {
         TabView {
             GeneralSettingsView(store: store)
                 .tabItem { Label("Estimation", systemImage: "slider.horizontal.3") }
+            ProviderSettingsView(model: credentials)
+                .tabItem { Label("Providers", systemImage: "key.fill") }
             DiagnosticsView(store: store)
                 .tabItem { Label("Diagnostics", systemImage: "stethoscope") }
         }
         .frame(width: 520, height: 390)
+    }
+}
+
+private struct ProviderSettingsView: View {
+    @ObservedObject var model: ProviderCredentialsModel
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Provider usage APIs")
+                        .font(.headline)
+                    Text("Optional Tier 1 sources provide exact organization token totals. Admin keys stay in macOS Keychain and are sent only to their own provider.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                ProviderCredentialCard(
+                    provider: .openAI,
+                    title: "OpenAI",
+                    detail: "Requires an organization Admin API key. Verification requests today's hourly usage grouped by model.",
+                    documentationURL: URL(string: "https://developers.openai.com/api/reference/resources/admin/subresources/organization/subresources/usage")!,
+                    model: model
+                )
+                ProviderCredentialCard(
+                    provider: .anthropic,
+                    title: "Anthropic",
+                    detail: "Requires an organization Admin API key. Verification requests today's usage grouped by model.",
+                    documentationURL: URL(string: "https://platform.claude.com/docs/en/api/admin/usage_report/retrieve_messages")!,
+                    model: model
+                )
+
+                Label("Verification sends only a time range and grouping request. It never sends prompts, responses, local paths, or keys to Quench servers.",
+                      systemImage: "lock.shield")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(20)
+        }
+    }
+}
+
+private struct ProviderCredentialCard: View {
+    let provider: UsageProvider
+    let title: String
+    let detail: String
+    let documentationURL: URL
+    @ObservedObject var model: ProviderCredentialsModel
+    @State private var credential = ""
+
+    var body: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text(title).font(.callout.weight(.semibold))
+                    Spacer()
+                    Label(stateLabel, systemImage: stateIcon)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(stateColor)
+                }
+                Text(detail).font(.caption).foregroundStyle(.secondary)
+                SecureField("Admin API key", text: $credential)
+                    .textFieldStyle(.roundedBorder)
+                    .privacySensitive()
+                HStack {
+                    Link("API documentation", destination: documentationURL)
+                        .font(.caption)
+                    Spacer()
+                    if isStored {
+                        Button("Remove", role: .destructive) { model.remove(provider) }
+                    }
+                    Button("Save & verify") {
+                        let value = credential
+                        credential = ""
+                        model.saveAndVerify(value, for: provider)
+                    }
+                    .disabled(credential.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isChecking)
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+            .padding(4)
+        }
+    }
+
+    private var state: ProviderCredentialState { model.state(for: provider) }
+    private var isChecking: Bool { if case .checking = state { true } else { false } }
+    private var isStored: Bool {
+        switch state {
+        case .saved, .checking, .verified, .failed: true
+        case .disconnected: false
+        }
+    }
+    private var stateLabel: String {
+        switch state {
+        case .disconnected: "Not connected"
+        case .saved: "Saved in Keychain"
+        case .checking: "Verifying…"
+        case .verified(let count): "Verified • \(count) groups"
+        case .failed(let message): message
+        }
+    }
+    private var stateIcon: String {
+        switch state {
+        case .disconnected: "minus.circle"
+        case .saved: "key.fill"
+        case .checking: "arrow.triangle.2.circlepath"
+        case .verified: "checkmark.circle.fill"
+        case .failed: "exclamationmark.triangle.fill"
+        }
+    }
+    private var stateColor: Color {
+        switch state {
+        case .disconnected: .secondary
+        case .saved: .blue
+        case .checking: .blue
+        case .verified: .green
+        case .failed: .orange
+        }
     }
 }
 

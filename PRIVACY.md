@@ -18,8 +18,9 @@ services. Useful local behavior remains available when a network service is unav
 
 ## Credentials
 
-Future API credentials will be stored in macOS Keychain, never in Quench's SQLite database,
-diagnostic logs, or telemetry.
+Provider Admin API credentials are stored in macOS Keychain with device-only, unlocked-device
+accessibility. They never enter Quench's SQLite database, UserDefaults, diagnostic logs, or
+telemetry, and Quench never reloads a saved key into a visible text field.
 
 ## Diagnostics and analytics
 
