@@ -27,13 +27,16 @@
         .filter((message) => message.role);
       const users = messages.filter((message) => message.role === "user").map((message) => message.node);
       const assistants = messages.filter((message) => message.role === "assistant").map((message) => message.node);
-      if (conversationPath !== location.pathname || baselineAssistantCount === undefined) {
+      if (globalThis.QuenchSiteAdapters.shouldBaseline(
+        conversationPath, location.pathname, baselineAssistantCount
+      )) {
         // Existing history may be days or months old. Baseline it instead of turning a reopened
         // conversation into today's usage; only assistant turns completed after this point count.
         conversationPath = location.pathname;
         baselineAssistantCount = assistants.length;
         return;
       }
+      conversationPath = location.pathname;
       for (let index = 0; index < assistants.length; index += 1) {
         if (index < baselineAssistantCount) continue;
         const assistant = assistants[index];

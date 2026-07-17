@@ -16,4 +16,8 @@ for (const fixture of fixtures) {
 assert.equal(adapters.estimateTokens("12345678"), 2);
 assert.equal(adapters.estimateTokens(""), 1);
 assert.equal(adapters.forHost("example.com"), null);
+assert.equal(adapters.shouldBaseline("/", "/", undefined), true);
+assert.equal(adapters.shouldBaseline("/", "/c/new-chat", 0), false);
+assert.equal(adapters.shouldBaseline("/c/old", "/c/reopened", 2), true);
+assert.equal(adapters.shouldBaseline("/c/same", "/c/same", 2), false);
 console.log(`site adapter fixtures passed (${fixtures.length})`);

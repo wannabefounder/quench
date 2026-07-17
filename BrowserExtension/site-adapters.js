@@ -32,6 +32,13 @@
     return forHost(hostname)?.role(attributesFor(element)) || null;
   }
   function estimateTokens(text) { return Math.max(1, Math.ceil((text || "").length / 4)); }
+  function shouldBaseline(previousPath, nextPath, baselineAssistantCount) {
+    if (baselineAssistantCount === undefined) return true;
+    if (previousPath === nextPath) return false;
+    // ChatGPT changes / into /c/<id> after the first prompt. That is the same new conversation,
+    // not reopened history, so its first assistant response must still be counted.
+    return !(previousPath === "/" && baselineAssistantCount === 0);
+  }
 
-  return Object.freeze({ forHost, roleForElement, estimateTokens });
+  return Object.freeze({ forHost, roleForElement, estimateTokens, shouldBaseline });
 });
