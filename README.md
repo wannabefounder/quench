@@ -1,6 +1,6 @@
 # Quench 💧
 
-A free, open-source macOS menu-bar app that races your daily water intake against the water your AI usage "drinks" in data centers. 100% private — everything stays on your device.
+A free, open-source macOS menu-bar app that races your daily water intake against the water your AI usage "drinks" in data centers. Privacy-first: local by default, with explicit provider connections.
 
 **Status: M4 complete; M5 in progress.** The menu-bar race and local water log are backed by an
 EcoLogits-faithful estimation engine with open coefficients. Private Claude Code and Codex log
@@ -12,6 +12,10 @@ Optional OpenAI and Anthropic organization connectors now have Keychain-only Adm
 storage, documented metadata-only verification, pagination-aware clients, and tested response
 normalization. Connected providers sync automatically at most every 15 minutes; manual diagnostics
 refresh can force a sync, and changing provider buckets are updated without double-counting.
+OpenRouter can be added with a Keychain-only key and exact generation receipts can be imported by
+ID. Its documented API does not provide bulk account history, and Quench never calls OpenRouter's
+separate stored-content endpoint. Settings independently control which retained sources count in
+the race, making API/local overlap visible and reversible without deleting history.
 
 ## Build & run (macOS 14+)
 

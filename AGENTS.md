@@ -35,8 +35,10 @@ contract and [`coefficients.json`](QuenchApp/Resources/coefficients.json) is the
 
 ### Usage collection tiers
 
-- **Tier 1 — API usage:** OpenAI/Anthropic/OpenRouter admin or usage endpoints; exact tokens where
-  available. Credentials belong in Keychain, never SQLite, logs, fixtures, or source control.
+- **Tier 1 — API usage:** OpenAI/Anthropic organization usage endpoints plus OpenRouter generation
+  metadata receipts by known ID; exact tokens where available. OpenRouter has no documented bulk
+  history endpoint and Quench must never call its stored-content endpoint. Credentials belong in
+  Keychain, never SQLite, logs, fixtures, or source control.
 - **Tier 2 — browser extension:** ChatGPT/Claude counts and token estimates via Chrome/Safari;
   transmit counts only, never prompts or responses.
 - **Tier 3 — local logs:** Claude Code, Codex, Gemini CLI, and similar JSONL sources; fully offline,

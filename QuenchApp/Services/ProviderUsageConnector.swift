@@ -97,3 +97,29 @@ struct AnthropicUsageConnector: ProviderUsageConnector {
         return try ProviderUsageParser.anthropic(data)
     }
 }
+
+struct OpenRouterGenerationConnector {
+    private let credential: String
+    private let transport: HTTPTransport
+
+    init(credential: String, transport: HTTPTransport = URLSessionTransport()) {
+        self.credential = credential
+        self.transport = transport
+    }
+
+    func fetchGeneration(id rawID: String) async throws -> NormalizedUsageEvent {
+        let id = rawID.trimmingCharacters(in: .whitespacesAndNewlines)
+        var components = URLComponents(string: "https://openrouter.ai/api/v1/generation")
+        components?.queryItems = [URLQueryItem(name: "id", value: id)]
+        guard !id.isEmpty, let url = components?.url else { throw ProviderConnectorError.invalidURL }
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(credential)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = 20
+        let (data, response) = try await transport.data(for: request)
+        guard (200..<300).contains(response.statusCode) else {
+            throw ProviderConnectorError.rejected(statusCode: response.statusCode)
+        }
+        return try ProviderUsageParser.openRouterGeneration(data)
+    }
+}

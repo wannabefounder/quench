@@ -68,6 +68,12 @@ final class RaceStore: ObservableObject {
             refresh()
         }
     }
+    @Published var countedSources: Set<String> {
+        didSet {
+            UserDefaults.standard.set(Array(countedSources), forKey: "countedSources")
+            refresh()
+        }
+    }
     let goalMl: Double = 2000
 
     private let coef: Coefficients
@@ -105,6 +111,8 @@ final class RaceStore: ObservableObject {
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         claudeCodeEnabled = UserDefaults.standard.object(forKey: "claudeCodeEnabled") as? Bool ?? true
         codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
+        countedSources = Set(UserDefaults.standard.stringArray(forKey: "countedSources")
+            ?? ["claude-code", "codex", "openai-api", "anthropic-api", "openrouter-api"])
         currentDay = RaceEngine.dayKey(for: Date())
         credentialObserver = NotificationCenter.default.addObserver(
             forName: .providerCredentialsChanged, object: nil, queue: .main
@@ -144,6 +152,7 @@ final class RaceStore: ObservableObject {
         if claudeCodeEnabled { enabledSources.insert("claude-code") }
         if codexEnabled { enabledSources.insert("codex") }
         let startOfDay = Calendar.current.startOfDay(for: Date())
+        let sourcesCountedInRace = countedSources
         Task { [weak self] in
             let payload = await Task.detached(priority: .utility) {
                 let statuses = ingestor.ingestAll(enabledSources: enabledSources)
@@ -151,7 +160,7 @@ final class RaceStore: ObservableObject {
                     startingAt: startOfDay, force: forceProviderSync
                 )
                 let user = (try? database.todayUserMl()) ?? 0
-                let samples = (try? database.todayUsageSamples()) ?? []
+                let samples = (try? database.todayUsageSamples(includedSources: sourcesCountedInRace)) ?? []
                 let ai = RaceEngine.aiWaterMl(samples, mode: selectedMode,
                                               region: selectedRegion, coef: coefficients)
                 return RefreshPayload(userMl: user, aiMl: ai, sourceStatuses: statuses,
@@ -168,6 +177,16 @@ final class RaceStore: ObservableObject {
                 refresh()
             }
         }
+    }
+
+    func bindingForCountedSource(_ source: String) -> Binding<Bool> {
+        Binding(
+            get: { self.countedSources.contains(source) },
+            set: { enabled in
+                if enabled { self.countedSources.insert(source) }
+                else { self.countedSources.remove(source) }
+            }
+        )
     }
 
     func logWater(ml: Int) {

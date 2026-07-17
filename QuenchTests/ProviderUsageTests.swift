@@ -44,6 +44,27 @@ final class ProviderUsageTests: XCTestCase {
     func testMalformedProviderResponsesThrow() {
         XCTAssertThrowsError(try ProviderUsageParser.openAI(Data("{}".utf8)))
         XCTAssertThrowsError(try ProviderUsageParser.anthropic(Data("not-json".utf8)))
+        XCTAssertThrowsError(try ProviderUsageParser.openRouterGeneration(Data("{}".utf8)))
+    }
+
+    func testOpenRouterGenerationPrefersNativeTokenCounts() throws {
+        let data = Data(#"{"data":{"id":"gen-123","created_at":"2026-07-18T10:30:00Z","model":"openai/gpt-5","native_tokens_prompt":120,"native_tokens_completion":45,"tokens_prompt":100,"tokens_completion":40}}"#.utf8)
+        let event = try ProviderUsageParser.openRouterGeneration(data)
+
+        XCTAssertEqual(event.externalID, "openrouter:gen-123")
+        XCTAssertEqual(event.source, "openrouter-api")
+        XCTAssertEqual(event.model, "openai/gpt-5")
+        XCTAssertEqual(event.inputTokens, 120)
+        XCTAssertEqual(event.outputTokens, 45)
+        XCTAssertEqual(event.accuracyTier, 1)
+    }
+
+    func testOpenRouterGenerationFallsBackToNormalizedTokenCounts() throws {
+        let data = Data(#"{"data":{"id":"gen-456","created_at":"2026-07-18T10:30:00.123Z","model":"anthropic/claude-sonnet-4","native_tokens_prompt":null,"native_tokens_completion":null,"tokens_prompt":80,"tokens_completion":20}}"#.utf8)
+        let event = try ProviderUsageParser.openRouterGeneration(data)
+
+        XCTAssertEqual(event.inputTokens, 80)
+        XCTAssertEqual(event.outputTokens, 20)
     }
 
     func testPaginationRejectsRepeatedCursor() throws {

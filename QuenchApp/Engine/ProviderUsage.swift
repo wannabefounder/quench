@@ -3,6 +3,7 @@ import Foundation
 public enum UsageProvider: String, CaseIterable, Hashable {
     case openAI = "openai"
     case anthropic = "anthropic"
+    case openRouter = "openrouter"
 }
 
 public struct ProviderUsagePage: Equatable {
@@ -96,10 +97,53 @@ public enum ProviderUsageParser {
                                  nextPage: response.hasMore ? response.nextPage : nil)
     }
 
+    /// Normalizes OpenRouter's generation metadata response. Quench deliberately uses this
+    /// endpoint rather than the separate content endpoint, so prompts and responses are never read.
+    public static func openRouterGeneration(_ data: Data) throws -> NormalizedUsageEvent {
+        let response = try JSONDecoder().decode(OpenRouterGenerationResponse.self, from: data)
+        guard let timestamp = parseDate(response.data.createdAt) else {
+            throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Invalid created_at"))
+        }
+        let input = response.data.nativeTokensPrompt ?? response.data.tokensPrompt
+        let output = response.data.nativeTokensCompletion ?? response.data.tokensCompletion
+        return NormalizedUsageEvent(
+            externalID: "openrouter:\(response.data.id)",
+            timestamp: timestamp,
+            source: "openrouter-api",
+            model: response.data.model,
+            inputTokens: input,
+            outputTokens: output,
+            accuracyTier: 1
+        )
+    }
+
     private static func parseDate(_ raw: String) -> Date? {
         let fractional = ISO8601DateFormatter()
         fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return fractional.date(from: raw) ?? ISO8601DateFormatter().date(from: raw)
+    }
+}
+
+private struct OpenRouterGenerationResponse: Decodable {
+    let data: Generation
+
+    struct Generation: Decodable {
+        let id: String
+        let createdAt: String
+        let model: String?
+        let nativeTokensPrompt: Int?
+        let nativeTokensCompletion: Int?
+        let tokensPrompt: Int
+        let tokensCompletion: Int
+
+        enum CodingKeys: String, CodingKey {
+            case id, model
+            case createdAt = "created_at"
+            case nativeTokensPrompt = "native_tokens_prompt"
+            case nativeTokensCompletion = "native_tokens_completion"
+            case tokensPrompt = "tokens_prompt"
+            case tokensCompletion = "tokens_completion"
+        }
     }
 }
 

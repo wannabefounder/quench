@@ -5,7 +5,8 @@ generations, DB dedupe, parser tests, visible source health, and the real bundle
 M4 DONE: onboarding, persistent scope/region, accuracy context, source toggles, and diagnostics.
 M5 IN PROGRESS: OpenAI + Anthropic Admin usage now auto-syncs with Keychain credentials, bounded
 pagination, 15-minute throttle, stable bucket upserts, isolated failures, and diagnostics status.
-Next: OpenRouter connector and explicit overlap guidance/source priority improvements.
+OpenRouter generation metadata imports are supported by ID (no bulk history/content calls); all
+local/API sources have independent race-inclusion controls. Next: browser Tier 2 architecture.
 
 Build env: sandbox is Linux/aarch64, Swift 5.10.1. Toolchain must be re-downloaded per session:
   https://download.swift.org/swift-5.10.1-release/ubuntu2204-aarch64/swift-5.10.1-RELEASE/swift-5.10.1-RELEASE-ubuntu22.04-aarch64.tar.gz
@@ -28,7 +29,7 @@ Package.swift builds QuenchEngine (pure) everywhere; app+GRDB only on macOS. Ful
 - SourceHealth.swift + tests — pure state rules including Disabled; no paths cross into UI.
 - OnboardingView + Settings diagnostics — counts, last activity, methodology version, refresh.
 - ProviderUsage.swift + tests — Tier 1 response normalization and pagination cursors.
-- Services/ — Keychain credentials and bounded OpenAI/Anthropic usage clients; no key logging.
+- Services/ — Keychain credentials, bounded OpenAI/Anthropic sync, OpenRouter receipt imports.
 - ProviderSyncService + DB v3 — scheduled/forced import, upsert, throttling, sanitized health.
 
 ## TODO / open

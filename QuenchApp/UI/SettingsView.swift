@@ -14,7 +14,7 @@ struct SettingsView: View {
             DiagnosticsView(store: store)
                 .tabItem { Label("Diagnostics", systemImage: "stethoscope") }
         }
-        .frame(width: 520, height: 390)
+        .frame(width: 540, height: 460)
     }
 }
 
@@ -39,6 +39,7 @@ private struct ProviderSettingsView: View {
                     documentationURL: URL(string: "https://developers.openai.com/api/reference/resources/admin/subresources/organization/subresources/usage")!,
                     model: model
                 )
+                OpenRouterReceiptCard(model: model)
                 ProviderCredentialCard(
                     provider: .anthropic,
                     title: "Anthropic",
@@ -57,6 +58,63 @@ private struct ProviderSettingsView: View {
                     .foregroundStyle(.secondary)
             }
             .padding(20)
+        }
+    }
+}
+
+private struct OpenRouterReceiptCard: View {
+    @ObservedObject var model: ProviderCredentialsModel
+    @State private var credential = ""
+    @State private var generationID = ""
+
+    var body: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("OpenRouter").font(.callout.weight(.semibold))
+                    Spacer()
+                    Text(isStored ? "Key saved" : "Not connected")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(isStored ? .blue : .secondary)
+                }
+                Text("OpenRouter has no documented bulk history API. Quench can import exact token metadata for a generation ID without reading its prompt or response.")
+                    .font(.caption).foregroundStyle(.secondary)
+                SecureField("OpenRouter API key", text: $credential)
+                    .textFieldStyle(.roundedBorder).privacySensitive()
+                HStack {
+                    Link("Generation API documentation", destination: URL(string: "https://openrouter.ai/docs/api/api-reference/generations/get-generation")!)
+                        .font(.caption)
+                    Spacer()
+                    if isStored { Button("Remove", role: .destructive) { model.remove(.openRouter) } }
+                    Button("Save key") {
+                        let value = credential
+                        credential = ""
+                        model.saveAndVerify(value, for: .openRouter)
+                    }
+                    .disabled(credential.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+                HStack {
+                    TextField("Generation ID", text: $generationID).textFieldStyle(.roundedBorder)
+                    Button("Import receipt") {
+                        let value = generationID
+                        generationID = ""
+                        model.importOpenRouterGeneration(id: value)
+                    }
+                    .disabled(!isStored || generationID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .buttonStyle(.borderedProminent)
+                }
+                if let message = model.openRouterImportMessage {
+                    Text(message).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .padding(4)
+        }
+    }
+
+    private var isStored: Bool {
+        switch model.state(for: .openRouter) {
+        case .disconnected: false
+        default: true
         }
     }
 }
@@ -181,6 +239,17 @@ private struct GeneralSettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+
+            Section("Count in today's race") {
+                Toggle("Claude Code logs", isOn: store.bindingForCountedSource("claude-code"))
+                Toggle("Codex logs", isOn: store.bindingForCountedSource("codex"))
+                Toggle("OpenAI API", isOn: store.bindingForCountedSource("openai-api"))
+                Toggle("Anthropic API", isOn: store.bindingForCountedSource("anthropic-api"))
+                Toggle("OpenRouter receipts", isOn: store.bindingForCountedSource("openrouter-api"))
+                Text("If local logs and a provider API describe the same requests, count only one source. Disabling a source keeps its private history on this Mac but removes it from race totals.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .padding(.top, 8)
@@ -266,12 +335,17 @@ private struct ProviderSyncCard: View {
     }
 
     private var providerName: String {
-        status.provider == .openAI ? "OpenAI" : "Anthropic"
+        switch status.provider {
+        case .openAI: "OpenAI"
+        case .anthropic: "Anthropic"
+        case .openRouter: "OpenRouter"
+        }
     }
     private var detail: String {
         switch status.state {
         case .notConfigured: "Not configured • add an Admin key in Providers"
         case .synced: "\(status.importedEvents) model buckets imported"
+        case .manual: status.message ?? "Receipt import ready"
         case .failed: status.message ?? "Sync failed"
         }
     }
@@ -279,6 +353,7 @@ private struct ProviderSyncCard: View {
         switch status.state {
         case .notConfigured: "minus.circle"
         case .synced: "checkmark.circle.fill"
+        case .manual: "doc.badge.plus"
         case .failed: "exclamationmark.triangle.fill"
         }
     }
@@ -286,6 +361,7 @@ private struct ProviderSyncCard: View {
         switch status.state {
         case .notConfigured: .secondary
         case .synced: .green
+        case .manual: .blue
         case .failed: .orange
         }
     }

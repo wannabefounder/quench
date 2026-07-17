@@ -97,12 +97,13 @@ final class AppDatabase {
     }
 
     /// Today's usage events as pure engine samples (local midnight boundary). Empty until M3+ populate them.
-    func todayUsageSamples(now: Date = Date(), calendar: Calendar = .current) throws -> [UsageSample] {
+    func todayUsageSamples(includedSources: Set<String>? = nil,
+                           now: Date = Date(), calendar: Calendar = .current) throws -> [UsageSample] {
         let startTs = Int64(calendar.startOfDay(for: now).timeIntervalSince1970)
         return try dbQueue.read { db in
             let rows = try UsageEvent.fetchAll(
                 db, sql: "SELECT * FROM usage_events WHERE ts >= ?", arguments: [startTs])
-            return rows.map {
+            return rows.filter { includedSources?.contains($0.source) ?? true }.map {
                 UsageSample(model: $0.model, inputTokens: $0.inputTokens,
                             outputTokens: $0.outputTokens, messageCount: $0.messageCount,
                             minutesActive: $0.minutesActive)

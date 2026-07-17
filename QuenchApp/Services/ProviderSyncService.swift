@@ -4,6 +4,7 @@ import QuenchEngine
 enum ProviderSyncState: Equatable {
     case notConfigured
     case synced
+    case manual
     case failed
 }
 
@@ -36,6 +37,10 @@ final class ProviderSyncService {
     func syncAll(startingAt: Date, force: Bool = false, now: Date = Date()) async -> [ProviderSyncStatus] {
         var statuses: [ProviderSyncStatus] = []
         for provider in UsageProvider.allCases {
+            if provider == .openRouter {
+                statuses.append(manualOpenRouterStatus())
+                continue
+            }
             statuses.append(await sync(provider, startingAt: startingAt, force: force, now: now))
         }
         return statuses
@@ -66,6 +71,7 @@ final class ProviderSyncService {
         let connector: ProviderUsageConnector = switch provider {
         case .openAI: OpenAIUsageConnector(credential: credential)
         case .anthropic: AnthropicUsageConnector(credential: credential)
+        case .openRouter: preconditionFailure("OpenRouter receipts are imported by generation ID")
         }
 
         do {
@@ -88,6 +94,13 @@ final class ProviderSyncService {
             let record = try? database.providerSyncRecord(provider)
             return status(provider, state: .failed, record: record, message: message)
         }
+    }
+
+    private func manualOpenRouterStatus() -> ProviderSyncStatus {
+        let record = try? database.providerSyncRecord(.openRouter)
+        let configured = ((try? credentials.read(for: .openRouter)) ?? nil) != nil
+        return status(.openRouter, state: configured ? .manual : .notConfigured,
+                      record: record, message: configured ? "Import receipts by generation ID." : nil)
     }
 
     private func status(_ provider: UsageProvider, state: ProviderSyncState,

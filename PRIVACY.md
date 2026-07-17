@@ -23,8 +23,13 @@ accessibility. They never enter Quench's SQLite database, UserDefaults, diagnost
 telemetry, and Quench never reloads a saved key into a visible text field.
 
 When a provider is connected, Quench requests organization token totals grouped by model from that
-provider. The request includes a time range and pagination cursor when needed. It does not include
+provider. The request includes a time range and pagination cursor when needed. OpenRouter imports
+only generation metadata for an ID entered by the user; Quench does not request stored generation
+content. These operations do not include
 prompts, responses, local paths, hydration data, or identifiers sent to a Quench-operated server.
+
+Every normalized source has a separate local “count in today's race” control. This lets users avoid
+API/local double-counting without deleting retained usage metadata.
 
 ## Diagnostics and analytics
 
