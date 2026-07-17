@@ -66,18 +66,20 @@ final class WaterMathTests: XCTestCase {
 
     func testWaterStandardGPT4o() {
         let s = UsageSample(model: "gpt-4o", inputTokens: 1000, outputTokens: 1000) // 0.98 Wh
-        // openai wue_onsite 0.30, global wue_offsite 3.00; (0.98/1000)*(3.30)*1000
-        XCTAssertEqual(WaterMath.waterMl(s, mode: .standard, coef: coef), 0.98 * 3.30, accuracy: 1e-6)
+        // Facility energy includes PUE, so on-site uses server energy: 0.30 / 1.20.
+        XCTAssertEqual(WaterMath.waterMl(s, mode: .standard, coef: coef),
+                       0.98 * (0.30 / 1.20 + 3.00), accuracy: 1e-6)
     }
 
     func testWaterConservativeIsOnSiteOnly() {
         let s = UsageSample(model: "gpt-4o", inputTokens: 1000, outputTokens: 1000)
-        XCTAssertEqual(WaterMath.waterMl(s, mode: .conservative, coef: coef), 0.98 * 0.30, accuracy: 1e-6)
+        XCTAssertEqual(WaterMath.waterMl(s, mode: .conservative, coef: coef),
+                       0.98 * 0.30 / 1.20, accuracy: 1e-6)
     }
 
     func testWaterFullAddsEmbodiedShare() {
         let s = UsageSample(model: "gpt-4o", inputTokens: 1000, outputTokens: 1000)
-        let standard = 0.98 * 3.30
+        let standard = 0.98 * (0.30 / 1.20 + 3.00)
         XCTAssertEqual(WaterMath.waterMl(s, mode: .full, coef: coef), standard * 1.12, accuracy: 1e-6)
     }
 
@@ -92,8 +94,9 @@ final class WaterMathTests: XCTestCase {
 
     func testAnthropicProviderOnSiteFactor() {
         let s = UsageSample(model: "claude-3-5-sonnet", inputTokens: 100, outputTokens: 300) // 1.155 Wh
-        // anthropic wue_onsite 0.55
-        XCTAssertEqual(WaterMath.waterMl(s, mode: .conservative, coef: coef), 1.155 * 0.55, accuracy: 1e-6)
+        // anthropic WUE 0.55 applies to server energy; facility coefficient includes PUE 1.12.
+        XCTAssertEqual(WaterMath.waterMl(s, mode: .conservative, coef: coef),
+                       1.155 * 0.55 / 1.12, accuracy: 1e-6)
     }
 
     func testRegionChangesOffSiteWater() {
@@ -101,8 +104,8 @@ final class WaterMathTests: XCTestCase {
         let china = WaterMath.waterMl(s, mode: .standard, region: "china", coef: coef)
         let eu = WaterMath.waterMl(s, mode: .standard, region: "eu", coef: coef)
         XCTAssertGreaterThan(china, eu)
-        // china: (0.98/1000)*(0.30+6.02)*1000
-        XCTAssertEqual(china, 0.98 * (0.30 + 6.02), accuracy: 1e-6)
+        // china: facility Wh * (server-side WUE / PUE + grid WUE)
+        XCTAssertEqual(china, 0.98 * (0.30 / 1.20 + 6.02), accuracy: 1e-6)
     }
 
     func testUnknownRegionFallsBackToDefault() {

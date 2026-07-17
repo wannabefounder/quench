@@ -53,8 +53,9 @@ We use the EcoLogits / Li et al. (2025) two-scope water formula. With energy in 
 in litres per kWh (which equals millilitres per Wh):
 
 ```
-on-site  = energy_kWh * WUE_onsite     # cooling water evaporated at the data center (Scope 1)
-off-site = energy_kWh * WUE_offsite    # water used to generate the electricity (Scope 2)
+server_energy_kWh = facility_energy_kWh / PUE
+on-site  = server_energy_kWh * WUE_onsite    # cooling water at the data center (Scope 1)
+off-site = facility_energy_kWh * WUE_offsite # water behind facility electricity (Scope 2)
 ```
 
 `WUE_onsite` and PUE are **per-provider** (OpenAI/Azure, Anthropic, Google, DeepSeek, Meta, or a
@@ -77,9 +78,22 @@ full         = (on-site + off-site) * (1 + embodied_fraction)
 ```
 
 Worked example — a GPT-4o request of 1000 input + 1000 output tokens (0.98 Wh), OpenAI provider,
-global grid: conservative ≈ **0.29 mL**, standard ≈ **3.23 mL**, full ≈ **3.62 mL**. Same query on
-the China grid rises to ≈ 6.2 mL (standard); on the Nordic grid it falls to ≈ 0.9 mL. The spread is
+global grid: conservative ≈ **0.25 mL**, standard ≈ **3.19 mL**, full ≈ **3.57 mL**. Same query on
+the China grid rises to ≈ 6.1 mL (standard); on the Nordic grid it falls to ≈ 0.8 mL. The spread is
 the point: we never present one number as truth.
+
+This placement of PUE mirrors EcoLogits' published formula. EcoLogits writes the equation from
+server energy as `E_server × [WUE_onsite + PUE × WUE_offsite]`; because Quench's calibrated energy
+coefficients are already facility-level, the algebraically equivalent form above divides only the
+on-site term by PUE.
+
+## Optional EcoLogits API enhancement
+
+EcoLogits also publishes a beta HTTP API at `https://api.ecologits.ai/v1beta`. Quench may use it to
+refresh public provider/model catalogs, retrieve country electricity-mix factors, and validate
+bundled estimates. The app remains useful when the service is unavailable. Any runtime comparison
+must disclose that provider, model, output-token count, optional latency, and region are sent; it
+must never send prompts, responses, local paths, user identity, or AI-provider credentials.
 
 ## Why estimates, and how to challenge them
 

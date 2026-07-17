@@ -6,7 +6,7 @@ import Darwin
 #endif
 
 // Pure water math. No SwiftUI, no DB. Mirrors the EcoLogits methodology:
-// energy -> water via WCF = E x [WUE_onsite + WUE_offsite] over three scopes.
+// facility energy -> water via WCF = E x [WUE_onsite / PUE + WUE_offsite] over three scopes.
 // All coefficients come from coefficients.json (Coefficients); nothing hardcoded here.
 
 /// One normalized usage event, decoupled from the GRDB record so the Engine stays pure.
@@ -145,7 +145,9 @@ public enum WaterMath {
         return 0
     }
 
-    /// Water (mL) for one event. WCF = E x [WUE_onsite + WUE_offsite], per mode/scope.
+    /// Water (mL) for one event. Our energy coefficients are facility-level (PUE included), while
+    /// EcoLogits applies on-site WUE to server energy and off-site WUE to facility energy:
+    /// WCF = E_facility x [WUE_onsite / PUE + WUE_offsite].
     public static func waterMl(_ s: UsageSample, mode: WaterMode = .standard,
                                region: String? = nil, coef: Coefficients) -> Double {
         let e = energyWh(s, coef: coef)
@@ -157,7 +159,7 @@ public enum WaterMath {
         let reg = coef.water.regions[regionKey] ?? coef.water.regions[coef.water.default_region]
             ?? .init(wue_offsite: 3.0, label: nil)
         let eKwh = e / 1000.0
-        let onsite = eKwh * prov.wue_onsite
+        let onsite = eKwh / max(prov.pue, 1.0) * prov.wue_onsite
         let offsite = eKwh * reg.wue_offsite
         let liters: Double
         switch mode {
