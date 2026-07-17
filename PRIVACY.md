@@ -42,6 +42,10 @@ Hydration notifications are off by default and require explicit macOS permission
 the local day, reminder count, and last-reminder time needed to enforce its daily cap and cooldown.
 Notification content contains a rounded hydration gap, never conversation or provider content.
 
+AI Water Wrapped images are rendered locally from aggregate daily totals. Choosing Share creates a
+temporary PNG and hands it to the standard macOS share sheet; Quench does not upload or retain a
+remote copy.
+
 ## Diagnostics and analytics
 
 Quench has no hidden analytics or advertising SDK. Any future diagnostic sharing must be explicit,

@@ -34,6 +34,9 @@ enables them. Shift-Command-D logs a 250 mL glass while the menu is open.
 Notifications require a packaged macOS application; raw `swift run` development launches safely
 leave them unavailable.
 
+Weekly, monthly, and yearly AI Water Wrapped cards are rendered locally in square or Story format.
+The share sheet receives a temporary PNG containing aggregate totals only; Quench does not upload it.
+
 ## Build & run (macOS 14+)
 
 ```sh

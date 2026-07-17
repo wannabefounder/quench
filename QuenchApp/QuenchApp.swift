@@ -124,6 +124,12 @@ final class RaceStore: ObservableObject {
 
     var coefficientsVersion: String { coef.version }
 
+    func wrappedSummary(for period: WrappedPeriod) -> WrappedSummary {
+        WrappedInsights.summarize(recentHistory.map {
+            DailyWaterSummary(day: $0.day, userMl: $0.userMl, aiMl: $0.aiMl, winner: $0.winner)
+        }, period: period)
+    }
+
     init() {
         let coefficients = RaceStore.loadCoefficients()
         coef = coefficients
@@ -204,7 +210,7 @@ final class RaceStore: ObservableObject {
                     day: day, aiMlLow: low, aiMlMid: standard, aiMlHigh: high,
                     userMl: user, winner: RaceEngine.winner(userMl: Double(user), aiMl: standard)
                 )
-                let summaries = (try? database.recentDailySummaries()) ?? []
+                let summaries = (try? database.recentDailySummaries(limit: 366)) ?? []
                 let streak = RaceEngine.hydrationStreak(summaries.map {
                     RaceDayResult(day: $0.day, winner: $0.winner ?? "tie")
                 })

@@ -13,6 +13,8 @@ struct SettingsView: View {
                 .tabItem { Label("Providers", systemImage: "key.fill") }
             HistorySettingsView(store: store)
                 .tabItem { Label("History", systemImage: "calendar") }
+            WrappedSettingsView(store: store)
+                .tabItem { Label("Wrapped", systemImage: "sparkles.rectangle.stack") }
             DiagnosticsView(store: store)
                 .tabItem { Label("Diagnostics", systemImage: "stethoscope") }
         }
