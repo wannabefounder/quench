@@ -45,7 +45,7 @@ it does not mean a future public release or partnership exists.
 | Source isolation and deduplication | Complete | `LocalLogIngestor`, provider sync, stable external IDs and database constraints |
 | Native packaged macOS app | Complete | `scripts/package-app.sh`; signature, bundle and plist validation pass |
 | Launch at login | Implemented; final restart check external | `SMAppService.mainApp`, packaged-only availability |
-| CI | Complete and authoritative | macOS workflow runs Swift tests, browser fixtures, and package validation |
+| CI | Complete and authoritative | [Run 29639719881](https://github.com/wannabefounder/quench/actions/runs/29639719881): 71 Swift tests, browser fixtures, and package validation passed |
 | Developer ID notarization | Automation complete; credentials external | `release.yml`, `RELEASING.md`; cannot run without owner Apple membership/secrets |
 | Homebrew | Template complete; publication external | `Packaging/quench.rb.template`; permanent URL/SHA require first notarized release |
 | Open-source community basics | Complete | MIT, contribution guide, code of conduct, security policy, governance, issue templates |
@@ -71,9 +71,26 @@ it does not mean a future public release or partnership exists.
    Source Collective; review and accept the current fiscal-sponsorship agreement.
 3. Enroll in the Apple Developer Program and add release secrets.
 4. Run the tag workflow, notarize/staple, verify checksum on a clean Mac, and publish the first release.
-5. Verify all four themes with Reduce Motion enabled and test an actual login restart.
+5. Verify Reduce Motion using the Mac-wide accessibility setting and test an actual login restart.
 6. Apply to a current grant only after an official live call and eligibility terms are verified.
 7. Conduct Product Hunt, Show HN, press, or charity outreach as human representational actions.
 
 Until those owner/external actions occur, Quench is engineering-ready but not truthfully a publicly
 notarized, fiscally sponsored, or charity-partnered product.
+
+## Packaged runtime verification
+
+The debug-signed `/Applications/Quench.app` was rebuilt and restarted after the final UI changes.
+The following checks passed through the real accessibility interface:
+
+- main dashboard appears and remains responsive;
+- the native menu entry is present; its packaged SwiftUI label is configured with `drop.fill`;
+- closing the dashboard leaves the pixel mini status visible;
+- the mini status displays `You / goal` and AI totals and its +250 mL action updates immediately;
+- clicking the pixel buddy recreates the dashboard after the original SwiftUI window was destroyed;
+- Aqua Lab, Forest Flow, Cosmic Sip, and Solar Splash each select their named buddy;
+- Settings opens, closes, and opens again on the newest build.
+
+The local Command Line Tools installation cannot import XCTest, so the macOS GitHub runner is the
+test authority. Local compilation, browser fixtures, bundle signing validation, plist validation,
+and the runtime checks above passed independently.

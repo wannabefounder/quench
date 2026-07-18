@@ -33,8 +33,8 @@ always-on-top pixel status fallback are implemented.
 
 ## TODO / open
 - Packaged coefficients and fallback are verified; app launch/icon/restart passed on this Mac.
-- Settings close/reopen and mini-widget water logging are verified on the packaged app. Manual UI
-  checks remain for all-theme Reduce Motion behavior and launch-at-login restart.
+- Settings close/reopen, all four theme switches, mini-widget logging, and widget-to-dashboard reopen
+  are verified. Manual checks remain for Reduce Motion and an actual launch-at-login restart.
 - This Mac's default CLT SDK alias (26.2) mismatches its Swift compiler build. App builds with the
   installed MacOSX15.4 SDK; README documents cache cleanup and the temporary SDKROOT workaround.
 - gpt-4o-mini output coef set below gpt-4o by size-prior (benchmark's mini figure looked anomalous).
