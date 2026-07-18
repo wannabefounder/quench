@@ -72,8 +72,12 @@ buddy is prominent in the main window, popover, and theme gallery and reacts to 
 water logging, and race state. Do not put a timer-driven `TimelineView` back into the `MenuBarExtra`
 label: on macOS 26 it loops inside `NSStatusBarButton.setImage`, hangs launch, and exhausts memory.
 Because macOS may collapse custom menu-bar text, the default always-on-top fallback is a draggable,
-non-activating pixel panel with only human goal progress, AI water, and a +250 mL action. It must not
-inspect other windows or request Screen Recording/Accessibility access.
+non-activating, resizable hydration instrument with human goal progress, AI estimate/range, race
+state, and editable sip/office-cup/glass/1 L bottle-sip actions. Do not restore a hard-coded single
+250 mL widget action: vessel sizes differ and the user explicitly requested calibration. Its visual
+language may feel like a youthful futuristic engineering instrument but must remain original, not
+copy another company's logo or exact trade dress. It must not inspect other windows or request
+Screen Recording/Accessibility access.
 
 Animation must communicate state without delaying interaction. Honor Reduce Motion automatically,
 avoid color-only status, keep the daily race understandable within seconds, and keep continuous

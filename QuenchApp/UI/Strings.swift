@@ -5,7 +5,6 @@ enum Strings {
     static let appName = "Quench"
     static let youLabel = "You"
     static let aiLabel = "Your AI"
-    static let logGlass = "+250 ml"
     static let mlSuffix = "ml"
     static let userAhead = "You're ahead — nice."
     static let aiAhead = "Your AI is ahead. Sip something?"

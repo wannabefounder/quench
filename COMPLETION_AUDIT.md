@@ -10,10 +10,10 @@ it does not mean a future public release or partnership exists.
 | Report requirement | Status | Authoritative evidence |
 |---|---|---|
 | Daily “You vs. Your AI” race | Complete | `MenuContentView.swift`, `RaceBarView.swift`, packaged UI verification |
-| One-click and keyboard water logging | Complete | `Database.swift`, `MenuContentView.swift`; main and mini-widget logging verified |
+| One-click and keyboard water logging | Complete | `Database.swift`, `MenuContentView.swift`; editable sip/cup/glass/bottle-sip actions replace a fixed serving assumption |
 | Local midnight winner, streak, one freeze | Complete | `RaceEngine.swift`, `RaceEngineTests.swift`, History UI |
 | Weekly Thirst Index | Complete | `HistoryInsights.swift`, tests, History UI |
-| Three clearly labeled water scopes | Complete | `WaterMath.swift`, `coefficients.json`, Settings, 21 water-math tests |
+| Three clearly labeled water scopes and visible range | Complete | `WaterMath.swift`, `coefficients.json`, dashboard/history/floating accessibility/Wrapped UI, 22 water-math tests |
 | Region-sensitive EcoLogits-style method | Complete, report formula superseded | Full method and rationale in `METHODOLOGY.md` and `AGENTS.md` |
 | Versioned open coefficients | Complete | Bundled `coefficients.json`; runtime uses reviewed offline copy |
 | Privacy-safe model freshness | Complete | Optional pinned EcoLogits catalog-only refresh; owner-only cache, schema/size/timeout validation, bundled coefficients win |
@@ -24,7 +24,7 @@ it does not mean a future public release or partnership exists.
 | Relatable cups/bottles/showers | Complete | `WrappedInsights.relatableComparison`, deterministic tests |
 | Per-liter clean-water pledge | Complete with safe deviation | Private calculator and independent links; no payment or partnership claim |
 | Four animated character themes | Complete | `QuenchTheme.swift`, `BuddyView.swift`, theme gallery, Reduce Motion handling |
-| Always-visible status | Complete with platform adaptation | Native drop icon plus default floating animated pixel water drop; timer-driven status icon was removed after a reproduced macOS 26 launch hang |
+| Always-visible status | Complete with platform adaptation | Native drop icon plus adaptive 340×124–640×360 floating hydration instrument; timer-driven status icon was removed after a reproduced macOS 26 launch hang |
 
 ## Collection architecture
 
@@ -88,7 +88,8 @@ The following checks passed through the real accessibility interface:
 - main dashboard appears and remains responsive;
 - the native menu entry is present; its packaged SwiftUI label is configured with `drop.fill`;
 - closing the dashboard leaves the animated pixel water drop status visible;
-- the mini status displays `You / goal` and AI totals and its +250 mL action updates immediately;
+- the compact and expanded hydration-instrument layouts render cleanly with `You / goal`, AI
+  estimate/range, race state, and four calibrated quick-add actions exposed accessibly;
 - clicking the pixel water drop recreates the dashboard after the original SwiftUI window was destroyed;
 - Aqua Lab, Forest Flow, Cosmic Sip, and Solar Splash each select their named buddy;
 - Settings opens, closes, and opens again on the newest build.

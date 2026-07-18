@@ -91,6 +91,18 @@ struct MenuContentView: View {
             }
             RaceBarView(userMl: Double(store.userMl), aiMl: store.aiMl,
                         goalMl: store.goalMl, theme: store.theme)
+            HStack(spacing: 5) {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                Text("Estimated range")
+                Spacer()
+                Text("\(volume(store.aiMlLow)) – \(volume(store.aiMlHigh))")
+                    .monospacedDigit()
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .help("Scope 1 cooling through the Full lifecycle allowance. The selected scope remains the race value.")
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("AI water estimate range, \(volume(store.aiMlLow)) to \(volume(store.aiMlHigh)). The selected \(store.waterMode.displayName) estimate is \(volume(store.aiMl)).")
             HStack {
                 Label("Daily fluid goal", systemImage: "target")
                 Spacer()
@@ -116,11 +128,12 @@ struct MenuContentView: View {
     }
 
     private var actionRow: some View {
-        Button(action: { store.logWater(ml: 250) }) {
+        Button(action: { store.logDrink(.glass) }) {
             HStack {
                 Image(systemName: "plus.circle.fill").font(.title3)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Log 250 mL").font(.body.weight(.bold))
+                    Text("Log glass · \(store.drinkAmount(for: .glass)) mL")
+                        .font(.body.weight(.bold))
                     Text("Shift-Command-D").font(.caption2).opacity(0.75)
                 }
                 Spacer()
@@ -133,8 +146,8 @@ struct MenuContentView: View {
         .buttonStyle(.borderedProminent)
         .tint(store.theme.secondaryAccent)
         .keyboardShortcut("d", modifiers: [.command, .shift])
-        .help("Log 250 mL while the Quench menu is open")
-        .accessibilityHint("Adds 250 milliliters to today's private water log")
+        .help("Log your calibrated glass while the Quench menu is open")
+        .accessibilityHint("Adds \(store.drinkAmount(for: .glass)) milliliters to today's private water log")
     }
 
     private var sourceSummary: some View {
@@ -174,6 +187,10 @@ struct MenuContentView: View {
             .padding(.horizontal, 8).padding(.vertical, 5)
             .background(store.theme.accent.opacity(0.1), in: Capsule())
             .accessibilityLabel(text)
+    }
+
+    private func volume(_ ml: Double) -> String {
+        MenuBarStatus.compactMilliliters(ml)
     }
 
     private var buddyHeadline: String {

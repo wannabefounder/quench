@@ -283,8 +283,10 @@ private struct HistorySettingsView: View {
                             HStack {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.day).font(.callout.weight(.semibold))
-                                    Text("You \(item.userMl) mL • AI \(Int(item.aiMl)) mL")
+                                    Text("You \(item.userMl) mL • Estimated AI \(Int(item.aiMl)) mL")
                                         .font(.caption).foregroundStyle(.secondary)
+                                    Text("Range \(Int(item.aiMlLow))–\(Int(item.aiMlHigh)) mL")
+                                        .font(.caption2).foregroundStyle(.tertiary)
                                 }
                                 Spacer()
                                 Label(winnerLabel(item.winner), systemImage: winnerIcon(item.winner))
@@ -501,7 +503,7 @@ private struct GeneralSettingsView: View {
         Form {
             Section("App") {
                 Toggle("Always-on-top mini status", isOn: $store.floatingWidgetEnabled)
-                Text("A draggable pixel-style panel shows only your fluid progress, AI water, and a +250 mL button. Click the water drop to reopen Quench. It stays above windows and across Spaces without reading anything on screen.")
+                Text("A draggable, resizable hydration instrument shows your progress, the AI estimate and range, and your own quick-add vessels. Click the water drop to reopen Quench. It stays above windows and across Spaces without reading anything on screen.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Open Quench when I log in", isOn: launchAtLogin.binding)
@@ -516,6 +518,22 @@ private struct GeneralSettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+
+            Section("Quick-add vessels") {
+                ForEach(HydrationVessel.allCases, id: \.self) { vessel in
+                    Stepper(value: store.bindingForDrinkAmount(vessel),
+                            in: vessel.allowedMl, step: vessel.adjustmentStep) {
+                        LabeledContent {
+                            Text("\(store.drinkAmount(for: vessel)) mL").monospacedDigit()
+                        } label: {
+                            Label(vessel.displayName, systemImage: vessel.symbol)
+                        }
+                    }
+                }
+                Text("These are editable starting points, not fixed serving sizes. Measure your usual cup or glass once if you want a closer number. ‘1 L bottle sip’ records only the amount you normally sip, not the whole bottle.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section("Estimation") {

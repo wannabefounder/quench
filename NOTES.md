@@ -10,8 +10,9 @@ local/API sources have independent race-inclusion controls.
 M6 DONE: packaged Chromium MV3 + Settings-guided Chrome/Brave/Edge connection + strict native bridge;
 count-only live ingestion and owner-only inbox. Safari is out of scope by user decision.
 M7: history/freeze/nudges/Wrapped comparisons/private pledge plus four buddy themes shipped.
-M8 underway: packaged app, original icon, launch-at-login, verified pixel water-drop status, and
-privacy-safe EcoLogits catalog freshness are implemented.
+M8 engineering-ready: packaged app, icon, launch-at-login, pixel water-drop status, visible
+low/mid/high ranges, resizable calibrated-vessel widget, release automation, and privacy-safe
+EcoLogits freshness are implemented.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,
@@ -32,8 +33,8 @@ privacy-safe EcoLogits catalog freshness are implemented.
 
 ## TODO / open
 - Packaged coefficients and fallback are verified; app launch/icon/restart passed on this Mac.
-- Settings close/reopen, all four theme switches, mini-widget logging, and widget-to-dashboard reopen
-  are verified. Manual checks remain for Reduce Motion and an actual launch-at-login restart.
+- Settings close/reopen, all four themes, both widget layouts, and dashboard reopen are verified;
+  manual checks remain for edge resizing, Reduce Motion, and an actual launch-at-login restart.
 - This Mac's default CLT SDK alias (26.2) mismatches its Swift compiler build. App builds with the
   installed MacOSX15.4 SDK; README documents cache cleanup and the temporary SDKROOT workaround.
 - gpt-4o-mini output coef set below gpt-4o by size-prior (benchmark's mini figure looked anomalous).

@@ -14,10 +14,16 @@ public struct DailyWaterSummary: Equatable {
     public let day: String
     public let userMl: Int
     public let aiMl: Double
+    public let aiMlLow: Double
+    public let aiMlHigh: Double
     public let winner: String
 
-    public init(day: String, userMl: Int, aiMl: Double, winner: String) {
-        self.day = day; self.userMl = userMl; self.aiMl = aiMl; self.winner = winner
+    public init(day: String, userMl: Int, aiMl: Double, aiMlLow: Double? = nil,
+                aiMlHigh: Double? = nil, winner: String) {
+        self.day = day; self.userMl = userMl; self.aiMl = aiMl
+        self.aiMlLow = min(aiMlLow ?? aiMl, aiMl)
+        self.aiMlHigh = max(aiMlHigh ?? aiMl, aiMl)
+        self.winner = winner
     }
 }
 
@@ -26,6 +32,8 @@ public struct WrappedSummary: Equatable {
     public let trackedDays: Int
     public let userMl: Int
     public let aiMl: Double
+    public let aiMlLow: Double
+    public let aiMlHigh: Double
     public let userWinDays: Int
     public let streak: HydrationStreak
 
@@ -35,9 +43,13 @@ public struct WrappedSummary: Equatable {
     }
 
     public init(period: WrappedPeriod, trackedDays: Int, userMl: Int, aiMl: Double,
+                aiMlLow: Double? = nil, aiMlHigh: Double? = nil,
                 userWinDays: Int, streak: HydrationStreak) {
         self.period = period; self.trackedDays = trackedDays; self.userMl = userMl
-        self.aiMl = aiMl; self.userWinDays = userWinDays; self.streak = streak
+        self.aiMl = aiMl
+        self.aiMlLow = min(aiMlLow ?? aiMl, aiMl)
+        self.aiMlHigh = max(aiMlHigh ?? aiMl, aiMl)
+        self.userWinDays = userWinDays; self.streak = streak
     }
 }
 
@@ -77,6 +89,8 @@ public enum WrappedInsights {
             trackedDays: included.count,
             userMl: included.reduce(0) { $0 + $1.userMl },
             aiMl: included.reduce(0) { $0 + $1.aiMl },
+            aiMlLow: included.reduce(0) { $0 + $1.aiMlLow },
+            aiMlHigh: included.reduce(0) { $0 + $1.aiMlHigh },
             userWinDays: included.filter { $0.winner == "user" }.count,
             streak: streak
         )

@@ -27,6 +27,19 @@ public struct UsageSample: Equatable {
 /// full = + embodied/lifecycle share (Scope 3). These are the honest range, not one "true" number.
 public enum WaterMode: String, CaseIterable, Hashable { case conservative, standard, full }
 
+/// The three transparent scope totals shown together whenever a single estimate could look exact.
+public struct WaterEstimateRange: Equatable, Sendable {
+    public let low: Double
+    public let mid: Double
+    public let high: Double
+
+    public init(low: Double, mid: Double, high: Double) {
+        self.low = min(low, mid)
+        self.mid = mid
+        self.high = max(high, mid)
+    }
+}
+
 // MARK: - Coefficients (decoded from coefficients.json)
 
 public struct Coefficients: Decodable {
@@ -192,15 +205,26 @@ public enum WaterMath {
 
     /// (low, mid, high) = (conservative, standard, full) for the honest range shown in-app.
     public static func waterRange(_ s: UsageSample, region: String? = nil,
-                                  coef: Coefficients) -> (low: Double, mid: Double, high: Double) {
-        (waterMl(s, mode: .conservative, region: region, coef: coef),
-         waterMl(s, mode: .standard, region: region, coef: coef),
-         waterMl(s, mode: .full, region: region, coef: coef))
+                                  coef: Coefficients) -> WaterEstimateRange {
+        WaterEstimateRange(
+            low: waterMl(s, mode: .conservative, region: region, coef: coef),
+            mid: waterMl(s, mode: .standard, region: region, coef: coef),
+            high: waterMl(s, mode: .full, region: region, coef: coef)
+        )
     }
 
     /// Total water (mL) across many events — what RaceEngine uses for the day.
     public static func totalWaterMl(_ samples: [UsageSample], mode: WaterMode = .standard,
                                     region: String? = nil, coef: Coefficients) -> Double {
         samples.reduce(0) { $0 + waterMl($1, mode: mode, region: region, coef: coef) }
+    }
+
+    public static func totalWaterRangeMl(_ samples: [UsageSample], region: String? = nil,
+                                         coef: Coefficients) -> WaterEstimateRange {
+        WaterEstimateRange(
+            low: totalWaterMl(samples, mode: .conservative, region: region, coef: coef),
+            mid: totalWaterMl(samples, mode: .standard, region: region, coef: coef),
+            high: totalWaterMl(samples, mode: .full, region: region, coef: coef)
+        )
     }
 }

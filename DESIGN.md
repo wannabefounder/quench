@@ -5,13 +5,19 @@ your AI usage**. Personality invites attention; the numbers, labels, and open me
 
 ## Experience hierarchy
 
-1. A tiny draggable animated pixel water-drop panel stays above normal windows and shows only human goal progress,
-   AI water, and the one-click log action. The native menu-bar icon remains the entry point because
+1. A draggable, resizable animated water-drop instrument stays above normal windows. Its original
+   industrial-console visual language uses monospaced telemetry, a restrained grid, high-contrast
+   physical-control cues, and each theme's accent—never another product's logo or copied layout.
+   It adapts from a compact strip to a fuller console with human progress, AI estimate/range, race
+   state, and calibrated quick-add controls. The native menu-bar icon remains the entry point because
    macOS may suppress or collapse custom status-item text.
 2. The main window and menu-bar popover lead with the same live character reaction and one
    plain-language status sentence, so launching the app is never a blank or hidden experience.
-3. Two labeled lanes—You and Your AI—show the race without relying on color alone.
-4. “Log 250 mL” is the single dominant action. Streaks, Thirst Index, and source health are secondary.
+3. Two labeled lanes—You and estimated AI—show the selected-scope race without relying on color
+   alone; the conservative-to-full range sits directly below so the race value cannot look measured.
+4. Logging stays immediate but is not locked to 250 mL. Sip, office cup, glass, and 1 L bottle-sip
+   actions start at 50/180/250/100 mL and are user-calibrated in Settings. Streaks, Thirst Index,
+   and source health are secondary.
 5. Scope, region, privacy, and source accuracy remain visible without turning the popover into a dashboard.
 
 ## Four themes
@@ -39,7 +45,8 @@ surface treatment; the live Axel character remains native SwiftUI for motion and
   found and to a configurable local sip reminder. Custom colored SwiftUI icons flatten into an
   unreadable black oval on macOS 26, while frame-rate timer labels trigger an AppKit layout loop.
 - The always-on-top panel uses a non-activating native `NSPanel`, joins every Space, never observes
-  other windows, and can be disabled in Settings. Its pixel water drop floats gently without a
+  other windows, and can be disabled in Settings. It exposes native edge resizing from 340×124 to
+  640×360 points and preserves the last frame. Its pixel water drop floats gently without a
   frame-rate timer loop and changes state color when AI water increases.
 - With macOS Reduce Motion enabled, ongoing translation/rotation pauses; expression, glyph, and
   color changes preserve meaning.
@@ -53,6 +60,8 @@ and [Accessibility](https://developer.apple.com/design/human-interface-guideline
 ## Accessibility and platform fit
 
 - Use text, symbols, and shape in addition to color; every buddy and race has a combined VoiceOver label.
+- Keep the low/high scope range in dashboard, history, floating-widget help/VoiceOver, and exported
+  Wrapped cards. A compact surface may show `≈`, but it must expose the full range accessibly.
 - Respect Reduce Motion, system appearance, increased contrast, and semantic control behavior.
 - Keep macOS targets at least 28×28 points and keep the primary action keyboard accessible.
 - Use native materials and system controls for legibility across desktop tinting and light/dark mode.

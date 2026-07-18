@@ -30,6 +30,19 @@ final class WrappedInsightsTests: XCTestCase {
         XCTAssertEqual(result.streak, HydrationStreak(winDays: 0, freezeDaysUsed: 0))
     }
 
+    func testWrappedSummaryPreservesTheHonestScopeRange() {
+        let now = DateComponents(calendar: calendar, year: 2026, month: 7, day: 18).date!
+        let result = WrappedInsights.summarize([
+            .init(day: "2026-07-18", userMl: 2000, aiMl: 500,
+                  aiMlLow: 50, aiMlHigh: 560, winner: "user"),
+            .init(day: "2026-07-17", userMl: 1800, aiMl: 100,
+                  aiMlLow: 10, aiMlHigh: 112, winner: "user")
+        ], period: .week, asOf: now, calendar: calendar)
+        XCTAssertEqual(result.aiMlLow, 60)
+        XCTAssertEqual(result.aiMl, 600)
+        XCTAssertEqual(result.aiMlHigh, 672)
+    }
+
     func testRelatableComparisonsScaleFromCupsToShowers() {
         XCTAssertEqual(WrappedInsights.relatableComparison(aiMl: 250), "≈ 1 cup")
         XCTAssertEqual(WrappedInsights.relatableComparison(aiMl: 1_500), "≈ 2 reusable bottles")

@@ -4,9 +4,18 @@ A free, open-source macOS menu-bar app that races your daily water intake agains
 
 Four character themes keep that race friendly: an axolotl scientist, capybara gardener, astronaut
 otter, or robot koi animates continuously in Quench and reacts when AI adds water or you log a
-glass. A draggable, always-on-top animated pixel water drop keeps the essential `You / goal`, `AI`, and `+250 mL`
-controls visible even when macOS collapses custom menu-bar content. The interface remains fully
-labeled and respects Reduce Motion.
+glass. A draggable, resizable, always-on-top animated water-drop instrument keeps `You / goal`, the
+AI estimate/range, race state, and quick-add controls visible even when macOS collapses custom
+menu-bar content. Its original futuristic industrial layout adapts between a compact strip and a
+fuller console. The interface remains fully labeled and respects Reduce Motion.
+
+Quick-add amounts are personal rather than hard-coded: sip (50 mL), office cup (180 mL), glass
+(250 mL), and a sip from a 1 L bottle (100 mL) are editable starting points. Measuring the vessel
+you actually use once gives a closer daily total.
+
+The selected scope drives the friendly race, while its conservative-to-full estimate range remains
+visible on the dashboard, in history, through the floating widget's accessibility text, and on
+Wrapped exports. Quench never presents the selected estimate as a measured fact.
 
 **Status: M7 complete; M8 release work in progress.** The menu-bar race and local water log are backed by an
 EcoLogits-faithful estimation engine with open coefficients. Private Claude Code and Codex log
@@ -55,7 +64,7 @@ not make consecutive days incomparable. One automatic grace-day freeze can bridg
 never an explicit loss, and the weekly Thirst Index identifies the model with the largest estimated
 water footprint. Optional hydration nudges are passive and silent, limited
 to two daytime reminders when AI is meaningfully ahead. They remain off until the user explicitly
-enables them. Shift-Command-D logs a 250 mL glass while the menu is open.
+enables them. Shift-Command-D logs the user's calibrated glass amount while the menu is open.
 Notifications require a packaged macOS application; raw `swift run` development launches safely
 leave them unavailable.
 

@@ -18,7 +18,7 @@ struct WrappedSettingsView: View {
     private var summary: WrappedSummary { store.wrappedSummary(for: period) }
     private var pledgeAmount: Double? { store.pledgeAmount(for: summary.aiMl) }
     private var exportKey: String {
-        "\(period.rawValue)-\(format.rawValue)-\(summary.trackedDays)-\(summary.userMl)-\(Int(summary.aiMl))-\(pledgeAmount ?? -1)-\(store.currencyCode)"
+        "\(period.rawValue)-\(format.rawValue)-\(summary.trackedDays)-\(summary.userMl)-\(Int(summary.aiMlLow))-\(Int(summary.aiMl))-\(Int(summary.aiMlHigh))-\(pledgeAmount ?? -1)-\(store.currencyCode)"
     }
 
     var body: some View {
@@ -109,13 +109,16 @@ struct WrappedCardView: View {
                     .foregroundStyle(.white.opacity(0.9))
 
                     Spacer()
-                    Text("Your AI drank")
+                    Text("Estimated AI water")
                         .font(.system(size: 24 * unit, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.72))
                     Text(volume(summary.aiMl))
                         .font(.system(size: 72 * unit, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                         .minimumScaleFactor(0.6)
+                    Text("Range \(volume(summary.aiMlLow)) – \(volume(summary.aiMlHigh))")
+                        .font(.system(size: 13 * unit, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.62))
                     Text(comparison)
                         .font(.system(size: 20 * unit, weight: .semibold, design: .rounded))
                         .foregroundStyle(.cyan)
@@ -159,7 +162,7 @@ struct WrappedCardView: View {
         amount.formatted(.currency(code: currencyCode))
     }
     private var accessibilitySummary: String {
-        var value = "\(summary.period.title) AI Water Wrapped. AI used \(volume(summary.aiMl)), \(comparison). You drank \(volume(Double(summary.userMl))). You won \(summary.userWinDays) of \(summary.trackedDays) tracked days."
+        var value = "\(summary.period.title) AI Water Wrapped. Estimated AI water was \(volume(summary.aiMl)), with a range from \(volume(summary.aiMlLow)) to \(volume(summary.aiMlHigh)); \(comparison). You drank \(volume(Double(summary.userMl))). You won \(summary.userWinDays) of \(summary.trackedDays) tracked days."
         if let pledgeAmount, pledgeAmount > 0 {
             value += " Private clean-water pledge: \(currency(pledgeAmount))."
         }

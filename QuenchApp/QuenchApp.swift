@@ -38,6 +38,8 @@ struct DailyRaceHistoryItem: Identifiable, Equatable {
     let day: String
     let userMl: Int
     let aiMl: Double
+    let aiMlLow: Double
+    let aiMlHigh: Double
     let winner: String
     var id: String { day }
 }
@@ -45,6 +47,7 @@ struct DailyRaceHistoryItem: Identifiable, Equatable {
 private struct RefreshPayload: @unchecked Sendable {
     let userMl: Int
     let aiMl: Double
+    let aiRange: WaterEstimateRange
     let sourceStatuses: [LocalSourceStatus]
     let providerStatuses: [ProviderSyncStatus]
     let streak: HydrationStreak
@@ -56,7 +59,10 @@ private struct RefreshPayload: @unchecked Sendable {
 @MainActor
 final class RaceStore: ObservableObject {
     @Published var userMl: Int = 0
-    @Published var aiMl: Double = 0     // Standard-mode water from today's AI usage (0 until M3+ sources feed events)
+    @Published var aiMl: Double = 0
+    @Published private(set) var aiMlLow: Double = 0
+    @Published private(set) var aiMlMid: Double = 0
+    @Published private(set) var aiMlHigh: Double = 0
     @Published var sourceStatuses: [LocalSourceStatus] = []
     @Published var providerSyncStatuses: [ProviderSyncStatus] = []
     @Published var isRefreshing = false
@@ -152,6 +158,14 @@ final class RaceStore: ObservableObject {
             updateMenuBarText()
         }
     }
+    @Published private(set) var drinkAmounts: [HydrationVessel: Int] {
+        didSet {
+            UserDefaults.standard.set(
+                Dictionary(uniqueKeysWithValues: drinkAmounts.map { ($0.key.rawValue, $0.value) }),
+                forKey: "hydrationQuickAmounts"
+            )
+        }
+    }
 
     private let baseCoef: Coefficients
     private var coef: Coefficients
@@ -195,7 +209,9 @@ final class RaceStore: ObservableObject {
 
     func wrappedSummary(for period: WrappedPeriod) -> WrappedSummary {
         WrappedInsights.summarize(recentHistory.map {
-            DailyWaterSummary(day: $0.day, userMl: $0.userMl, aiMl: $0.aiMl, winner: $0.winner)
+            DailyWaterSummary(day: $0.day, userMl: $0.userMl, aiMl: $0.aiMl,
+                              aiMlLow: $0.aiMlLow, aiMlHigh: $0.aiMlHigh,
+                              winner: $0.winner)
         }, period: period)
     }
 
@@ -220,6 +236,7 @@ final class RaceStore: ObservableObject {
         pledgePerLiter = savedPledge > 0 ? min(max(savedPledge, 1), 10_000) : 10
         let savedGoal = UserDefaults.standard.double(forKey: "dailyFluidGoalMl")
         goalMl = savedGoal > 0 ? min(max(savedGoal, 1_000), 5_000) : 2_000
+        drinkAmounts = RaceStore.loadDrinkAmounts()
         gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
         menuBarNudgesEnabled = UserDefaults.standard.object(forKey: "menuBarNudgesEnabled") as? Bool ?? true
         floatingWidgetEnabled = UserDefaults.standard.object(forKey: "floatingWidgetEnabled") as? Bool ?? true
@@ -309,18 +326,15 @@ final class RaceStore: ObservableObject {
                 )
                 let user = (try? database.todayUserMl()) ?? 0
                 let samples = (try? database.todayUsageSamples(includedSources: sourcesCountedInRace)) ?? []
-                let low = RaceEngine.aiWaterMl(samples, mode: .conservative,
-                                               region: selectedRegion, coef: coefficients)
-                let standard = RaceEngine.aiWaterMl(samples, mode: .standard,
-                                                    region: selectedRegion, coef: coefficients)
-                let high = RaceEngine.aiWaterMl(samples, mode: .full,
-                                                region: selectedRegion, coef: coefficients)
+                let range = WaterMath.totalWaterRangeMl(
+                    samples, region: selectedRegion, coef: coefficients
+                )
                 let ai = RaceEngine.aiWaterMl(samples, mode: selectedMode,
                                               region: selectedRegion, coef: coefficients)
                 let day = RaceEngine.dayKey(for: Date())
                 try? database.saveDailySummary(
-                    day: day, aiMlLow: low, aiMlMid: standard, aiMlHigh: high,
-                    userMl: user, winner: RaceEngine.winner(userMl: Double(user), aiMl: standard)
+                    day: day, aiMlLow: range.low, aiMlMid: range.mid, aiMlHigh: range.high,
+                    userMl: user, winner: RaceEngine.winner(userMl: Double(user), aiMl: range.mid)
                 )
                 let summaries = (try? database.recentDailySummaries(limit: 366)) ?? []
                 let streak = RaceEngine.hydrationStreak(summaries.map {
@@ -336,9 +350,13 @@ final class RaceStore: ObservableObject {
                 )
                 let history = summaries.map {
                     DailyRaceHistoryItem(day: $0.day, userMl: $0.userMl ?? 0,
-                                         aiMl: $0.aiMlMid ?? 0, winner: $0.winner ?? "tie")
+                                         aiMl: $0.aiMlMid ?? 0,
+                                         aiMlLow: $0.aiMlLow ?? $0.aiMlMid ?? 0,
+                                         aiMlHigh: $0.aiMlHigh ?? $0.aiMlMid ?? 0,
+                                         winner: $0.winner ?? "tie")
                 }
-                return RefreshPayload(userMl: user, aiMl: ai, sourceStatuses: statuses,
+                return RefreshPayload(userMl: user, aiMl: ai, aiRange: range,
+                                      sourceStatuses: statuses,
                                       providerStatuses: providerStatuses, streak: streak,
                                       history: history, thirstiestModel: thirstiestModel)
             }.value
@@ -346,6 +364,9 @@ final class RaceStore: ObservableObject {
             let previousAI = aiMl
             userMl = payload.userMl
             aiMl = payload.aiMl
+            aiMlLow = payload.aiRange.low
+            aiMlMid = payload.aiRange.mid
+            aiMlHigh = payload.aiRange.high
             sourceStatuses = payload.sourceStatuses
             providerSyncStatuses = payload.providerStatuses
             userWinStreak = payload.streak.winDays
@@ -412,6 +433,21 @@ final class RaceStore: ObservableObject {
         refresh()
     }
 
+    func drinkAmount(for vessel: HydrationVessel) -> Int {
+        drinkAmounts[vessel] ?? vessel.defaultMl
+    }
+
+    func logDrink(_ vessel: HydrationVessel) {
+        logWater(ml: drinkAmount(for: vessel))
+    }
+
+    func bindingForDrinkAmount(_ vessel: HydrationVessel) -> Binding<Int> {
+        Binding(
+            get: { self.drinkAmount(for: vessel) },
+            set: { value in self.drinkAmounts[vessel] = vessel.clamped(value) }
+        )
+    }
+
     func completeOnboarding() {
         hasCompletedOnboarding = true
         refresh()
@@ -460,5 +496,13 @@ final class RaceStore: ObservableObject {
             guard !Task.isCancelled, let self else { return }
             self.buddyActivity = self.restingBuddyActivity
         }
+    }
+
+    private static func loadDrinkAmounts() -> [HydrationVessel: Int] {
+        let saved = UserDefaults.standard.dictionary(forKey: "hydrationQuickAmounts") ?? [:]
+        return Dictionary(uniqueKeysWithValues: HydrationVessel.allCases.map { vessel in
+            let value = (saved[vessel.rawValue] as? NSNumber)?.intValue ?? vessel.defaultMl
+            return (vessel, vessel.clamped(value))
+        })
     }
 }

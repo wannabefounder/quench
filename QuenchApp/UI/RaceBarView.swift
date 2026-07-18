@@ -12,10 +12,10 @@ struct RaceBarView: View {
     var body: some View {
         VStack(spacing: 10) {
             lane(label: "YOU", value: userMl, color: theme.accent, icon: "person.fill")
-            lane(label: "YOUR AI", value: aiMl, color: theme.secondaryAccent, icon: "cpu")
+            lane(label: "EST. AI", value: aiMl, color: theme.secondaryAccent, icon: "cpu")
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Race progress. You: \(Int(userMl)) milliliters. Your AI: \(Int(aiMl)) milliliters.")
+        .accessibilityLabel("Race progress. You: \(Int(userMl)) milliliters. Estimated AI water: \(Int(aiMl)) milliliters.")
     }
 
     private func lane(label: String, value: Double, color: Color, icon: String) -> some View {

@@ -181,6 +181,25 @@ final class WaterMathTests: XCTestCase {
         XCTAssertGreaterThan(total, 0)
     }
 
+    func testTotalWaterRangeAggregatesEveryScope() {
+        let samples = [
+            UsageSample(model: "gpt-4o", inputTokens: 1000, outputTokens: 1000),
+            UsageSample(model: "claude-haiku", inputTokens: 200, outputTokens: 400)
+        ]
+        let range = WaterMath.totalWaterRangeMl(samples, region: "global", coef: coef)
+        XCTAssertEqual(range.low,
+                       WaterMath.totalWaterMl(samples, mode: .conservative,
+                                              region: "global", coef: coef), accuracy: 1e-9)
+        XCTAssertEqual(range.mid,
+                       WaterMath.totalWaterMl(samples, mode: .standard,
+                                              region: "global", coef: coef), accuracy: 1e-9)
+        XCTAssertEqual(range.high,
+                       WaterMath.totalWaterMl(samples, mode: .full,
+                                              region: "global", coef: coef), accuracy: 1e-9)
+        XCTAssertLessThan(range.low, range.mid)
+        XCTAssertLessThan(range.mid, range.high)
+    }
+
     func testRaceEngineAIWaterUsesStandardMode() {
         let a = UsageSample(model: "gpt-4o", inputTokens: 1000, outputTokens: 1000)
         XCTAssertEqual(RaceEngine.aiWaterMl([a], coef: coef),
