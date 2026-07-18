@@ -61,6 +61,10 @@ AI Water Wrapped images are rendered locally from aggregate daily totals. Choosi
 temporary PNG and hands it to the standard macOS share sheet; Quench does not upload or retain a
 remote copy.
 
+The optional clean-water pledge is a local calculator stored in UserDefaults. Quench does not
+collect payments, verify donations, operate a donation server, or send pledge/usage data to a
+charity. Charity links open only when clicked and are independent links, not claimed partnerships.
+
 ## Diagnostics and analytics
 
 Quench has no hidden analytics or advertising SDK. Any future diagnostic sharing must be explicit,

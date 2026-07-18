@@ -24,6 +24,7 @@ struct SettingsView: View {
                 case .providers: ProviderSettingsView(model: credentials)
                 case .history: HistorySettingsView(store: store)
                 case .wrapped: WrappedSettingsView(store: store)
+                case .impact: ImpactSettingsView(store: store)
                 case .diagnostics: DiagnosticsView(store: store)
                 }
             }
@@ -34,13 +35,14 @@ struct SettingsView: View {
 }
 
 private enum SettingsSection: String, CaseIterable, Identifiable {
-    case appearance, estimation, providers, history, wrapped, diagnostics
+    case appearance, estimation, providers, history, wrapped, impact, diagnostics
     var id: String { rawValue }
     var title: String {
         switch self {
         case .appearance: "Buddies & Themes"; case .estimation: "Estimation"
         case .providers: "Providers"; case .history: "History"
         case .wrapped: "Wrapped"; case .diagnostics: "Diagnostics"
+        case .impact: "Impact"
         }
     }
     var symbol: String {
@@ -48,7 +50,49 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
         case .appearance: "face.smiling.inverse"; case .estimation: "slider.horizontal.3"
         case .providers: "key.fill"; case .history: "calendar"
         case .wrapped: "sparkles.rectangle.stack"; case .diagnostics: "stethoscope"
+        case .impact: "heart.circle.fill"
         }
+    }
+}
+
+private struct ImpactSettingsView: View {
+    @ObservedObject var store: RaceStore
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Track a private clean-water pledge", isOn: $store.pledgeEnabled)
+                Stepper(value: $store.pledgePerLiter, in: 1...10_000, step: 1) {
+                    LabeledContent("Amount per AI liter",
+                                   value: currency(store.pledgePerLiter))
+                }
+                .disabled(!store.pledgeEnabled)
+                LabeledContent("Today's suggested pledge",
+                               value: currency(store.pledgeAmount(for: store.aiMl) ?? 0))
+                    .foregroundStyle(store.pledgeEnabled ? .primary : .secondary)
+            } header: {
+                Text("Private pledge")
+            } footer: {
+                Text("Calculated entirely on this Mac. This is a personal intention, not proof of a donation, and Quench never receives money or pledge data.")
+            }
+
+            Section("Donate directly") {
+                Link(destination: URL(string: "https://www.charitywater.org/donate")!) {
+                    Label("Open charity: water", systemImage: "safari")
+                }
+                Link(destination: URL(string: "https://water.org/donate/")!) {
+                    Label("Open Water.org", systemImage: "safari")
+                }
+                Text("Independent links, not endorsements or partnerships. The charity site receives data only if you choose to open it; Quench sends no usage or pledge information.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+    }
+
+    private func currency(_ amount: Double) -> String {
+        amount.formatted(.currency(code: store.currencyCode))
     }
 }
 

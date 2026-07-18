@@ -119,6 +119,12 @@ final class RaceStore: ObservableObject {
             refresh()
         }
     }
+    @Published var pledgeEnabled: Bool {
+        didSet { UserDefaults.standard.set(pledgeEnabled, forKey: "pledgeEnabled") }
+    }
+    @Published var pledgePerLiter: Double {
+        didSet { UserDefaults.standard.set(pledgePerLiter, forKey: "pledgePerLiter") }
+    }
     let goalMl: Double = 2000
 
     private let coef: Coefficients
@@ -148,6 +154,14 @@ final class RaceStore: ObservableObject {
     }
 
     var coefficientsVersion: String { coef.version }
+    var currencyCode: String {
+        (Locale.current as NSLocale).object(forKey: .currencyCode) as? String ?? "USD"
+    }
+
+    func pledgeAmount(for aiMl: Double) -> Double? {
+        guard pledgeEnabled else { return nil }
+        return WrappedInsights.pledgeAmount(aiMl: aiMl, amountPerLiter: pledgePerLiter)
+    }
 
     func wrappedSummary(for period: WrappedPeriod) -> WrappedSummary {
         WrappedInsights.summarize(recentHistory.map {
@@ -169,6 +183,9 @@ final class RaceStore: ObservableObject {
         geminiCLIEnabled = UserDefaults.standard.object(forKey: "geminiCLIEnabled") as? Bool ?? true
         browserExtensionEnabled = UserDefaults.standard.object(forKey: "browserExtensionEnabled") as? Bool ?? true
         activityProxyEnabled = UserDefaults.standard.bool(forKey: "activityProxyEnabled")
+        pledgeEnabled = UserDefaults.standard.bool(forKey: "pledgeEnabled")
+        let savedPledge = UserDefaults.standard.double(forKey: "pledgePerLiter")
+        pledgePerLiter = savedPledge > 0 ? min(max(savedPledge, 1), 10_000) : 10
         gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
         theme = QuenchTheme(rawValue: UserDefaults.standard.string(forKey: "quenchTheme") ?? "")
             ?? .aquaLab

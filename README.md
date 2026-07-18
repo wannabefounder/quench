@@ -48,6 +48,9 @@ leave them unavailable.
 
 Weekly, monthly, and yearly AI Water Wrapped cards are rendered locally in square or Story format.
 The share sheet receives a temporary PNG containing aggregate totals only; Quench does not upload it.
+Cards include relatable cups, reusable bottles, or five-minute showers. An optional private
+per-liter clean-water pledge can appear on the card without sending money or usage data through
+Quench; official charity sites open only when the user chooses a link.
 
 ## Build & run (macOS 14+)
 

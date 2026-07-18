@@ -16,8 +16,9 @@ struct WrappedSettingsView: View {
     @State private var exportURL: URL?
 
     private var summary: WrappedSummary { store.wrappedSummary(for: period) }
+    private var pledgeAmount: Double? { store.pledgeAmount(for: summary.aiMl) }
     private var exportKey: String {
-        "\(period.rawValue)-\(format.rawValue)-\(summary.trackedDays)-\(summary.userMl)-\(Int(summary.aiMl))"
+        "\(period.rawValue)-\(format.rawValue)-\(summary.trackedDays)-\(summary.userMl)-\(Int(summary.aiMl))-\(pledgeAmount ?? -1)-\(store.currencyCode)"
     }
 
     var body: some View {
@@ -41,7 +42,8 @@ struct WrappedSettingsView: View {
                 )
                 .frame(maxHeight: .infinity)
             } else {
-                WrappedCardView(summary: summary)
+                WrappedCardView(summary: summary, pledgeAmount: pledgeAmount,
+                                currencyCode: store.currencyCode)
                     .aspectRatio(format.size.width / format.size.height, contentMode: .fit)
                     .frame(maxHeight: 330)
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -65,13 +67,24 @@ struct WrappedSettingsView: View {
         .padding(20)
         .task(id: exportKey) {
             guard summary.trackedDays > 0 else { exportURL = nil; return }
-            exportURL = WrappedExportService.render(summary: summary, format: format)
+            exportURL = WrappedExportService.render(
+                summary: summary, format: format, pledgeAmount: pledgeAmount,
+                currencyCode: store.currencyCode
+            )
         }
     }
 }
 
 struct WrappedCardView: View {
     let summary: WrappedSummary
+    var pledgeAmount: Double?
+    var currencyCode: String
+
+    init(summary: WrappedSummary, pledgeAmount: Double? = nil, currencyCode: String = "USD") {
+        self.summary = summary
+        self.pledgeAmount = pledgeAmount
+        self.currencyCode = currencyCode
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -106,6 +119,12 @@ struct WrappedCardView: View {
                     Text(comparison)
                         .font(.system(size: 20 * unit, weight: .semibold, design: .rounded))
                         .foregroundStyle(.cyan)
+                    if let pledgeAmount, pledgeAmount > 0 {
+                        Label("Private clean-water pledge: \(currency(pledgeAmount))",
+                              systemImage: "heart.fill")
+                            .font(.system(size: 15 * unit, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.82))
+                    }
 
                     Spacer()
                     HStack(spacing: 28 * unit) {
@@ -121,7 +140,7 @@ struct WrappedCardView: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(summary.period.title) AI Water Wrapped. AI used \(volume(summary.aiMl)). You drank \(volume(Double(summary.userMl))). You won \(summary.userWinDays) of \(summary.trackedDays) tracked days.")
+        .accessibilityLabel(accessibilitySummary)
     }
 
     private func metric(_ label: String, _ value: String) -> some View {
@@ -134,16 +153,27 @@ struct WrappedCardView: View {
         ml >= 1000 ? String(format: "%.1f L", ml / 1000) : "\(Int(ml.rounded())) mL"
     }
     private var comparison: String {
-        if summary.aiMl >= 65_000 { return "≈ \(Int((summary.aiMl / 65_000).rounded())) showers" }
-        return "≈ \(max(1, Int((summary.aiMl / 750).rounded()))) reusable bottles"
+        WrappedInsights.relatableComparison(aiMl: summary.aiMl)
+    }
+    private func currency(_ amount: Double) -> String {
+        amount.formatted(.currency(code: currencyCode))
+    }
+    private var accessibilitySummary: String {
+        var value = "\(summary.period.title) AI Water Wrapped. AI used \(volume(summary.aiMl)), \(comparison). You drank \(volume(Double(summary.userMl))). You won \(summary.userWinDays) of \(summary.trackedDays) tracked days."
+        if let pledgeAmount, pledgeAmount > 0 {
+            value += " Private clean-water pledge: \(currency(pledgeAmount))."
+        }
+        return value
     }
 }
 
 @MainActor
 private enum WrappedExportService {
-    static func render(summary: WrappedSummary, format: WrappedCardFormat) -> URL? {
+    static func render(summary: WrappedSummary, format: WrappedCardFormat,
+                       pledgeAmount: Double?, currencyCode: String) -> URL? {
         let size = format.size
-        let renderer = ImageRenderer(content: WrappedCardView(summary: summary)
+        let renderer = ImageRenderer(content: WrappedCardView(
+            summary: summary, pledgeAmount: pledgeAmount, currencyCode: currencyCode)
             .frame(width: size.width, height: size.height))
         renderer.proposedSize = ProposedViewSize(size)
         renderer.scale = 2

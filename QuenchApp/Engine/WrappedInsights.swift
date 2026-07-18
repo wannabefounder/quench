@@ -42,6 +42,25 @@ public struct WrappedSummary: Equatable {
 }
 
 public enum WrappedInsights {
+    public static func relatableComparison(aiMl: Double) -> String {
+        guard aiMl > 0 else { return "0 cups" }
+        if aiMl >= 65_000 {
+            let count = max(1, Int((aiMl / 65_000).rounded()))
+            return "≈ \(count) five-minute \(count == 1 ? "shower" : "showers")"
+        }
+        if aiMl >= 750 {
+            let count = max(1, Int((aiMl / 750).rounded()))
+            return "≈ \(count) reusable \(count == 1 ? "bottle" : "bottles")"
+        }
+        let count = max(1, Int((aiMl / 250).rounded()))
+        return "≈ \(count) \(count == 1 ? "cup" : "cups")"
+    }
+
+    public static func pledgeAmount(aiMl: Double, amountPerLiter: Double) -> Double {
+        guard aiMl > 0, amountPerLiter > 0 else { return 0 }
+        return aiMl / 1_000 * amountPerLiter
+    }
+
     public static func summarize(_ daysNewestFirst: [DailyWaterSummary], period: WrappedPeriod,
                                  asOf now: Date = Date(), calendar: Calendar = .current) -> WrappedSummary {
         let today = calendar.startOfDay(for: now)

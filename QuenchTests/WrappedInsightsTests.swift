@@ -29,4 +29,17 @@ final class WrappedInsightsTests: XCTestCase {
         XCTAssertEqual(result.winRate, 0)
         XCTAssertEqual(result.streak, HydrationStreak(winDays: 0, freezeDaysUsed: 0))
     }
+
+    func testRelatableComparisonsScaleFromCupsToShowers() {
+        XCTAssertEqual(WrappedInsights.relatableComparison(aiMl: 250), "≈ 1 cup")
+        XCTAssertEqual(WrappedInsights.relatableComparison(aiMl: 1_500), "≈ 2 reusable bottles")
+        XCTAssertEqual(WrappedInsights.relatableComparison(aiMl: 130_000),
+                       "≈ 2 five-minute showers")
+    }
+
+    func testPrivatePledgeScalesWithAILiters() {
+        XCTAssertEqual(WrappedInsights.pledgeAmount(aiMl: 4_200, amountPerLiter: 10),
+                       42, accuracy: 1e-9)
+        XCTAssertEqual(WrappedInsights.pledgeAmount(aiMl: 4_200, amountPerLiter: 0), 0)
+    }
 }

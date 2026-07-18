@@ -31,7 +31,8 @@ contract and [`coefficients.json`](QuenchApp/Resources/coefficients.json) is the
 - One-click/keyboard water logging, local-midnight rollover, daily winner, streaks, and freeze tokens.
 - Conservative (Scope 1), Standard (Scopes 1+2), and Full footprint modes with region controls.
 - Weekly/monthly/yearly "AI Water Wrapped" cards designed for sharing without exposing private data.
-- Optional donation pledges and charity links only after the core product is trustworthy.
+- Optional donation pledges are implemented as a private local calculator plus independent external
+  charity links. Quench must never claim a partnership, collect payment, or transmit pledge data.
 
 ### Usage collection tiers
 
@@ -119,8 +120,8 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
 6. **M6 — complete:** Chromium companion extension and private local bridge. The Chromium MV3
    count-only path and event-driven app ingestion are implemented. **Safari is intentionally out of
    scope per the user's decision on 2026-07-18.**
-7. **M7 — complete:** streaks, restrained notifications, history, Wrapped cards, accessibility, and
-   the four always-visible animated buddy themes.
+7. **M7 — complete:** streaks, restrained notifications, history, Wrapped cards with relatable
+   comparisons/private pledges, accessibility, and the four animated buddy themes.
    **English-only UI per the user's decision on 2026-07-18; do not add Hindi/Telugu localization.**
 8. **M8 — current:** packaged distribution, signing/notarization automation, Homebrew cask, launch
    materials, and fiscal-sponsorship preparation.
