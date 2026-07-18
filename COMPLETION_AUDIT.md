@@ -47,7 +47,7 @@ it does not mean a future public release or partnership exists.
 | Source isolation and deduplication | Complete | `LocalLogIngestor`, provider sync, stable external IDs and database constraints |
 | Native packaged macOS app | Complete | `scripts/package-app.sh`, `scripts/verify-release-readiness.sh`; bundle, privacy surface, signature, archive and checksum gates |
 | Launch at login | Implemented; final restart check external | `SMAppService.mainApp`, packaged-only availability |
-| CI | Complete and authoritative | [Run 29647079683](https://github.com/wannabefounder/quench/actions/runs/29647079683): 85 Swift tests, browser fixtures, package/archive validation, and release-readiness gate passed |
+| CI | Complete and authoritative | [Run 29652342945](https://github.com/wannabefounder/quench/actions/runs/29652342945): 85 Swift tests, browser fixtures, package/archive validation, and release-readiness gate passed |
 | Developer ID notarization | Automation complete; credentials external | `release.yml`, `RELEASING.md`; cannot run without owner Apple membership/secrets |
 | Homebrew | Template complete; publication external | `Packaging/quench.rb.template`; permanent URL/SHA require first notarized release |
 | Open-source community basics | Complete | MIT, contribution guide, code of conduct, security policy, governance, issue templates |
