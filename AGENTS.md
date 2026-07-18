@@ -94,6 +94,11 @@ model implemented at M2:
 Do not collapse this back to a single factor. Changes require methodology notes, cited coefficient
 updates, and tests against the real JSON.
 
+The provider-transparency scorecard is also versioned public evidence, not a moral ranking. A checked
+criterion requires a dated first-party source that actually publishes that item. Use “not in the
+reviewed disclosure,” never an unprovable claim that evidence does not exist, and update
+`TRANSPARENCY.md`, the bundled JSON, tests, and review date together.
+
 ## Online and EcoLogits policy
 
 Quench is **privacy-preserving hybrid**, not offline-only. Online features may improve model catalogs,

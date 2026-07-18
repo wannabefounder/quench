@@ -27,6 +27,7 @@ struct SettingsView: View {
                     browserCompanion: browserCompanion,
                     ecoLogitsCatalog: ecoLogitsCatalog)
                 case .providers: ProviderSettingsView(model: credentials)
+                case .transparency: TransparencySettingsView()
                 case .history: HistorySettingsView(store: store)
                 case .wrapped: WrappedSettingsView(store: store)
                 case .impact: ImpactSettingsView(store: store)
@@ -40,12 +41,13 @@ struct SettingsView: View {
 }
 
 private enum SettingsSection: String, CaseIterable, Identifiable {
-    case appearance, estimation, providers, history, wrapped, impact, diagnostics
+    case appearance, estimation, providers, transparency, history, wrapped, impact, diagnostics
     var id: String { rawValue }
     var title: String {
         switch self {
         case .appearance: "Buddies & Themes"; case .estimation: "Estimation"
-        case .providers: "Providers"; case .history: "History"
+        case .providers: "Providers"; case .transparency: "Transparency"
+        case .history: "History"
         case .wrapped: "Wrapped"; case .diagnostics: "Diagnostics"
         case .impact: "Impact"
         }
@@ -53,9 +55,91 @@ private enum SettingsSection: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .appearance: "face.smiling.inverse"; case .estimation: "slider.horizontal.3"
-        case .providers: "key.fill"; case .history: "calendar"
+        case .providers: "key.fill"; case .transparency: "eye.fill"
+        case .history: "calendar"
         case .wrapped: "sparkles.rectangle.stack"; case .diagnostics: "stethoscope"
         case .impact: "heart.circle.fill"
+        }
+    }
+}
+
+private struct TransparencySettingsView: View {
+    private let report = TransparencyReportLoader.load()
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("What providers disclose").font(.title2.weight(.bold))
+                    Text("Four public evidence checks explain why Quench shows estimates and ranges. This is not a moral ranking.")
+                        .font(.callout).foregroundStyle(.secondary)
+                }
+
+                if let report {
+                    ForEach(report.providers) { provider in
+                        TransparencyProviderCard(provider: provider, report: report)
+                    }
+                    Text(report.disclaimer)
+                        .font(.caption).foregroundStyle(.secondary)
+                        .padding(12)
+                        .background(.quaternary.opacity(0.35),
+                                    in: RoundedRectangle(cornerRadius: 12))
+                    HStack {
+                        Text("Reviewed \(report.reviewedAt) • Dataset \(report.version)")
+                        Spacer()
+                        Link("Public scorecard", destination: URL(string:
+                            "https://github.com/wannabefounder/quench/blob/main/TRANSPARENCY.md")!)
+                    }
+                    .font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ContentUnavailableView(
+                        "Scorecard unavailable", systemImage: "doc.text.magnifyingglass",
+                        description: Text("The bundled transparency data could not be validated."))
+                }
+            }
+            .padding(20)
+        }
+    }
+}
+
+private struct TransparencyProviderCard: View {
+    let provider: ProviderTransparencyRecord
+    let report: ProviderTransparencyReport
+
+    var body: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 9) {
+                HStack {
+                    Text(provider.name).font(.headline)
+                    Spacer()
+                    Text("\(report.evidenceCount(for: provider)) of \(report.criteria.count) checks")
+                        .font(.caption.weight(.semibold))
+                }
+                ForEach(report.criteria) { criterion in
+                    Label {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(criterion.title).font(.caption.weight(.medium))
+                            Text(criterion.explanation).font(.caption2).foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: provider.discloses(criterion.id)
+                              ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(provider.discloses(criterion.id) ? .blue : .secondary)
+                    }
+                }
+                Text(provider.summary).font(.caption).foregroundStyle(.secondary)
+                HStack(spacing: 12) {
+                    ForEach(Array(provider.sources.enumerated()), id: \.offset) { index, source in
+                        if let url = URL(string: source.url) {
+                            Link(provider.sources.count == 1
+                                 ? "Reviewed source" : "Source \(index + 1)",
+                                 destination: url)
+                                .font(.caption)
+                        }
+                    }
+                }
+            }
+            .padding(4)
         }
     }
 }
@@ -417,7 +501,7 @@ private struct GeneralSettingsView: View {
         Form {
             Section("App") {
                 Toggle("Always-on-top mini status", isOn: $store.floatingWidgetEnabled)
-                Text("A draggable pixel-style panel shows only your fluid progress, AI water, and a +250 mL button. Click the buddy to reopen Quench. It stays above windows and across Spaces without reading anything on screen.")
+                Text("A draggable pixel-style panel shows only your fluid progress, AI water, and a +250 mL button. Click the water drop to reopen Quench. It stays above windows and across Spaces without reading anything on screen.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Open Quench when I log in", isOn: launchAtLogin.binding)

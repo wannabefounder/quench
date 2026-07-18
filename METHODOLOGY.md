@@ -111,7 +111,9 @@ Vendors disclose little (OpenAI's figure is Scope-1 only; Anthropic publishes no
 grids vary by region and season, and cooling technology is improving fast. Critics will say the
 numbers are wrong in both directions — so Quench ships ranges, cites every source here and in
 `coefficients.json`, keeps the coefficients open and versioned, and updates them as new disclosures
-land. If you think a coefficient is off, the file is right there to audit and PR.
+land. The in-app [provider transparency scorecard](TRANSPARENCY.md) separately shows which evidence
+major providers publish, without treating disclosure as proof of accuracy. If you think a coefficient
+or evidence check is off, the versioned source is available to audit and change through a pull request.
 
 ## Sources
 - EcoLogits methodology — https://ecologits.ai/latest/methodology/llm_inference/

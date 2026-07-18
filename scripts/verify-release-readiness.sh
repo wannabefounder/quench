@@ -22,7 +22,7 @@ if git grep -nE 'gh[pousr]_[A-Za-z0-9_]{20,}' -- .; then
 fi
 pass "clean tracked source and secret-pattern scan"
 
-for document in LICENSE README.md PRIVACY.md SECURITY.md METHODOLOGY.md GOVERNANCE.md \
+for document in LICENSE README.md PRIVACY.md SECURITY.md METHODOLOGY.md TRANSPARENCY.md GOVERNANCE.md \
   CONTRIBUTING.md CODE_OF_CONDUCT.md COMPLETION_AUDIT.md RELEASING.md; do
   test -s "$document" || fail "missing required project document: $document"
 done
@@ -33,6 +33,8 @@ test -x "$APP/Contents/MacOS/QuenchApp" || fail "main executable missing"
 test -x "$APP/Contents/Helpers/QuenchBrowserBridge" || fail "browser bridge missing"
 test -s "$APP/Contents/Resources/Quench.icns" || fail "app icon missing"
 test -s "$APP/Contents/Resources/coefficients.json" || fail "coefficients missing"
+test -s "$APP/Contents/Resources/provider-transparency.json" \
+  || fail "provider transparency scorecard missing"
 plutil -lint "$PLIST" >/dev/null
 test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$PLIST")" = \
   "com.wannabefounder.quench" || fail "unexpected bundle identifier"
@@ -48,6 +50,13 @@ for permission in NSCameraUsageDescription NSMicrophoneUsageDescription \
   fi
 done
 jq empty "$APP/Contents/Resources/coefficients.json"
+jq -e '
+  .version == "2026.07" and
+  (.criteria | length) == 4 and
+  (.providers | length) >= 4 and
+  ([.providers[].sources[].url | startswith("https://")] | all)
+' "$APP/Contents/Resources/provider-transparency.json" >/dev/null \
+  || fail "provider transparency scorecard contract changed"
 grep -F 'https://api.ecologits.ai/v1beta' QuenchApp/Services/EcoLogitsCatalogModel.swift >/dev/null \
   || fail "EcoLogits catalog API version is not pinned"
 if rg -n '/estimations' QuenchApp >/dev/null; then

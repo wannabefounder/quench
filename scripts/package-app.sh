@@ -21,6 +21,8 @@ cp "$BIN_DIR/QuenchApp" "$APP/Contents/MacOS/QuenchApp"
 cp "$BIN_DIR/QuenchBrowserBridge" "$APP/Contents/Helpers/QuenchBrowserBridge"
 cp "$ROOT/Packaging/Info.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/QuenchApp/Resources/coefficients.json" "$APP/Contents/Resources/coefficients.json"
+cp "$ROOT/QuenchApp/Resources/provider-transparency.json" \
+    "$APP/Contents/Resources/provider-transparency.json"
 for file in manifest.json background.js content.js site-adapters.js popup.html popup.js README.md; do
     cp "$ROOT/BrowserExtension/$file" "$APP/Contents/Resources/BrowserExtension/$file"
 done

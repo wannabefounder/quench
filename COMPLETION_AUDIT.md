@@ -17,6 +17,7 @@ it does not mean a future public release or partnership exists.
 | Region-sensitive EcoLogits-style method | Complete, report formula superseded | Full method and rationale in `METHODOLOGY.md` and `AGENTS.md` |
 | Versioned open coefficients | Complete | Bundled `coefficients.json`; runtime uses reviewed offline copy |
 | Privacy-safe model freshness | Complete | Optional pinned EcoLogits catalog-only refresh; owner-only cache, schema/size/timeout validation, bundled coefficients win |
+| Vendor transparency scorecard | Complete | Versioned four-check first-party evidence dataset, in-app source links, public `TRANSPARENCY.md`, deterministic validation tests |
 | Plain daily hydration numbers and goal | Complete | Always-visible `You current / goal`, AI total, editable 1–5 L goal |
 | Restrained, research-informed nudges | Complete | `HydrationPacing.swift`, `HydrationNudgePolicy.swift`, tests; maximum two notifications/day |
 | Weekly/monthly/yearly Wrapped | Complete | `WrappedInsights.swift`, square/Story local PNG export, tests |

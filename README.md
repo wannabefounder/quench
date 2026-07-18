@@ -19,6 +19,11 @@ usage or identity; Quench caches only public architecture sizes and uses them to
 fallback for newly released models. The reviewed bundled coefficients always take precedence, and
 the app remains fully useful offline.
 
+A secondary Transparency tab shows four plain evidence checks for major AI providers—per-request
+energy, per-request water, methodology scope, and lifecycle impacts—with dated first-party links.
+It is an evidence checklist rather than a moral ranking; the public dataset is documented in
+[`TRANSPARENCY.md`](TRANSPARENCY.md).
+
 Exact local ingestion supports Claude Code, Codex, and Gemini CLI session logs. Quench normalizes
 only timestamps, model names, and token totals; prompts, responses, thoughts, tool arguments, local
 paths, and session content are never copied into its database.
@@ -129,7 +134,8 @@ Privacy: no telemetry or conversation content. Network features may refresh publ
 or improve estimates, with minimal disclosed metadata and a safe local fallback. Read the
 [methodology](METHODOLOGY.md), [privacy principles](PRIVACY.md), [project guide](AGENTS.md),
 [design system](DESIGN.md), [governance](GOVERNANCE.md), [funding packet](FUNDING.md),
-[completion audit](COMPLETION_AUDIT.md), and [contribution guide](CONTRIBUTING.md).
+[provider transparency](TRANSPARENCY.md), [completion audit](COMPLETION_AUDIT.md), and
+[contribution guide](CONTRIBUTING.md).
 
 ## Why Quench
 

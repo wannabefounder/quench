@@ -1,0 +1,77 @@
+{
+  "version": "2026.07",
+  "reviewedAt": "2026-07-18",
+  "disclaimer": "Evidence checklist, not a moral ranking. A check means the linked first-party material publishes that specific evidence; it does not mean the claim is independently verified or applies to every model, region, or request.",
+  "criteria": [
+    {
+      "id": "request-energy",
+      "title": "Energy per request",
+      "explanation": "Publishes a numerical energy value for a request, prompt, or response."
+    },
+    {
+      "id": "request-water",
+      "title": "Water per request",
+      "explanation": "Publishes a numerical water-consumption value for a request, prompt, or response."
+    },
+    {
+      "id": "methodology-scope",
+      "title": "Method and scope",
+      "explanation": "Publishes enough methodology to understand the serving-system boundary and major inclusions."
+    },
+    {
+      "id": "lifecycle",
+      "title": "Lifecycle impacts",
+      "explanation": "Includes upstream hardware, manufacturing, or other lifecycle impacts in the disclosed boundary."
+    }
+  ],
+  "providers": [
+    {
+      "id": "google",
+      "name": "Google Gemini",
+      "summary": "Publishes point-in-time median Gemini text-prompt energy and water estimates with a detailed operational serving boundary. The disclosure says the claims are not independently verified and do not represent every prompt.",
+      "evidence": ["request-energy", "request-water", "methodology-scope"],
+      "sources": [
+        {
+          "title": "Google Cloud — Measuring the environmental impact of AI inference",
+          "url": "https://cloud.google.com/blog/products/infrastructure/measuring-the-environmental-impact-of-ai-inference/"
+        }
+      ]
+    },
+    {
+      "id": "mistral",
+      "name": "Mistral AI",
+      "summary": "Publishes water, carbon, and resource-depletion impacts for a 400-token Le Chat response using a lifecycle assessment that includes upstream server manufacturing. It does not publish request energy in the cited release.",
+      "evidence": ["request-water", "methodology-scope", "lifecycle"],
+      "sources": [
+        {
+          "title": "Mistral AI — Contribution to a global environmental standard",
+          "url": "https://mistral.ai/news/our-contribution-to-a-global-environmental-standard-for-ai/"
+        }
+      ]
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI / ChatGPT",
+      "summary": "A first-party leadership statement publishes average ChatGPT-query energy and water numbers. The statement does not provide model, token, region, system-boundary, or reproducible methodology detail.",
+      "evidence": ["request-energy", "request-water"],
+      "sources": [
+        {
+          "title": "Sam Altman — The Gentle Singularity",
+          "url": "https://blog.samaltman.com/the-gentle-singularity"
+        }
+      ]
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic Claude",
+      "summary": "The reviewed first-party sustainability material describes annual operational carbon accounting and offsets, but does not publish per-request energy, per-request water, an inference boundary, or lifecycle inference impacts.",
+      "evidence": [],
+      "sources": [
+        {
+          "title": "Anthropic — Claude 3 Model Card, sustainability section",
+          "url": "https://assets.anthropic.com/m/61e7d27f8c8f5919/original/Claude-3-Model-Card.pdf"
+        }
+      ]
+    }
+  ]
+}

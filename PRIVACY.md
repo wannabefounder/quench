@@ -12,6 +12,10 @@ Gemini CLI session files can contain full conversations, tool activity, and reas
 Quench accepts only Gemini message records with token summaries and extracts timestamp, model,
 input-token count, and output-token count. No other Gemini session field is retained.
 
+The provider-transparency scorecard is a read-only JSON resource bundled with the app. It contains
+public evidence labels and HTTPS source links, not user data. Quench makes no request to those
+sources unless the user chooses a link; the destination then receives normal web connection metadata.
+
 ## Network features
 
 Quench may use secure network connections for public coefficient/model-catalog updates, software
