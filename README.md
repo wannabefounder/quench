@@ -6,7 +6,7 @@ Four character themes keep that race visible: an axolotl scientist, capybara gar
 otter, or robot koi animates continuously in the menu bar and reacts when AI adds water or you log a
 glass. The interface remains fully labeled and respects Reduce Motion.
 
-**Status: M6 complete; M7 in progress.** The menu-bar race and local water log are backed by an
+**Status: M7 complete; M8 release work in progress.** The menu-bar race and local water log are backed by an
 EcoLogits-faithful estimation engine with open coefficients. Private Claude Code and Codex log
 ingestion includes durable cursors, deduplication, rotation handling, and visible source health.
 First-run onboarding, per-source privacy controls, diagnostics, and persistent scope/region settings
@@ -47,6 +47,18 @@ The share sheet receives a temporary PNG containing aggregate totals only; Quenc
 swift build          # or open Package.swift in Xcode and run the QuenchApp scheme
 swift run QuenchApp
 ```
+
+Create a normal macOS application bundle (including the app icon, bundled methodology data,
+native browser bridge, and an ad-hoc development signature):
+
+```sh
+./scripts/package-app.sh
+open dist/Quench.app
+```
+
+The packaged build supports notifications and the optional **Open Quench when I log in** setting.
+Release maintainers can set `SIGN_IDENTITY` to a Developer ID Application identity; the default `-`
+creates a local ad-hoc signature suitable for development only.
 
 Run the engine tests (these also run on Linux):
 

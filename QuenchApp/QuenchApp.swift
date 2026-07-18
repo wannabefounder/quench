@@ -170,10 +170,16 @@ final class RaceStore: ObservableObject {
 
     /// Load bundled coefficients.json; fall back to the built-in defaults if missing/corrupt.
     static func loadCoefficients() -> Coefficients {
-        if let url = Bundle.module.url(forResource: "coefficients", withExtension: "json"),
-           let data = try? Data(contentsOf: url),
-           let c = try? Coefficients.load(from: data) {
-            return c
+        let sourceTreeURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("Resources/coefficients.json")
+        let candidates = [Bundle.main.url(forResource: "coefficients", withExtension: "json"),
+                          sourceTreeURL]
+        for url in candidates.compactMap({ $0 }) {
+            if let data = try? Data(contentsOf: url),
+               let coefficients = try? Coefficients.load(from: data) {
+                return coefficients
+            }
         }
         return .fallback
     }

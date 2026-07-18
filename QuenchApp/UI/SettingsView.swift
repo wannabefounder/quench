@@ -4,6 +4,7 @@ import QuenchEngine
 struct SettingsView: View {
     @ObservedObject var store: RaceStore
     @StateObject private var credentials = ProviderCredentialsModel()
+    @StateObject private var launchAtLogin = LaunchAtLoginModel()
     @State private var selection: SettingsSection = .appearance
 
     var body: some View {
@@ -19,7 +20,7 @@ struct SettingsView: View {
             Group {
                 switch selection {
                 case .appearance: AppearanceSettingsView(store: store)
-                case .estimation: GeneralSettingsView(store: store)
+                case .estimation: GeneralSettingsView(store: store, launchAtLogin: launchAtLogin)
                 case .providers: ProviderSettingsView(model: credentials)
                 case .history: HistorySettingsView(store: store)
                 case .wrapped: WrappedSettingsView(store: store)
@@ -359,9 +360,25 @@ private struct ProviderCredentialCard: View {
 
 private struct GeneralSettingsView: View {
     @ObservedObject var store: RaceStore
+    @ObservedObject var launchAtLogin: LaunchAtLoginModel
 
     var body: some View {
         Form {
+            Section("App") {
+                Toggle("Open Quench when I log in", isOn: launchAtLogin.binding)
+                    .disabled(launchAtLogin.isChanging || !launchAtLogin.isAvailable)
+                if let message = launchAtLogin.message {
+                    Label(message, systemImage: launchAtLogin.isAvailable
+                          ? "checkmark.circle" : "shippingbox")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Optional and easy to turn off. Quench runs as a menu-bar app without a background helper.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section("Estimation") {
                 Picker("Water scope", selection: $store.waterMode) {
                     ForEach(WaterMode.allCases, id: \.self) { mode in

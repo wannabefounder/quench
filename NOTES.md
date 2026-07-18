@@ -10,6 +10,7 @@ local/API sources have independent race-inclusion controls.
 M6 DONE: Chromium MV3 + strict native bridge + event-driven browser receipt ingestion;
 count-only messages, canonical rewrite, owner-only inbox. Safari is out of scope by user decision.
 M7: history/freeze/Thirst Index/nudges/Wrapped plus four always-visible buddy themes shipped.
+M8 underway: packaged app, original icon, and opt-in SMAppService launch-at-login are implemented.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,

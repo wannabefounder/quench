@@ -21,6 +21,10 @@ your AI usage**. Personality invites attention; the numbers, labels, and open me
 Every character supports the same semantic states: idle, AI drinking, user drinking, user ahead, AI
 ahead, and tied. Themes change personality and palette, never calculations or meaning.
 
+The application icon uses an original Aqua Lab illustration of Axel holding a glass of water. It is
+kept as a high-resolution raster master because Dock and Finder rendering benefit from the soft 3D
+surface treatment; the live Axel character remains native SwiftUI for motion and accessibility.
+
 ## Motion contract
 
 - Ambient breathing, blinking, and contained bubbles make the buddy feel alive while visible.
