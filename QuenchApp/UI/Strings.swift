@@ -1,6 +1,6 @@
 import Foundation
 
-/// All user-visible strings live here (future localization: Hindi/Telugu).
+/// Central English copy. Per the user's decision on 2026-07-18, Quench is English-only.
 enum Strings {
     static let appName = "Quench"
     static let youLabel = "You"

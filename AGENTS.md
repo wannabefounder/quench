@@ -115,7 +115,8 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
 6. **M6 — complete:** Chromium companion extension and private local bridge. The Chromium MV3
    count-only path and event-driven app ingestion are implemented. **Safari is intentionally out of
    scope per the user's decision on 2026-07-18.**
-7. **M7 — current:** streaks, restrained notifications, history, Wrapped cards, accessibility/localization.
+7. **M7 — current:** streaks, restrained notifications, history, Wrapped cards, and accessibility.
+   **English-only UI per the user's decision on 2026-07-18; do not add Hindi/Telugu localization.**
 8. **M8:** signed/notarized distribution, Homebrew cask, launch materials, fiscal sponsorship.
 
 Finish and test the current milestone before pulling later-phase features forward.

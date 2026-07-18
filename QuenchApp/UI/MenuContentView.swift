@@ -116,9 +116,10 @@ struct MenuContentView: View {
         }
         .controlSize(.large)
         .buttonStyle(.borderedProminent)
-        .tint(store.theme.accent)
+        .tint(store.theme.secondaryAccent)
         .keyboardShortcut("d", modifiers: [.command, .shift])
         .help("Log 250 mL while the Quench menu is open")
+        .accessibilityHint("Adds 250 milliliters to today's private water log")
     }
 
     private var sourceSummary: some View {
@@ -145,6 +146,7 @@ struct MenuContentView: View {
             .buttonStyle(.plain)
             .font(.caption)
             .help("Open Quench Settings")
+            .accessibilityHint("Opens the Quench Settings window and brings it forward")
             Button("Quit") { NSApp.terminate(nil) }
                 .buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
         }

@@ -42,6 +42,8 @@ and [Accessibility](https://developer.apple.com/design/human-interface-guideline
 - Respect Reduce Motion, system appearance, increased contrast, and semantic control behavior.
 - Keep macOS targets at least 28×28 points and keep the primary action keyboard accessible.
 - Use native materials and system controls for legibility across desktop tinting and light/dark mode.
+- Quench is English-only per the product owner's 2026-07-18 decision; do not expose incomplete
+  language choices or ship untranslated surfaces.
 
 The character-led motivation draws on the approachable collection pattern documented by
 [Waterllama](https://waterllama.com/), while Quench stays distinct through original characters and the

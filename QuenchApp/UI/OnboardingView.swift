@@ -53,7 +53,7 @@ struct OnboardingView: View {
             }
             .controlSize(.large)
             .buttonStyle(.borderedProminent)
-            .tint(store.theme.accent)
+            .tint(store.theme.secondaryAccent)
         }
     }
 }
