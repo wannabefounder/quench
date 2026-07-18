@@ -94,6 +94,12 @@ final class RaceStore: ObservableObject {
             refresh()
         }
     }
+    @Published var geminiCLIEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(geminiCLIEnabled, forKey: "geminiCLIEnabled")
+            refresh()
+        }
+    }
     @Published var browserExtensionEnabled: Bool {
         didSet {
             UserDefaults.standard.set(browserExtensionEnabled, forKey: "browserExtensionEnabled")
@@ -152,12 +158,13 @@ final class RaceStore: ObservableObject {
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         claudeCodeEnabled = UserDefaults.standard.object(forKey: "claudeCodeEnabled") as? Bool ?? true
         codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
+        geminiCLIEnabled = UserDefaults.standard.object(forKey: "geminiCLIEnabled") as? Bool ?? true
         browserExtensionEnabled = UserDefaults.standard.object(forKey: "browserExtensionEnabled") as? Bool ?? true
         gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
         theme = QuenchTheme(rawValue: UserDefaults.standard.string(forKey: "quenchTheme") ?? "")
             ?? .aquaLab
         countedSources = Set(UserDefaults.standard.stringArray(forKey: "countedSources")
-            ?? ["claude-code", "codex", "browser-extension", "openai-api", "anthropic-api", "openrouter-api"])
+            ?? ["claude-code", "codex", "gemini-cli", "browser-extension", "openai-api", "anthropic-api", "openrouter-api"])
         currentDay = RaceEngine.dayKey(for: Date())
         credentialObserver = NotificationCenter.default.addObserver(
             forName: .providerCredentialsChanged, object: nil, queue: .main
@@ -205,6 +212,7 @@ final class RaceStore: ObservableObject {
         var enabledSources = Set<String>()
         if claudeCodeEnabled { enabledSources.insert("claude-code") }
         if codexEnabled { enabledSources.insert("codex") }
+        if geminiCLIEnabled { enabledSources.insert("gemini-cli") }
         if browserExtensionEnabled { enabledSources.insert("browser-extension") }
         let startOfDay = Calendar.current.startOfDay(for: Date())
         let sourcesCountedInRace = countedSources

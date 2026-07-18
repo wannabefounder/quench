@@ -8,6 +8,10 @@ Quench stores hydration entries and normalized usage metadata such as timestamp,
 token counts, and accuracy tier. It does not need prompt or response content. Local AI-tool logs are
 read incrementally and only the normalized metadata is written to Quench's database.
 
+Gemini CLI session files can contain full conversations, tool activity, and reasoning summaries.
+Quench accepts only Gemini message records with token summaries and extracts timestamp, model,
+input-token count, and output-token count. No other Gemini session field is retained.
+
 ## Network features
 
 Quench may use secure network connections for public coefficient/model-catalog updates, software

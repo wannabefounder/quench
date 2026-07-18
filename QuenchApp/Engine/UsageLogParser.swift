@@ -130,6 +130,26 @@ public struct CodexLogParser {
     }
 }
 
+public enum GeminiCLILogParser {
+    /// Gemini CLI appends versioned message records to project-scoped session JSONL files. Updated
+    /// Gemini messages carry exact token summaries; conversation content is ignored and never
+    /// included in the normalized event.
+    public static func parse(line: Data, externalID: String) -> NormalizedUsageEvent? {
+        guard let root = LogJSON.object(line), root["type"] as? String == "gemini",
+              let tokens = LogJSON.dictionary(root["tokens"]),
+              let timestamp = LogJSON.date(root["timestamp"]) else { return nil }
+        let input = LogJSON.int(tokens["input"]) ?? 0
+        let output = LogJSON.int(tokens["output"]) ?? 0
+        guard input > 0 || output > 0 else { return nil }
+
+        return NormalizedUsageEvent(
+            externalID: externalID, timestamp: timestamp, source: "gemini-cli",
+            model: root["model"] as? String, inputTokens: input, outputTokens: output,
+            accuracyTier: 3
+        )
+    }
+}
+
 public enum BrowserReceiptParser {
     /// Parses the canonical count-only receipt written by QuenchBrowserBridge. Unknown fields are
     /// ignored, but the bridge itself rewrites accepted messages so page content cannot reach disk.

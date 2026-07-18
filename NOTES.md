@@ -1,6 +1,6 @@
 # NOTES (agent scratchpad, ≤40 lines)
 
-Current milestone: M3 DONE — Claude Code + Codex JSONL ingestion has durable cursors, truncation
+Current milestone: M3 DONE — Claude Code + Codex + Gemini CLI ingestion has durable cursors, truncation
 generations, DB dedupe, parser tests, visible source health, and the real bundled coefficients.
 M4 DONE: onboarding, persistent scope/region, accuracy context, source toggles, and diagnostics.
 M5 DONE: OpenAI + Anthropic Admin usage auto-syncs with Keychain credentials, bounded
@@ -22,7 +22,7 @@ M8 underway: packaged app, original icon, and opt-in SMAppService launch-at-logi
 - QuenchApp/Models/Database.swift — added todayUsageSamples() (usage_events -> [UsageSample]).
 - QuenchApp/QuenchApp.swift — RaceStore loads coefficients + computes aiMl via WaterMath.
 - QuenchTests/WaterMathTests.swift — 20 tests vs real JSON. RaceEngineTests.swift — 6 tests.
-- UsageLogParser.swift + UsageLogParserTests.swift — metadata-only Claude/Codex parsers.
+- UsageLogParser.swift + UsageLogParserTests.swift — metadata-only Claude/Codex/Gemini parsers.
 - LocalLogIngestor.swift + DB v2 — byte cursors, rotation generations, unique external IDs.
 - Menu source rows — privacy-safe Tracking/Watching/Not found/Needs attention states.
 - SourceHealth.swift + tests — pure state rules including Disabled; no paths cross into UI.

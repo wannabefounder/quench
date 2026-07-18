@@ -418,6 +418,7 @@ private struct GeneralSettingsView: View {
             Section("Local sources") {
                 Toggle("Claude Code", isOn: $store.claudeCodeEnabled)
                 Toggle("Codex", isOn: $store.codexEnabled)
+                Toggle("Gemini CLI", isOn: $store.geminiCLIEnabled)
                 Toggle("Browser companion", isOn: $store.browserExtensionEnabled)
                 Text("Disabled sources are not scanned. Previously normalized counts remain in your local history.")
                     .font(.caption)
@@ -427,6 +428,7 @@ private struct GeneralSettingsView: View {
             Section("Count in today's race") {
                 Toggle("Claude Code logs", isOn: store.bindingForCountedSource("claude-code"))
                 Toggle("Codex logs", isOn: store.bindingForCountedSource("codex"))
+                Toggle("Gemini CLI logs", isOn: store.bindingForCountedSource("gemini-cli"))
                 Toggle("Browser companion", isOn: store.bindingForCountedSource("browser-extension"))
                 Toggle("OpenAI API", isOn: store.bindingForCountedSource("openai-api"))
                 Toggle("Anthropic API", isOn: store.bindingForCountedSource("anthropic-api"))

@@ -70,4 +70,25 @@ final class UsageLogParserTests: XCTestCase {
         let same = Data(#"{"timestamp":"2026-07-18T10:20:31Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":10,"output_tokens":5}}}}"#.utf8)
         XCTAssertNil(parser.parse(line: same, externalID: "fixture:4"))
     }
+
+    func testGeminiCLIParsesExactTokenSummaryWithoutContent() {
+        let line = Data(#"{"id":"gemini-message-1","timestamp":"2026-07-18T10:20:30.123Z","type":"gemini","model":"gemini-2.5-pro","content":"must never be retained","tokens":{"input":1200,"output":340,"cached":100,"thoughts":20,"tool":0,"total":1660}}"#.utf8)
+        let event = GeminiCLILogParser.parse(line: line, externalID: "gemini-session:42")
+
+        XCTAssertEqual(event?.externalID, "gemini-session:42")
+        XCTAssertEqual(event?.source, "gemini-cli")
+        XCTAssertEqual(event?.model, "gemini-2.5-pro")
+        XCTAssertEqual(event?.inputTokens, 1200)
+        XCTAssertEqual(event?.outputTokens, 340)
+        XCTAssertEqual(event?.accuracyTier, 3)
+    }
+
+    func testGeminiCLIIgnoresContentOnlyAndMetadataRecords() {
+        XCTAssertNil(GeminiCLILogParser.parse(
+            line: Data(#"{"id":"user-1","timestamp":"2026-07-18T10:20:30Z","type":"user","content":"private"}"#.utf8),
+            externalID: "fixture:5"))
+        XCTAssertNil(GeminiCLILogParser.parse(
+            line: Data(#"{"sessionId":"abc","projectHash":"redacted","startTime":"2026-07-18T10:00:00Z"}"#.utf8),
+            externalID: "fixture:6"))
+    }
 }

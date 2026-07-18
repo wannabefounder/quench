@@ -130,7 +130,7 @@ struct MenuContentView: View {
                 if store.isRefreshing { ProgressView().controlSize(.mini) }
                 else { Text("Content never leaves this Mac").font(.caption2).foregroundStyle(.tertiary) }
             }
-            ForEach(store.sourceStatuses.prefix(3)) { source in SourceStatusRow(source: source) }
+            ForEach(store.sourceStatuses.prefix(4)) { source in SourceStatusRow(source: source) }
         }
     }
 

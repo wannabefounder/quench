@@ -12,6 +12,10 @@ ingestion includes durable cursors, deduplication, rotation handling, and visibl
 First-run onboarding, per-source privacy controls, diagnostics, and persistent scope/region settings
 make every estimate's assumptions and collection state visible.
 
+Exact local ingestion supports Claude Code, Codex, and Gemini CLI session logs. Quench normalizes
+only timestamps, model names, and token totals; prompts, responses, thoughts, tool arguments, local
+paths, and session content are never copied into its database.
+
 Optional OpenAI and Anthropic organization connectors now have Keychain-only Admin credential
 storage, documented metadata-only verification, pagination-aware clients, and tested response
 normalization. Connected providers sync automatically at most every 15 minutes; manual diagnostics

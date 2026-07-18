@@ -20,6 +20,9 @@ final class LocalLogIngestor {
             ingestTree(home.appendingPathComponent(".codex/sessions"),
                        source: "codex", displayName: "Codex",
                        isEnabled: enabledSources.contains("codex")),
+            ingestTree(home.appendingPathComponent(".gemini/tmp"),
+                       source: "gemini-cli", displayName: "Gemini CLI",
+                       isEnabled: enabledSources.contains("gemini-cli")),
             ingestSingleFile(
                 home.appendingPathComponent("Library/Application Support/Quench/browser-events.jsonl"),
                 source: "browser-extension", displayName: "Browser Extension",
@@ -117,6 +120,9 @@ final class LocalLogIngestor {
                     events.append(event)
                 }
             } else if source == "codex", let event = codex.parse(line: line, externalID: externalID) {
+                events.append(event)
+            } else if source == "gemini-cli",
+                      let event = GeminiCLILogParser.parse(line: line, externalID: externalID) {
                 events.append(event)
             } else if source == "browser-extension",
                       let event = BrowserReceiptParser.parse(line: line) {

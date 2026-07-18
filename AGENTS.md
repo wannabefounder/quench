@@ -108,7 +108,7 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
 
 1. **M1 — complete:** menu-bar skeleton, race bar, SQLite water logging, local day rollover.
 2. **M2 — complete:** EcoLogits-faithful water engine, open coefficients, methodology, tests.
-3. **M3 — complete:** Tier 3 Claude Code + Codex JSONL ingestion, cursors, rotation handling,
+3. **M3 — complete:** Tier 3 Claude Code + Codex + Gemini CLI JSONL ingestion, cursors, rotation handling,
    deduplication, source health, and tests.
 4. **M4 — complete:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
 5. **M5 — complete:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
