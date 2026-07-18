@@ -48,8 +48,8 @@ swift build          # or open Package.swift in Xcode and run the QuenchApp sche
 swift run QuenchApp
 ```
 
-Quench is an accessory app: look for its animated buddy in the macOS menu bar. It intentionally
-does not keep a Dock icon or open a normal document window.
+Opening Quench shows its race window and Dock icon. Closing the window leaves the animated buddy in
+the macOS menu bar so the daily race remains one click away.
 
 Create a normal macOS application bundle (including the app icon, bundled methodology data,
 native browser bridge, and an ad-hoc development signature):

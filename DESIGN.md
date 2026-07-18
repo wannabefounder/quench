@@ -6,7 +6,8 @@ your AI usage**. Personality invites attention; the numbers, labels, and open me
 ## Experience hierarchy
 
 1. The menu-bar buddy is always visible and moves subtly without requiring a click.
-2. The open popover leads with a live character reaction and one plain-language status sentence.
+2. The main window and menu-bar popover lead with the same live character reaction and one
+   plain-language status sentence, so launching the app is never a blank or hidden experience.
 3. Two labeled lanes—You and Your AI—show the race without relying on color alone.
 4. “Log 250 mL” is the single dominant action. Streaks, Thirst Index, and source health are secondary.
 5. Scope, region, privacy, and source accuracy remain visible without turning the popover into a dashboard.

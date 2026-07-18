@@ -6,6 +6,12 @@ struct QuenchApp: App {
     @StateObject private var store = RaceStore()
 
     var body: some Scene {
+        WindowGroup("Quench", id: "dashboard") {
+            MenuContentView(store: store)
+        }
+        .defaultSize(width: 402, height: 650)
+        .windowResizability(.contentSize)
+
         MenuBarExtra {
             MenuContentView(store: store)
         } label: {
