@@ -133,6 +133,7 @@ final class WaterMathTests: XCTestCase {
         XCTAssertEqual(WaterMath.providerKey(forModel: "gemini"), "google")
         XCTAssertEqual(WaterMath.providerKey(forModel: "llama-405b"), "meta")
         XCTAssertEqual(WaterMath.providerKey(forModel: "default"), "default")
+        XCTAssertEqual(WaterMath.providerKey(forModel: "gpt-6"), "openai")
     }
 
     // MARK: param fallback (EcoLogits GPU formula)
@@ -145,6 +146,28 @@ final class WaterMathTests: XCTestCase {
         XCTAssertGreaterThan(big, small) // more active params -> more energy
         // 50B active ~ 0.829 Wh/1k output tokens (facility)
         XCTAssertEqual(WaterMath.paramEnergyPer1k(50, pf), 0.8288, accuracy: 1e-3)
+    }
+
+    func testNewExactModelUsesParameterFallbackBeforeFamilyMapping() throws {
+        let testDir = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+        let root = testDir.deletingLastPathComponent()
+        let data = try Data(contentsOf:
+            root.appendingPathComponent("QuenchApp/Resources/coefficients.json"))
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var energy = try XCTUnwrap(json["energy"] as? [String: Any])
+        var fallback = try XCTUnwrap(energy["param_fallback"] as? [String: Any])
+        var parameters = try XCTUnwrap(fallback["model_active_params_b"] as? [String: Double])
+        parameters["gpt-6"] = 25
+        fallback["model_active_params_b"] = parameters
+        energy["param_fallback"] = fallback
+        json["energy"] = energy
+        let custom = try Coefficients.load(from: JSONSerialization.data(withJSONObject: json))
+
+        let sample = UsageSample(model: "openai/gpt-6", inputTokens: 1_000, outputTokens: 1_000)
+        let output = WaterMath.paramEnergyPer1k(25, custom.energy.param_fallback)
+        XCTAssertEqual(WaterMath.energyWh(sample, coef: custom),
+                       0.08 + output * 0.05 + output, accuracy: 1e-9)
+        XCTAssertEqual(WaterMath.coefficientKey(sample.model, custom), "gpt-6")
     }
 
     // MARK: aggregate

@@ -106,6 +106,11 @@ public enum WaterMath {
     }
 
     public static func providerKey(forModel key: String) -> String {
+        if key.hasPrefix("gpt-") { return "openai" }
+        if key.hasPrefix("claude-") { return "anthropic" }
+        if key.hasPrefix("gemini-") { return "google" }
+        if key.hasPrefix("deepseek-") { return "deepseek" }
+        if key.hasPrefix("llama-") { return "meta" }
         switch key {
         case "gpt-4o", "gpt-4o-mini", "gpt-4.1-nano", "gpt-5", "o3": return "openai"
         case "claude-sonnet", "claude-opus", "claude-haiku": return "anthropic"
@@ -114,6 +119,21 @@ public enum WaterMath {
         case "llama-405b": return "meta"
         default: return "default"
         }
+    }
+
+    /// Prefer an exact catalog key before broad family mapping. This is what makes a newly added
+    /// `model_active_params_b` entry usable without requiring a code release for the model name.
+    static func coefficientKey(_ raw: String?, _ coef: Coefficients) -> String {
+        guard let raw, !raw.isEmpty else { return "default" }
+        let normalized = raw.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        let candidates = [normalized, normalized.split(separator: "/").last.map(String.init)]
+            .compactMap { $0 }
+        for candidate in candidates where
+            coef.energy.wh_per_1k_tokens[candidate] != nil
+                || coef.energy.param_fallback.model_active_params_b[candidate] != nil {
+            return candidate
+        }
+        return modelKey(raw)
     }
 
     /// EcoLogits GPU energy model, used only for models absent from the table.
@@ -133,7 +153,7 @@ public enum WaterMath {
 
     /// Facility-level energy (Wh) for one event. PUE is already baked into the coefficients.
     public static func energyWh(_ s: UsageSample, coef: Coefficients) -> Double {
-        let c = energyCoef(modelKey(s.model), coef)
+        let c = energyCoef(coefficientKey(s.model, coef), coef)
         if s.inputTokens != nil || s.outputTokens != nil {
             let inT = Double(s.inputTokens ?? 0), outT = Double(s.outputTokens ?? 0)
             return c.fixed_wh + inT / 1000.0 * c.input + outT / 1000.0 * c.output
@@ -152,7 +172,7 @@ public enum WaterMath {
                                region: String? = nil, coef: Coefficients) -> Double {
         let e = energyWh(s, coef: coef)
         if e <= 0 { return 0 }
-        let key = modelKey(s.model)
+        let key = coefficientKey(s.model, coef)
         let prov = coef.water.providers[providerKey(forModel: key)]
             ?? coef.water.providers["default"] ?? .init(wue_onsite: 0.40, pue: 1.20)
         let regionKey = region ?? coef.water.default_region

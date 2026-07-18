@@ -33,9 +33,8 @@ M8 underway: packaged app, original icon, and opt-in SMAppService launch-at-logi
 - BrowserExtension + QuenchBrowserBridge — Tier 2 count-only native messaging preview.
 
 ## TODO / open
-- Bundled coefficients resource is wired into the Swift package; fallback remains for corrupt installs.
-- M1 manual check on Mac still pending (launch/icon/log/restart).
-- M2 Mac check: debug pane showing computed mL for a sample event (engine verified on Linux).
+- Packaged coefficients and fallback are verified; app launch/icon/restart passed on this Mac.
+- Manual UI check remains for Settings twice, theme switching, water log, and launch-at-login restart.
 - This Mac's default CLT SDK alias (26.2) mismatches its Swift compiler build. App builds with the
   installed MacOSX15.4 SDK; README documents cache cleanup and the temporary SDKROOT workaround.
 - gpt-4o-mini output coef set below gpt-4o by size-prior (benchmark's mini figure looked anomalous).
