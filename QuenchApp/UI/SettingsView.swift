@@ -453,6 +453,19 @@ private struct GeneralSettingsView: View {
             }
 
             Section("Gentle nudges") {
+                Toggle("Menu bar sip reminders", isOn: $store.menuBarNudgesEnabled)
+                if store.menuBarNudgesEnabled {
+                    Picker("Menu bar interval", selection: $store.menuBarNudgeIntervalMinutes) {
+                        Text("30 minutes").tag(30)
+                        Text("45 minutes").tag(45)
+                        Text("1 hour").tag(60)
+                        Text("90 minutes").tag(90)
+                        Text("2 hours").tag(120)
+                    }
+                }
+                Text("The always-visible menu bar rotates from private daily stats to “AI just drank” updates and a short sip reminder. No notification permission is needed.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Toggle("Hydration notifications", isOn: store.gentleNotificationsBinding)
                 Text("Opt-in, passive, and silent. At most two per day between 10:00 and 18:00, only when AI is at least 250 mL ahead. macOS Focus settings remain in control.")
                     .font(.caption)

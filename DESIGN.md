@@ -32,8 +32,10 @@ surface treatment; the live Axel character remains native SwiftUI for motion and
   main window and whenever the popover or theme gallery is visible.
 - An increase in AI water triggers the AI-drinking state automatically; logging water triggers a
   short celebration. Resting expression follows the race state.
-- Interaction never waits for animation. The 18-point menu-bar face updates on real race activity
-  but does not run its own timer; this avoids a macOS 26 AppKit status-item layout loop.
+- Interaction never waits for animation. The menu bar uses the standard monochrome smiling-face
+  symbol beside calm, always-visible stats. It briefly rotates to “AI just drank” when new usage is
+  found and to a configurable local sip reminder. Custom colored SwiftUI icons flatten into an
+  unreadable black oval on macOS 26, while frame-rate timer labels trigger an AppKit layout loop.
 - With macOS Reduce Motion enabled, ongoing translation/rotation pauses; expression, glyph, and
   color changes preserve meaning.
 

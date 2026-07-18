@@ -15,7 +15,11 @@ struct QuenchApp: App {
         MenuBarExtra {
             MenuContentView(store: store)
         } label: {
-            BuddyMenuBarIcon(theme: store.theme, activity: store.buddyActivity)
+            Label {
+                Text(store.menuBarText)
+            } icon: {
+                Image(systemName: "face.smiling.inverse")
+            }
         }
         .menuBarExtraStyle(.window)
 
@@ -62,6 +66,16 @@ final class RaceStore: ObservableObject {
     @Published private(set) var buddyActivity: BuddyActivity = .idle
     @Published var recentHistory: [DailyRaceHistoryItem] = []
     @Published private(set) var gentleNotificationsEnabled: Bool
+    @Published private(set) var menuBarText = "Quench · Starting…"
+    @Published var menuBarNudgesEnabled: Bool {
+        didSet { UserDefaults.standard.set(menuBarNudgesEnabled, forKey: "menuBarNudgesEnabled") }
+    }
+    @Published var menuBarNudgeIntervalMinutes: Int {
+        didSet {
+            UserDefaults.standard.set(menuBarNudgeIntervalMinutes, forKey: "menuBarNudgeIntervalMinutes")
+            nextMenuBarNudge = Date().addingTimeInterval(TimeInterval(menuBarNudgeIntervalMinutes * 60))
+        }
+    }
     @Published var theme: QuenchTheme {
         didSet { UserDefaults.standard.set(theme.rawValue, forKey: "quenchTheme") }
     }
@@ -138,6 +152,8 @@ final class RaceStore: ObservableObject {
     private var browserReceiptWatcher: BrowserReceiptWatcher?
     private var buddyActivityTask: Task<Void, Never>?
     private var activityProxy: ActivityProxyService?
+    private var menuBarEvent: (text: String, expires: Date)?
+    private var nextMenuBarNudge: Date
 
     var regionOptions: [RegionOption] {
         coef.water.regions.map { key, value in
@@ -187,6 +203,12 @@ final class RaceStore: ObservableObject {
         let savedPledge = UserDefaults.standard.double(forKey: "pledgePerLiter")
         pledgePerLiter = savedPledge > 0 ? min(max(savedPledge, 1), 10_000) : 10
         gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
+        menuBarNudgesEnabled = UserDefaults.standard.object(forKey: "menuBarNudgesEnabled") as? Bool ?? true
+        let savedMenuBarInterval = UserDefaults.standard.integer(forKey: "menuBarNudgeIntervalMinutes")
+        let initialMenuBarInterval = [30, 45, 60, 90, 120].contains(savedMenuBarInterval)
+            ? savedMenuBarInterval : 60
+        menuBarNudgeIntervalMinutes = initialMenuBarInterval
+        nextMenuBarNudge = Date().addingTimeInterval(TimeInterval(initialMenuBarInterval * 60))
         theme = QuenchTheme(rawValue: UserDefaults.standard.string(forKey: "quenchTheme") ?? "")
             ?? .aquaLab
         countedSources = Set(UserDefaults.standard.stringArray(forKey: "countedSources")
@@ -207,7 +229,10 @@ final class RaceStore: ObservableObject {
         refresh()
         // Day rollover check: once a minute, reset when local midnight passes.
         timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.checkRollover() }
+            Task { @MainActor in
+                self?.checkRollover()
+                self?.updateMenuBarText()
+            }
         }
     }
 
@@ -300,9 +325,12 @@ final class RaceStore: ObservableObject {
             thirstiestModel = payload.thirstiestModel
             if payload.aiMl > previousAI + 0.01 {
                 showBuddyActivity(.aiDrinking, for: 4.5)
+                let delta = payload.aiMl - previousAI
+                menuBarEvent = (MenuBarStatus.aiDrank(deltaMl: delta), Date().addingTimeInterval(90))
             } else if buddyActivity != .userDrinking && buddyActivity != .aiDrinking {
                 buddyActivity = restingBuddyActivity
             }
+            updateMenuBarText()
             if gentleNotificationsEnabled {
                 Task { await self.notificationService?.consider(
                     userMl: payload.userMl, aiMl: payload.aiMl
@@ -350,6 +378,8 @@ final class RaceStore: ObservableObject {
     func logWater(ml: Int) {
         try? AppDatabase.shared.logWater(ml: ml)
         showBuddyActivity(.userDrinking, for: 2.5)
+        menuBarEvent = ("You drank \(ml) mL · Nice!", Date().addingTimeInterval(90))
+        updateMenuBarText()
         refresh()
     }
 
@@ -364,6 +394,21 @@ final class RaceStore: ObservableObject {
             currentDay = day
             refresh()
         }
+    }
+
+    private func updateMenuBarText(now: Date = Date()) {
+        if let event = menuBarEvent, event.expires > now {
+            menuBarText = event.text
+            return
+        }
+        menuBarEvent = nil
+        if menuBarNudgesEnabled, now >= nextMenuBarNudge {
+            menuBarEvent = ("Time for a sip", now.addingTimeInterval(90))
+            nextMenuBarNudge = now.addingTimeInterval(TimeInterval(menuBarNudgeIntervalMinutes * 60))
+            menuBarText = "Time for a sip"
+            return
+        }
+        menuBarText = MenuBarStatus.stats(userMl: userMl, aiMl: aiMl)
     }
 
     private var restingBuddyActivity: BuddyActivity {

@@ -1,27 +1,5 @@
 import SwiftUI
 
-struct BuddyMenuBarIcon: View {
-    let theme: QuenchTheme
-    let activity: BuddyActivity
-
-    var body: some View {
-        ZStack {
-            Circle().fill(theme.accent.opacity(0.24))
-            Circle().stroke(theme.accent, lineWidth: 1.4)
-            HStack(spacing: 3) {
-                Capsule().fill(.primary).frame(width: 2.5, height: 4)
-                Capsule().fill(.primary).frame(width: 2.5, height: 4)
-            }
-            if activity == .aiDrinking {
-                Circle().fill(theme.secondaryAccent).frame(width: 4, height: 4)
-                    .offset(x: 7, y: -7)
-            }
-        }
-        .frame(width: 18, height: 18)
-        .accessibilityLabel("Quench, \(theme.buddyName), \(activity.accessibilityDescription)")
-    }
-}
-
 struct BuddyStageView: View {
     let theme: QuenchTheme
     let activity: BuddyActivity
