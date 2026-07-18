@@ -11,7 +11,7 @@ M6 DONE: packaged Chromium MV3 + Settings-guided Chrome/Brave/Edge connection + 
 count-only live ingestion and owner-only inbox. Safari is out of scope by user decision.
 M7: history/freeze/nudges/Wrapped comparisons/private pledge plus four buddy themes shipped.
 M8 engineering-ready: packaged app, icon, launch-at-login, pixel water-drop status, visible
-low/mid/high ranges, resizable calibrated-vessel widget, release automation, and privacy-safe
+low/mid/high ranges, 228×84–640×360 calibrated-vessel widget, release automation, and privacy-safe
 EcoLogits freshness are implemented.
 
 ## Files

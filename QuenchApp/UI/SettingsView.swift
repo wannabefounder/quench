@@ -506,6 +506,21 @@ private struct GeneralSettingsView: View {
                 Text("A draggable, resizable hydration instrument shows your progress, the AI estimate and range, and your own quick-add vessels. Click the water drop to reopen Quench. It stays above windows and across Spaces without reading anything on screen.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                LabeledContent("Widget size") {
+                    HStack(spacing: 6) {
+                        ForEach(FloatingWidgetSizePreset.allCases, id: \.self) { preset in
+                            Button(preset.label) {
+                                FloatingStatusPanelController.shared.resize(to: preset)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
+                }
+                .disabled(!store.floatingWidgetEnabled)
+                Text("Small keeps only the water drop, daily percentage, AI estimate, and your calibrated Sip action. Compact and Console reveal progressively more detail.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Toggle("Open Quench when I log in", isOn: launchAtLogin.binding)
                     .disabled(launchAtLogin.isChanging || !launchAtLogin.isAvailable)
                 if let message = launchAtLogin.message {

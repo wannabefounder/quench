@@ -24,7 +24,7 @@ it does not mean a future public release or partnership exists.
 | Relatable cups/bottles/showers | Complete | `WrappedInsights.relatableComparison`, deterministic tests |
 | Per-liter clean-water pledge | Complete with safe deviation | Private calculator and independent links; no payment or partnership claim |
 | Four animated character themes | Complete | `QuenchTheme.swift`, `BuddyView.swift`, theme gallery, Reduce Motion handling |
-| Always-visible status | Complete with platform adaptation | Native drop icon plus adaptive 340×124–640×360 floating hydration instrument; timer-driven status icon was removed after a reproduced macOS 26 launch hang |
+| Always-visible status | Complete with platform adaptation | Native drop icon plus adaptive 228×84–640×360 floating hydration instrument and Small/Compact/Console presets; timer-driven status icon was removed after a reproduced macOS 26 launch hang |
 
 ## Collection architecture
 

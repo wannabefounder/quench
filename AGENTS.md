@@ -78,6 +78,8 @@ state, and editable sip/office-cup/glass/1 L bottle-sip actions. Do not restore 
 language may feel like a youthful futuristic engineering instrument but must remain original, not
 copy another company's logo or exact trade dress. It must not inspect other windows or request
 Screen Recording/Accessibility access.
+The 228×84 Small preset must retain the animated drop, daily percentage, selected AI estimate, and
+calibrated Sip action; Compact and Console progressively reveal more context.
 
 Animation must communicate state without delaying interaction. Honor Reduce Motion automatically,
 avoid color-only status, keep the daily race understandable within seconds, and keep continuous

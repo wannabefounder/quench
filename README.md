@@ -6,8 +6,10 @@ Four character themes keep that race friendly: an axolotl scientist, capybara ga
 otter, or robot koi animates continuously in Quench and reacts when AI adds water or you log a
 glass. A draggable, resizable, always-on-top animated water-drop instrument keeps `You / goal`, the
 AI estimate/range, race state, and quick-add controls visible even when macOS collapses custom
-menu-bar content. Its original futuristic industrial layout adapts between a compact strip and a
-fuller console. The interface remains fully labeled and respects Reduce Motion.
+menu-bar content. Its original futuristic industrial layout adapts between a 228×84 Small view, a
+compact strip, and a fuller console; Settings provides one-click presets for all three. The Small
+view keeps only the drop, daily percentage, AI estimate, and calibrated Sip action. The interface
+remains fully labeled and respects Reduce Motion.
 
 Quick-add amounts are personal rather than hard-coded: sip (50 mL), office cup (180 mL), glass
 (250 mL), and a sip from a 1 L bottle (100 mL) are editable starting points. Measuring the vessel

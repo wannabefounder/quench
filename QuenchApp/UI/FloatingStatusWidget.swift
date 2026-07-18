@@ -2,6 +2,21 @@ import AppKit
 import SwiftUI
 import QuenchEngine
 
+enum FloatingWidgetSizePreset: String, CaseIterable, Hashable {
+    case small
+    case compact
+    case console
+
+    var label: String { rawValue.capitalized }
+    var size: NSSize {
+        switch self {
+        case .small: NSSize(width: 228, height: 84)
+        case .compact: NSSize(width: 340, height: 124)
+        case .console: NSSize(width: 480, height: 240)
+        }
+    }
+}
+
 @MainActor
 final class FloatingStatusPanelController {
     static let shared = FloatingStatusPanelController()
@@ -37,8 +52,22 @@ final class FloatingStatusPanelController {
         }
     }
 
+    func resize(to preset: FloatingWidgetSizePreset) {
+        if panel == nil { setVisible(true) }
+        guard let panel else { return }
+        let oldFrame = panel.frame
+        let size = preset.size
+        let frame = NSRect(
+            x: oldFrame.maxX - size.width,
+            y: oldFrame.maxY - size.height,
+            width: size.width,
+            height: size.height
+        )
+        panel.setFrame(frame, display: true, animate: true)
+    }
+
     private func makePanel(store: RaceStore) -> NSPanel {
-        let size = NSSize(width: 480, height: 240)
+        let size = FloatingWidgetSizePreset.console.size
         let panel = NSPanel(
             contentRect: NSRect(origin: .zero, size: size),
             styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel, .resizable],
@@ -60,10 +89,10 @@ final class FloatingStatusPanelController {
         panel.isMovableByWindowBackground = true
         panel.becomesKeyOnlyIfNeeded = true
         panel.isReleasedWhenClosed = false
-        panel.contentMinSize = NSSize(width: 340, height: 124)
+        panel.contentMinSize = FloatingWidgetSizePreset.small.size
         panel.contentMaxSize = NSSize(width: 640, height: 360)
         panel.contentView = NSHostingView(rootView: FloatingStatusWidget(store: store)
-            .frame(minWidth: 340, maxWidth: 640, minHeight: 124, maxHeight: 360))
+            .frame(minWidth: 228, maxWidth: 640, minHeight: 84, maxHeight: 360))
         panel.setContentSize(size)
         let frameName = "QuenchFloatingStatusV3"
         panel.setFrameAutosaveName(frameName)
@@ -91,17 +120,63 @@ private struct FloatingStatusWidget: View {
     var body: some View {
         GeometryReader { proxy in
             Group {
-                if proxy.size.height < 170 || proxy.size.width < 410 {
+                if proxy.size.height < 110 || proxy.size.width < 300 {
+                    microInstrument
+                } else if proxy.size.height < 170 || proxy.size.width < 410 {
                     compactInstrument
                 } else {
                     expandedInstrument(showDetail: proxy.size.height >= 240)
                 }
             }
-            .padding(proxy.size.height < 170 ? 10 : 14)
+            .padding(proxy.size.height < 110 || proxy.size.width < 300 ? 7
+                     : (proxy.size.height < 170 ? 10 : 14))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(instrumentBackground)
         }
         .accessibilityElement(children: .contain)
+    }
+
+    private var microInstrument: some View {
+        HStack(spacing: 7) {
+            dropButton(size: 30)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Text("YOU").instrumentLabel(size: 7).foregroundStyle(store.theme.accent)
+                    Text("\(progressPercent)%")
+                        .font(.system(size: 11, weight: .black, design: .monospaced))
+                        .foregroundStyle(.white)
+                }
+                Text("AI≈\(volume(store.aiMl))")
+                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                    .foregroundStyle(store.theme.secondaryAccent)
+                    .lineLimit(1)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(statusAccessibility)
+
+            Spacer(minLength: 1)
+
+            Button { store.logDrink(.sip) } label: {
+                VStack(spacing: 0) {
+                    Image(systemName: HydrationVessel.sip.symbol)
+                        .font(.system(size: 10, weight: .bold))
+                    Text("+\(store.drinkAmount(for: .sip))")
+                        .font(.system(size: 10, weight: .black, design: .monospaced))
+                        .monospacedDigit()
+                }
+                .foregroundStyle(Color(red: 0.08, green: 0.09, blue: 0.09))
+                .frame(width: 47, height: 38)
+                .background(Color(red: 0.88, green: 0.87, blue: 0.78),
+                            in: RoundedRectangle(cornerRadius: 7))
+                .overlay(alignment: .top) {
+                    Rectangle().fill(store.theme.accent).frame(height: 3)
+                        .clipShape(.rect(topLeadingRadius: 7, topTrailingRadius: 7))
+                }
+            }
+            .buttonStyle(InstrumentButtonStyle())
+            .help("Log a \(store.drinkAmount(for: .sip)) mL sip")
+            .accessibilityLabel("Log \(store.drinkAmount(for: .sip)) milliliters, Sip")
+        }
     }
 
     private var compactInstrument: some View {

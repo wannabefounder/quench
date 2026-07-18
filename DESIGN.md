@@ -8,8 +8,9 @@ your AI usage**. Personality invites attention; the numbers, labels, and open me
 1. A draggable, resizable animated water-drop instrument stays above normal windows. Its original
    industrial-console visual language uses monospaced telemetry, a restrained grid, high-contrast
    physical-control cues, and each theme's accent—never another product's logo or copied layout.
-   It adapts from a compact strip to a fuller console with human progress, AI estimate/range, race
-   state, and calibrated quick-add controls. The native menu-bar icon remains the entry point because
+   It adapts from a 228×84 micro instrument (drop, progress, AI estimate, Sip) through a compact
+   strip to a fuller console with human progress, AI estimate/range, race state, and calibrated
+   quick-add controls. The native menu-bar icon remains the entry point because
    macOS may suppress or collapse custom status-item text.
 2. The main window and menu-bar popover lead with the same live character reaction and one
    plain-language status sentence, so launching the app is never a blank or hidden experience.
@@ -45,8 +46,9 @@ surface treatment; the live Axel character remains native SwiftUI for motion and
   found and to a configurable local sip reminder. Custom colored SwiftUI icons flatten into an
   unreadable black oval on macOS 26, while frame-rate timer labels trigger an AppKit layout loop.
 - The always-on-top panel uses a non-activating native `NSPanel`, joins every Space, never observes
-  other windows, and can be disabled in Settings. It exposes native edge resizing from 340×124 to
-  640×360 points and preserves the last frame. Its pixel water drop floats gently without a
+  other windows, and can be disabled in Settings. It exposes native edge resizing from 228×84 to
+  640×360 points, preserves the last frame, and provides Small/Compact/Console preset buttons for
+  precise one-click sizing. Its pixel water drop floats gently without a
   frame-rate timer loop and changes state color when AI water increases.
 - With macOS Reduce Motion enabled, ongoing translation/rotation pauses; expression, glyph, and
   color changes preserve meaning.
