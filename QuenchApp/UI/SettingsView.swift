@@ -4,21 +4,102 @@ import QuenchEngine
 struct SettingsView: View {
     @ObservedObject var store: RaceStore
     @StateObject private var credentials = ProviderCredentialsModel()
+    @State private var selection: SettingsSection = .appearance
 
     var body: some View {
-        TabView {
-            GeneralSettingsView(store: store)
-                .tabItem { Label("Estimation", systemImage: "slider.horizontal.3") }
-            ProviderSettingsView(model: credentials)
-                .tabItem { Label("Providers", systemImage: "key.fill") }
-            HistorySettingsView(store: store)
-                .tabItem { Label("History", systemImage: "calendar") }
-            WrappedSettingsView(store: store)
-                .tabItem { Label("Wrapped", systemImage: "sparkles.rectangle.stack") }
-            DiagnosticsView(store: store)
-                .tabItem { Label("Diagnostics", systemImage: "stethoscope") }
+        HStack(spacing: 0) {
+            List(SettingsSection.allCases, selection: $selection) { section in
+                Label(section.title, systemImage: section.symbol).tag(section)
+            }
+            .listStyle(.sidebar)
+            .frame(width: 165)
+
+            Divider()
+
+            Group {
+                switch selection {
+                case .appearance: AppearanceSettingsView(store: store)
+                case .estimation: GeneralSettingsView(store: store)
+                case .providers: ProviderSettingsView(model: credentials)
+                case .history: HistorySettingsView(store: store)
+                case .wrapped: WrappedSettingsView(store: store)
+                case .diagnostics: DiagnosticsView(store: store)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(width: 540, height: 460)
+        .frame(width: 760, height: 540)
+    }
+}
+
+private enum SettingsSection: String, CaseIterable, Identifiable {
+    case appearance, estimation, providers, history, wrapped, diagnostics
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .appearance: "Buddies & Themes"; case .estimation: "Estimation"
+        case .providers: "Providers"; case .history: "History"
+        case .wrapped: "Wrapped"; case .diagnostics: "Diagnostics"
+        }
+    }
+    var symbol: String {
+        switch self {
+        case .appearance: "face.smiling.inverse"; case .estimation: "slider.horizontal.3"
+        case .providers: "key.fill"; case .history: "calendar"
+        case .wrapped: "sparkles.rectangle.stack"; case .diagnostics: "stethoscope"
+        }
+    }
+}
+
+private struct AppearanceSettingsView: View {
+    @ObservedObject var store: RaceStore
+    private let columns = [GridItem(.flexible()), GridItem(.flexible())]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Choose your Quench buddy").font(.title2.weight(.bold))
+                    Text("Every theme has a character that stays animated, reacts when AI adds water, and celebrates when you log a glass.")
+                        .font(.callout).foregroundStyle(.secondary)
+                }
+
+                LazyVGrid(columns: columns, spacing: 14) {
+                    ForEach(QuenchTheme.allCases) { theme in
+                        Button { store.theme = theme } label: {
+                            VStack(spacing: 8) {
+                                BuddyStageView(theme: theme,
+                                               activity: store.theme == theme ? store.buddyActivity : .idle,
+                                               compact: true)
+                                    .frame(height: 105)
+                                VStack(spacing: 2) {
+                                    Label(theme.name, systemImage: theme.symbol)
+                                        .font(.headline).foregroundStyle(.primary)
+                                    Text(theme.buddyName).font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(12)
+                            .background(theme.background,
+                                        in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .overlay(RoundedRectangle(cornerRadius: 18)
+                                .stroke(store.theme == theme ? theme.accent : .secondary.opacity(0.18),
+                                        lineWidth: store.theme == theme ? 3 : 1))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Use \(theme.name), featuring \(theme.buddyName)")
+                        .accessibilityAddTraits(store.theme == theme ? .isSelected : [])
+                    }
+                }
+
+                Label("Animations are always visible when Quench is on screen. Reduce Motion automatically switches to expression and color changes without continuous movement.",
+                      systemImage: "accessibility")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .padding(12)
+                    .background(.quaternary.opacity(0.35), in: RoundedRectangle(cornerRadius: 12))
+            }
+            .padding(24)
+        }
     }
 }
 

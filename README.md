@@ -2,6 +2,10 @@
 
 A free, open-source macOS menu-bar app that races your daily water intake against the water your AI usage "drinks" in data centers. Privacy-first: local by default, with explicit provider connections.
 
+Four character themes keep that race visible: an axolotl scientist, capybara gardener, astronaut
+otter, or robot koi animates continuously in the menu bar and reacts when AI adds water or you log a
+glass. The interface remains fully labeled and respects Reduce Motion.
+
 **Status: M6 complete; M7 in progress.** The menu-bar race and local water log are backed by an
 EcoLogits-faithful estimation engine with open coefficients. Private Claude Code and Codex log
 ingestion includes durable cursors, deduplication, rotation handling, and visible source health.
@@ -80,8 +84,8 @@ The SDK override is a local development workaround, not a Quench runtime require
 
 Privacy: no telemetry or conversation content. Network features may refresh public scientific data
 or improve estimates, with minimal disclosed metadata and a safe local fallback. Read the
-[methodology](METHODOLOGY.md), [privacy principles](PRIVACY.md), [project guide](AGENTS.md), and
-[contribution guide](CONTRIBUTING.md).
+[methodology](METHODOLOGY.md), [privacy principles](PRIVACY.md), [project guide](AGENTS.md),
+[design system](DESIGN.md), and [contribution guide](CONTRIBUTING.md).
 
 ## Why Quench
 

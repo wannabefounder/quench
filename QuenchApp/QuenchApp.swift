@@ -9,7 +9,7 @@ struct QuenchApp: App {
         MenuBarExtra {
             MenuContentView(store: store)
         } label: {
-            Image(systemName: store.userMl >= Int(store.goalMl) ? "drop.fill" : "drop")
+            BuddyMenuBarIcon(theme: store.theme, activity: store.buddyActivity)
         }
         .menuBarExtraStyle(.window)
 
@@ -53,8 +53,12 @@ final class RaceStore: ObservableObject {
     @Published var userWinStreak = 0
     @Published var streakFreezeDaysUsed = 0
     @Published var thirstiestModel: ModelWaterTotal?
+    @Published private(set) var buddyActivity: BuddyActivity = .idle
     @Published var recentHistory: [DailyRaceHistoryItem] = []
     @Published private(set) var gentleNotificationsEnabled: Bool
+    @Published var theme: QuenchTheme {
+        didSet { UserDefaults.standard.set(theme.rawValue, forKey: "quenchTheme") }
+    }
     @Published var waterMode: WaterMode {
         didSet {
             UserDefaults.standard.set(waterMode.rawValue, forKey: "waterMode")
@@ -107,6 +111,7 @@ final class RaceStore: ObservableObject {
     private var needsRefresh = false
     private var credentialObserver: NSObjectProtocol?
     private var browserReceiptWatcher: BrowserReceiptWatcher?
+    private var buddyActivityTask: Task<Void, Never>?
 
     var regionOptions: [RegionOption] {
         coef.water.regions.map { key, value in
@@ -143,6 +148,8 @@ final class RaceStore: ObservableObject {
         codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
         browserExtensionEnabled = UserDefaults.standard.object(forKey: "browserExtensionEnabled") as? Bool ?? true
         gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
+        theme = QuenchTheme(rawValue: UserDefaults.standard.string(forKey: "quenchTheme") ?? "")
+            ?? .aquaLab
         countedSources = Set(UserDefaults.standard.stringArray(forKey: "countedSources")
             ?? ["claude-code", "codex", "browser-extension", "openai-api", "anthropic-api", "openrouter-api"])
         currentDay = RaceEngine.dayKey(for: Date())
@@ -231,6 +238,7 @@ final class RaceStore: ObservableObject {
                                       history: history, thirstiestModel: thirstiestModel)
             }.value
             guard let self else { return }
+            let previousAI = aiMl
             userMl = payload.userMl
             aiMl = payload.aiMl
             sourceStatuses = payload.sourceStatuses
@@ -239,6 +247,11 @@ final class RaceStore: ObservableObject {
             streakFreezeDaysUsed = payload.streak.freezeDaysUsed
             recentHistory = payload.history
             thirstiestModel = payload.thirstiestModel
+            if payload.aiMl > previousAI + 0.01 {
+                showBuddyActivity(.aiDrinking, for: 4.5)
+            } else if buddyActivity != .userDrinking && buddyActivity != .aiDrinking {
+                buddyActivity = restingBuddyActivity
+            }
             if gentleNotificationsEnabled {
                 Task { await self.notificationService?.consider(
                     userMl: payload.userMl, aiMl: payload.aiMl
@@ -285,6 +298,7 @@ final class RaceStore: ObservableObject {
 
     func logWater(ml: Int) {
         try? AppDatabase.shared.logWater(ml: ml)
+        showBuddyActivity(.userDrinking, for: 2.5)
         refresh()
     }
 
@@ -298,6 +312,24 @@ final class RaceStore: ObservableObject {
         if day != currentDay {
             currentDay = day
             refresh()
+        }
+    }
+
+    private var restingBuddyActivity: BuddyActivity {
+        switch RaceEngine.state(userMl: Double(userMl), aiMl: aiMl) {
+        case .userAhead: .userAhead
+        case .aiAhead: .aiAhead
+        case .tied: .tied
+        }
+    }
+
+    private func showBuddyActivity(_ activity: BuddyActivity, for duration: TimeInterval) {
+        buddyActivityTask?.cancel()
+        buddyActivity = activity
+        buddyActivityTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(duration))
+            guard !Task.isCancelled, let self else { return }
+            self.buddyActivity = self.restingBuddyActivity
         }
     }
 }

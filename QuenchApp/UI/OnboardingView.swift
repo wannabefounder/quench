@@ -6,18 +6,24 @@ struct OnboardingView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 10) {
-                Image(systemName: "drop.fill")
-                    .font(.system(size: 28))
-                    .foregroundStyle(.blue.gradient)
+            HStack(spacing: 12) {
+                BuddyStageView(theme: store.theme, activity: .idle, compact: true)
+                    .frame(width: 74, height: 74)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Welcome to Quench")
-                        .font(.headline)
+                        .font(.title3.weight(.bold))
                     Text("You vs. your AI — measured honestly")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
+
+            Picker("Choose your buddy", selection: $store.theme) {
+                ForEach(QuenchTheme.allCases) { theme in
+                    Label(theme.name, systemImage: theme.symbol).tag(theme)
+                }
+            }
+            .accessibilityHint("Changes the always-visible animated character and color theme")
 
             OnboardingPoint(icon: "lock.shield.fill", title: "Private by design",
                             detail: "Only model names, timestamps, and token counts are kept. Never prompts or responses.")
@@ -42,11 +48,12 @@ struct OnboardingView: View {
             }
 
             Button(action: store.completeOnboarding) {
-                Text("Start the race")
+                Label("Start the race with \(store.theme.buddyName)", systemImage: "flag.checkered")
                     .frame(maxWidth: .infinity)
             }
             .controlSize(.large)
             .buttonStyle(.borderedProminent)
+            .tint(store.theme.accent)
         }
     }
 }

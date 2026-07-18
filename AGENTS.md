@@ -27,7 +27,7 @@ contract and [`coefficients.json`](QuenchApp/Resources/coefficients.json) is the
 
 ### Core loop
 
-- Live menu-bar droplet and dropdown race bar for daily human intake vs. AI water estimate.
+- Live animated menu-bar buddy and dropdown race bar for daily human intake vs. AI water estimate.
 - One-click/keyboard water logging, local-midnight rollover, daily winner, streaks, and freeze tokens.
 - Conservative (Scope 1), Standard (Scopes 1+2), and Full footprint modes with region controls.
 - Weekly/monthly/yearly "AI Water Wrapped" cards designed for sharing without exposing private data.
@@ -59,6 +59,17 @@ broken or changed log format must not stop other sources or the app.
 
 Keep normalized data-source interfaces provider-neutral. Prefer incremental ingestion and database
 uniqueness constraints over in-memory deduplication. Never perform network work on the main thread.
+
+### Character-led UI direction — updated at M7 (2026-07-18)
+
+Per the user's explicit direction, Quench is not a plain droplet utility. It has four selectable
+character themes (Aqua Lab, Forest Flow, Cosmic Sip, Solar Splash), each with an original animated
+buddy. The buddy remains visible without a click in the menu bar, is prominent whenever the popover
+or theme gallery is visible, and reacts to new AI usage, human water logging, and race state.
+
+Animation must communicate state without delaying interaction. Honor Reduce Motion automatically,
+avoid color-only status, keep the daily race understandable within seconds, and keep continuous
+menu-bar motion subtle enough for an always-running app. See [`DESIGN.md`](DESIGN.md).
 
 ## Water math — superseded Section 6
 
