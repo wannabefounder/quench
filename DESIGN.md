@@ -28,10 +28,12 @@ surface treatment; the live Axel character remains native SwiftUI for motion and
 
 ## Motion contract
 
-- Ambient breathing, blinking, and contained bubbles make the buddy feel alive while visible.
+- Ambient breathing, blinking, and contained bubbles make the buddy feel alive in the always-open
+  main window and whenever the popover or theme gallery is visible.
 - An increase in AI water triggers the AI-drinking state automatically; logging water triggers a
   short celebration. Resting expression follows the race state.
-- Interaction never waits for animation. Menu-bar motion is lower-frequency than popover motion.
+- Interaction never waits for animation. The 18-point menu-bar face updates on real race activity
+  but does not run its own timer; this avoids a macOS 26 AppKit status-item layout loop.
 - With macOS Reduce Motion enabled, ongoing translation/rotation pauses; expression, glyph, and
   color changes preserve meaning.
 

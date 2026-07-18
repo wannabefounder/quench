@@ -3,26 +3,21 @@ import SwiftUI
 struct BuddyMenuBarIcon: View {
     let theme: QuenchTheme
     let activity: BuddyActivity
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: reduceMotion ? 60 : 0.45)) { context in
-            let tick = Int(context.date.timeIntervalSinceReferenceDate * 2)
-            ZStack {
-                Circle().fill(theme.accent.opacity(0.24))
-                Circle().stroke(theme.accent, lineWidth: 1.4)
-                HStack(spacing: 3) {
-                    Capsule().fill(.primary).frame(width: 2.5, height: tick % 9 == 0 ? 1 : 4)
-                    Capsule().fill(.primary).frame(width: 2.5, height: tick % 9 == 0 ? 1 : 4)
-                }
-                if activity == .aiDrinking {
-                    Circle().fill(theme.secondaryAccent).frame(width: 4, height: 4)
-                        .offset(x: 7, y: -7 + CGFloat(tick % 3))
-                }
+        ZStack {
+            Circle().fill(theme.accent.opacity(0.24))
+            Circle().stroke(theme.accent, lineWidth: 1.4)
+            HStack(spacing: 3) {
+                Capsule().fill(.primary).frame(width: 2.5, height: 4)
+                Capsule().fill(.primary).frame(width: 2.5, height: 4)
             }
-            .frame(width: 18, height: 18)
-            .offset(y: reduceMotion ? 0 : (tick.isMultiple(of: 2) ? -0.5 : 0.5))
+            if activity == .aiDrinking {
+                Circle().fill(theme.secondaryAccent).frame(width: 4, height: 4)
+                    .offset(x: 7, y: -7)
+            }
         }
+        .frame(width: 18, height: 18)
         .accessibilityLabel("Quench, \(theme.buddyName), \(activity.accessibilityDescription)")
     }
 }

@@ -65,8 +65,10 @@ uniqueness constraints over in-memory deduplication. Never perform network work 
 
 Per the user's explicit direction, Quench is not a plain droplet utility. It has four selectable
 character themes (Aqua Lab, Forest Flow, Cosmic Sip, Solar Splash), each with an original animated
-buddy. The buddy remains visible without a click in the menu bar, is prominent whenever the popover
-or theme gallery is visible, and reacts to new AI usage, human water logging, and race state.
+buddy. A stable buddy face remains visible without a click in the menu bar; the continuously animated
+buddy is prominent in the main window, popover, and theme gallery and reacts to new AI usage, human
+water logging, and race state. Do not put a timer-driven `TimelineView` back into the `MenuBarExtra`
+label: on macOS 26 it loops inside `NSStatusBarButton.setImage`, hangs launch, and exhausts memory.
 
 Animation must communicate state without delaying interaction. Honor Reduce Motion automatically,
 avoid color-only status, keep the daily race understandable within seconds, and keep continuous
