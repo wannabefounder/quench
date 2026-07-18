@@ -48,6 +48,9 @@ swift build          # or open Package.swift in Xcode and run the QuenchApp sche
 swift run QuenchApp
 ```
 
+Quench is an accessory app: look for its animated buddy in the macOS menu bar. It intentionally
+does not keep a Dock icon or open a normal document window.
+
 Create a normal macOS application bundle (including the app icon, bundled methodology data,
 native browser bridge, and an ad-hoc development signature):
 
@@ -60,6 +63,8 @@ The packaged build supports notifications and the optional **Open Quench when I 
 Release maintainers can set `SIGN_IDENTITY` to a Developer ID Application identity; the default `-`
 creates a local ad-hoc signature suitable for development only.
 See [RELEASING.md](RELEASING.md) for notarized releases and the Homebrew cask template.
+Maintainers can use [LAUNCH.md](LAUNCH.md) for release copy, screenshots, claim guardrails, and the
+final public-launch gate.
 
 Run the engine tests (these also run on Linux):
 

@@ -1,7 +1,8 @@
 # Contributing to Quench
 
 Thank you for helping make AI's resource use easier to understand. Contributions to code,
-methodology, accessibility, translations, research citations, and data-source support are welcome.
+methodology, accessibility, research citations, and data-source support are welcome. The product UI
+is currently English-only by owner decision; please coordinate before starting localization work.
 
 ## Before opening a pull request
 
