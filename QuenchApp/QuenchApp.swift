@@ -8,7 +8,6 @@ struct QuenchApp: App {
     var body: some Scene {
         WindowGroup("Quench", id: "dashboard") {
             MenuContentView(store: store)
-                .task { FloatingStatusPanelController.shared.attach(to: store) }
         }
         .defaultSize(width: 402, height: 650)
         .windowResizability(.contentSize)

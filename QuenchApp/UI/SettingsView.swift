@@ -410,7 +410,7 @@ private struct GeneralSettingsView: View {
         Form {
             Section("App") {
                 Toggle("Always-on-top mini status", isOn: $store.floatingWidgetEnabled)
-                Text("A draggable pixel-style panel shows only your fluid progress, AI water, and a +250 mL button. It stays above windows and across Spaces without reading anything on screen.")
+                Text("A draggable pixel-style panel shows only your fluid progress, AI water, and a +250 mL button. Click the buddy to reopen Quench. It stays above windows and across Spaces without reading anything on screen.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Open Quench when I log in", isOn: launchAtLogin.binding)

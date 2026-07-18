@@ -5,6 +5,7 @@ import QuenchEngine
 struct MenuContentView: View {
     @ObservedObject var store: RaceStore
     @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Group {
@@ -15,6 +16,11 @@ struct MenuContentView: View {
         .frame(width: 370)
         .background(store.theme.background)
         .onAppear { store.refresh() }
+        .task {
+            FloatingStatusPanelController.shared.attach(to: store) {
+                openWindow(id: "dashboard")
+            }
+        }
     }
 
     private var dashboard: some View {

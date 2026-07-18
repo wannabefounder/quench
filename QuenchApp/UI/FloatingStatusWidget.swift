@@ -7,9 +7,11 @@ final class FloatingStatusPanelController {
     static let shared = FloatingStatusPanelController()
     private var panel: NSPanel?
     private weak var store: RaceStore?
+    private var openDashboardAction: (() -> Void)?
 
-    func attach(to store: RaceStore) {
+    func attach(to store: RaceStore, openDashboard: @escaping () -> Void) {
         self.store = store
+        openDashboardAction = openDashboard
         setVisible(store.floatingWidgetEnabled)
     }
 
@@ -21,6 +23,18 @@ final class FloatingStatusPanelController {
         guard let store else { return }
         if panel == nil { panel = makePanel(store: store) }
         panel?.orderFrontRegardless()
+    }
+
+    func openDashboard() {
+        NSApp.activate(ignoringOtherApps: true)
+        let dashboard = NSApp.windows.first {
+            $0 !== panel && $0.title == "Quench" && $0.styleMask.contains(.titled)
+        }
+        if let dashboard {
+            dashboard.makeKeyAndOrderFront(nil)
+        } else {
+            openDashboardAction?()
+        }
     }
 
     private func makePanel(store: RaceStore) -> NSPanel {
@@ -67,8 +81,13 @@ private struct FloatingStatusWidget: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            PixelBuddy(theme: store.theme, activity: store.buddyActivity)
-                .frame(width: 42, height: 42)
+            Button { FloatingStatusPanelController.shared.openDashboard() } label: {
+                PixelBuddy(theme: store.theme, activity: store.buddyActivity)
+                    .frame(width: 42, height: 42)
+            }
+            .buttonStyle(.plain)
+            .help("Open Quench")
+            .accessibilityLabel("Open Quench dashboard")
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 5) {
