@@ -1,0 +1,17 @@
+cask "quench" do
+  version "VERSION"
+  sha256 "SHA256"
+
+  url "https://github.com/wannabefounder/quench/releases/download/v#{version}/Quench.zip"
+  name "Quench"
+  desc "Race your water intake against the estimated water footprint of your AI usage"
+  homepage "https://github.com/wannabefounder/quench"
+
+  depends_on macos: ">= :sonoma"
+  app "Quench.app"
+
+  zap trash: [
+    "~/Library/Application Support/Quench",
+    "~/Library/Preferences/com.wannabefounder.quench.plist",
+  ]
+end

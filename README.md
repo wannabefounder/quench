@@ -59,6 +59,7 @@ open dist/Quench.app
 The packaged build supports notifications and the optional **Open Quench when I log in** setting.
 Release maintainers can set `SIGN_IDENTITY` to a Developer ID Application identity; the default `-`
 creates a local ad-hoc signature suitable for development only.
+See [RELEASING.md](RELEASING.md) for notarized releases and the Homebrew cask template.
 
 Run the engine tests (these also run on Linux):
 

@@ -18,3 +18,5 @@ jobs:
         run: swift test
       - name: Browser adapter fixtures
         run: node BrowserExtension/tests/site-adapters.test.js
+      - name: Validate packaged app
+        run: CONFIGURATION=debug ./scripts/package-app.sh

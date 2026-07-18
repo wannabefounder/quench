@@ -16,6 +16,11 @@ feature must disclose its purpose and the categories of metadata sent. Quench wi
 responses, local file paths, or provider credentials to analytics or environmental-estimation
 services. Useful local behavior remains available when a network service is unavailable.
 
+Quench's current EcoLogits-faithful water estimate runs locally. It does not call EcoLogits' live
+estimation endpoint, because that would disclose provider, model, output-token count, and electricity
+region to another service. A future public model-catalog refresh may retrieve catalog data without
+sending AI usage; any usage-bearing live estimate must remain separately disclosed and opt-in.
+
 ## Credentials
 
 Provider Admin API credentials are stored in macOS Keychain with device-only, unlocked-device

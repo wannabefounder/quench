@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CONFIGURATION="${CONFIGURATION:-release}"
 SIGN_IDENTITY="${SIGN_IDENTITY:--}"
+VERSION="${VERSION:-0.1.0}"
+BUILD_NUMBER="${BUILD_NUMBER:-1}"
 APP="$ROOT/dist/Quench.app"
 ICONSET="$ROOT/dist/Quench.iconset"
 
@@ -18,6 +20,8 @@ cp "$BIN_DIR/QuenchApp" "$APP/Contents/MacOS/QuenchApp"
 cp "$BIN_DIR/QuenchBrowserBridge" "$APP/Contents/Helpers/QuenchBrowserBridge"
 cp "$ROOT/Packaging/Info.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/QuenchApp/Resources/coefficients.json" "$APP/Contents/Resources/coefficients.json"
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP/Contents/Info.plist"
 
 MASTER="$ROOT/QuenchApp/Resources/AppIconMaster.png"
 sips -z 16 16 "$MASTER" --out "$ICONSET/icon_16x16.png" >/dev/null
