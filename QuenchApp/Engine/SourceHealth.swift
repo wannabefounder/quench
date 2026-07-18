@@ -17,9 +17,11 @@ public struct LocalSourceStatus: Identifiable, Equatable {
     public let errorCount: Int
     public let lastEvent: Date?
     public let isEnabled: Bool
+    public let itemLabel: String
 
     public init(source: String, displayName: String, fileCount: Int, eventCount: Int,
-                errorCount: Int, lastEvent: Date?, isEnabled: Bool = true) {
+                errorCount: Int, lastEvent: Date?, isEnabled: Bool = true,
+                itemLabel: String = "Files") {
         self.source = source
         self.displayName = displayName
         self.fileCount = fileCount
@@ -27,6 +29,7 @@ public struct LocalSourceStatus: Identifiable, Equatable {
         self.errorCount = errorCount
         self.lastEvent = lastEvent
         self.isEnabled = isEnabled
+        self.itemLabel = itemLabel
     }
 
     public var id: String { source }

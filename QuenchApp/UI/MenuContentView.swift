@@ -230,6 +230,7 @@ struct SourceStatusRow: View {
     }
     private var detail: String {
         if !source.isEnabled { return "Turn on in Settings" }
+        if source.source == "activity-proxy" { return "Rough foreground-time estimate" }
         if source.eventCount > 0 { return "\(source.eventCount) usage events" }
         if source.fileCount > 0 { return "\(source.fileCount) log files found" }
         return "No supported local logs"

@@ -106,6 +106,13 @@ final class RaceStore: ObservableObject {
             refresh()
         }
     }
+    @Published var activityProxyEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(activityProxyEnabled, forKey: "activityProxyEnabled")
+            activityProxy?.setEnabled(activityProxyEnabled)
+            refresh()
+        }
+    }
     @Published var countedSources: Set<String> {
         didSet {
             UserDefaults.standard.set(Array(countedSources), forKey: "countedSources")
@@ -124,6 +131,7 @@ final class RaceStore: ObservableObject {
     private var credentialObserver: NSObjectProtocol?
     private var browserReceiptWatcher: BrowserReceiptWatcher?
     private var buddyActivityTask: Task<Void, Never>?
+    private var activityProxy: ActivityProxyService?
 
     var regionOptions: [RegionOption] {
         coef.water.regions.map { key, value in
@@ -160,11 +168,12 @@ final class RaceStore: ObservableObject {
         codexEnabled = UserDefaults.standard.object(forKey: "codexEnabled") as? Bool ?? true
         geminiCLIEnabled = UserDefaults.standard.object(forKey: "geminiCLIEnabled") as? Bool ?? true
         browserExtensionEnabled = UserDefaults.standard.object(forKey: "browserExtensionEnabled") as? Bool ?? true
+        activityProxyEnabled = UserDefaults.standard.bool(forKey: "activityProxyEnabled")
         gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
         theme = QuenchTheme(rawValue: UserDefaults.standard.string(forKey: "quenchTheme") ?? "")
             ?? .aquaLab
         countedSources = Set(UserDefaults.standard.stringArray(forKey: "countedSources")
-            ?? ["claude-code", "codex", "gemini-cli", "browser-extension", "openai-api", "anthropic-api", "openrouter-api"])
+            ?? ["claude-code", "codex", "gemini-cli", "browser-extension", "activity-proxy", "openai-api", "anthropic-api", "openrouter-api"])
         currentDay = RaceEngine.dayKey(for: Date())
         credentialObserver = NotificationCenter.default.addObserver(
             forName: .providerCredentialsChanged, object: nil, queue: .main
@@ -174,6 +183,10 @@ final class RaceStore: ObservableObject {
         browserReceiptWatcher = BrowserReceiptWatcher { [weak self] in
             Task { @MainActor in self?.refresh() }
         }
+        activityProxy = ActivityProxyService { [weak self] in
+            Task { @MainActor in self?.refresh() }
+        }
+        activityProxy?.setEnabled(activityProxyEnabled)
         refresh()
         // Day rollover check: once a minute, reset when local midnight passes.
         timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
@@ -214,6 +227,7 @@ final class RaceStore: ObservableObject {
         if codexEnabled { enabledSources.insert("codex") }
         if geminiCLIEnabled { enabledSources.insert("gemini-cli") }
         if browserExtensionEnabled { enabledSources.insert("browser-extension") }
+        if activityProxyEnabled { enabledSources.insert("activity-proxy") }
         let startOfDay = Calendar.current.startOfDay(for: Date())
         let sourcesCountedInRace = countedSources
         Task { [weak self] in

@@ -420,6 +420,10 @@ private struct GeneralSettingsView: View {
                 Toggle("Codex", isOn: $store.codexEnabled)
                 Toggle("Gemini CLI", isOn: $store.geminiCLIEnabled)
                 Toggle("Browser companion", isOn: $store.browserExtensionEnabled)
+                Toggle("Desktop activity fallback (rough)", isOn: $store.activityProxyEnabled)
+                Text("Off by default. When enabled, Quench counts only foreground time in the ChatGPT or Claude desktop app. It does not use Accessibility access or read windows, typing, files, or conversation content.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Text("Disabled sources are not scanned. Previously normalized counts remain in your local history.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -430,6 +434,7 @@ private struct GeneralSettingsView: View {
                 Toggle("Codex logs", isOn: store.bindingForCountedSource("codex"))
                 Toggle("Gemini CLI logs", isOn: store.bindingForCountedSource("gemini-cli"))
                 Toggle("Browser companion", isOn: store.bindingForCountedSource("browser-extension"))
+                Toggle("Desktop activity fallback", isOn: store.bindingForCountedSource("activity-proxy"))
                 Toggle("OpenAI API", isOn: store.bindingForCountedSource("openai-api"))
                 Toggle("Anthropic API", isOn: store.bindingForCountedSource("anthropic-api"))
                 Toggle("OpenRouter receipts", isOn: store.bindingForCountedSource("openrouter-api"))
@@ -562,7 +567,7 @@ private struct DiagnosticSourceCard: View {
             HStack {
                 SourceStatusRow(source: source)
                 Divider().frame(height: 28)
-                metric("Files", source.fileCount)
+                metric(source.itemLabel, source.fileCount)
                 metric("Events", source.eventCount)
                 metric("Errors", source.errorCount)
                 if let lastEvent = source.lastEvent {

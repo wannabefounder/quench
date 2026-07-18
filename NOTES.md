@@ -2,7 +2,7 @@
 
 Current milestone: M3 DONE — Claude Code + Codex + Gemini CLI ingestion has durable cursors, truncation
 generations, DB dedupe, parser tests, visible source health, and the real bundled coefficients.
-M4 DONE: onboarding, persistent scope/region, accuracy context, source toggles, and diagnostics.
+M4 DONE: onboarding, scope/region, source controls, diagnostics, and opt-in Tier 4 activity fallback.
 M5 DONE: OpenAI + Anthropic Admin usage auto-syncs with Keychain credentials, bounded
 pagination, 15-minute throttle, stable bucket upserts, isolated failures, and diagnostics status.
 OpenRouter generation metadata imports are supported by ID (no bulk history/content calls); all

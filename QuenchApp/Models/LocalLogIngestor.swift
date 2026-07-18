@@ -26,8 +26,19 @@ final class LocalLogIngestor {
             ingestSingleFile(
                 home.appendingPathComponent("Library/Application Support/Quench/browser-events.jsonl"),
                 source: "browser-extension", displayName: "Browser Extension",
-                isEnabled: enabledSources.contains("browser-extension"))
+                isEnabled: enabledSources.contains("browser-extension")),
+            activityProxyStatus(isEnabled: enabledSources.contains("activity-proxy"))
         ]
+    }
+
+    private func activityProxyStatus(isEnabled: Bool) -> LocalSourceStatus {
+        let summary = try? database.sourceEventSummary(source: "activity-proxy")
+        return LocalSourceStatus(
+            source: "activity-proxy", displayName: "Desktop Activity (Rough)",
+            fileCount: ActivityProxyPolicy.supportedAppCount, eventCount: summary?.count ?? 0,
+            errorCount: 0, lastEvent: summary?.lastEvent, isEnabled: isEnabled,
+            itemLabel: "Apps"
+        )
     }
 
     private func ingestSingleFile(_ url: URL, source: String, displayName: String,

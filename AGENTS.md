@@ -43,7 +43,8 @@ contract and [`coefficients.json`](QuenchApp/Resources/coefficients.json) is the
   transmit counts only, never prompts or responses.
 - **Tier 3 — local logs:** Claude Code, Codex, Gemini CLI, and similar JSONL sources; fully offline,
   byte-offset/cursor based, idempotent, and resilient to truncation/rotation.
-- **Tier 4 — activity proxy:** opt-in macOS app-focus estimation, clearly labeled rough.
+- **Tier 4 — activity proxy:** implemented as an off-by-default macOS foreground-time estimate for
+  ChatGPT/Claude desktop, clearly labeled rough and requiring no Accessibility permission.
 
 Each normalized usage event records source, model, token/message/minute counts, timestamp, accuracy
 tier, and a stable external identifier for deduplication. Source failures must be isolated: one
@@ -110,7 +111,8 @@ enhanced-estimation mode. Cache only non-personal catalog data by default. A run
 2. **M2 — complete:** EcoLogits-faithful water engine, open coefficients, methodology, tests.
 3. **M3 — complete:** Tier 3 Claude Code + Codex + Gemini CLI JSONL ingestion, cursors, rotation handling,
    deduplication, source health, and tests.
-4. **M4 — complete:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic view.
+4. **M4 — complete:** source settings/onboarding, accuracy labels, region/mode settings, diagnostic
+   view, and the opt-in Tier 4 desktop activity fallback.
 5. **M5 — complete:** Tier 1 provider usage connectors with Keychain storage and strict permission boundaries.
 6. **M6 — complete:** Chromium companion extension and private local bridge. The Chromium MV3
    count-only path and event-driven app ingestion are implemented. **Safari is intentionally out of

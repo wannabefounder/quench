@@ -40,6 +40,12 @@ prompts, responses, local paths, hydration data, or identifiers sent to a Quench
 Every normalized source has a separate local “count in today's race” control. This lets users avoid
 API/local double-counting without deleting retained usage metadata.
 
+The Tier 4 desktop-activity fallback is off by default. If enabled, Quench observes only foreground
+application activation through macOS Workspace notifications for the ChatGPT and Claude desktop
+apps. It stores generic model family, active minutes, timestamp, and rough accuracy tier. It does
+not request Accessibility permission or read window titles, typing, URLs, documents, bundle
+identifiers, prompts, or responses. Short focus flickers are ignored and sleep gaps are capped.
+
 The optional browser companion reads rendered message text transiently inside ChatGPT or Claude only
 to estimate token counts. Conversation text never leaves the tab. The extension sends an opaque
 local receipt ID, timestamp, site name, optional model name, and input/output integers through

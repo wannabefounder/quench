@@ -177,6 +177,19 @@ final class AppDatabase {
         }
     }
 
+    func recordActivityProxy(model: String, minutes: Double, at date: Date,
+                             externalID: String) throws {
+        guard minutes > 0 else { return }
+        try dbQueue.write { db in
+            try db.execute(sql: """
+                INSERT OR IGNORE INTO usage_events
+                  (ts, source, model, minutes_active, accuracy_tier, external_id)
+                VALUES (?, 'activity-proxy', ?, ?, ?, ?)
+                """, arguments: [Int64(date.timeIntervalSince1970), model, minutes,
+                                   ActivityProxyPolicy.accuracyTier, externalID])
+        }
+    }
+
     // MARK: - Provider usage sync
 
     func providerSyncRecord(_ provider: UsageProvider) throws -> ProviderSyncRecord? {

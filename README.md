@@ -16,6 +16,10 @@ Exact local ingestion supports Claude Code, Codex, and Gemini CLI session logs. 
 only timestamps, model names, and token totals; prompts, responses, thoughts, tool arguments, local
 paths, and session content are never copied into its database.
 
+An optional Tier 4 fallback can estimate ChatGPT/Claude desktop activity from foreground time. It is
+off by default, clearly labeled rough, needs no Accessibility permission, and records no titles,
+typing, documents, URLs, or conversation content.
+
 Optional OpenAI and Anthropic organization connectors now have Keychain-only Admin credential
 storage, documented metadata-only verification, pagination-aware clients, and tested response
 normalization. Connected providers sync automatically at most every 15 minutes; manual diagnostics
