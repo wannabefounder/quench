@@ -66,11 +66,14 @@ uniqueness constraints over in-memory deduplication. Never perform network work 
 
 Per the user's explicit direction, Quench is not a plain droplet utility. It has four selectable
 character themes (Aqua Lab, Forest Flow, Cosmic Sip, Solar Splash), each with an original animated
-buddy. A standard smiling buddy face and calm stats remain visible without a click in the menu bar;
-the label can rotate to local AI-usage and sip nudges at minute-scale intervals. The continuously animated
+buddy. A standard water-drop symbol remains visible in the menu bar; where macOS permits sufficient
+status-item width, its label can rotate through calm stats and local nudges. The continuously animated
 buddy is prominent in the main window, popover, and theme gallery and reacts to new AI usage, human
 water logging, and race state. Do not put a timer-driven `TimelineView` back into the `MenuBarExtra`
 label: on macOS 26 it loops inside `NSStatusBarButton.setImage`, hangs launch, and exhausts memory.
+Because macOS may collapse custom menu-bar text, the default always-on-top fallback is a draggable,
+non-activating pixel panel with only human goal progress, AI water, and a +250 mL action. It must not
+inspect other windows or request Screen Recording/Accessibility access.
 
 Animation must communicate state without delaying interaction. Honor Reduce Motion automatically,
 avoid color-only status, keep the daily race understandable within seconds, and keep continuous

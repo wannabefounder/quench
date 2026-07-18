@@ -8,6 +8,7 @@ struct QuenchApp: App {
     var body: some Scene {
         WindowGroup("Quench", id: "dashboard") {
             MenuContentView(store: store)
+                .task { FloatingStatusPanelController.shared.attach(to: store) }
         }
         .defaultSize(width: 402, height: 650)
         .windowResizability(.contentSize)
@@ -18,7 +19,7 @@ struct QuenchApp: App {
             Label {
                 Text(store.menuBarText)
             } icon: {
-                Image(systemName: "face.smiling.inverse")
+                Image(systemName: "drop.fill")
             }
         }
         .menuBarExtraStyle(.window)
@@ -74,6 +75,12 @@ final class RaceStore: ObservableObject {
         didSet {
             UserDefaults.standard.set(menuBarNudgeIntervalMinutes, forKey: "menuBarNudgeIntervalMinutes")
             nextMenuBarNudge = Date().addingTimeInterval(TimeInterval(menuBarNudgeIntervalMinutes * 60))
+        }
+    }
+    @Published var floatingWidgetEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(floatingWidgetEnabled, forKey: "floatingWidgetEnabled")
+            FloatingStatusPanelController.shared.setVisible(floatingWidgetEnabled)
         }
     }
     @Published var theme: QuenchTheme {
@@ -139,7 +146,13 @@ final class RaceStore: ObservableObject {
     @Published var pledgePerLiter: Double {
         didSet { UserDefaults.standard.set(pledgePerLiter, forKey: "pledgePerLiter") }
     }
-    let goalMl: Double = 2000
+    @Published var goalMl: Double {
+        didSet {
+            goalMl = min(max(goalMl, 1_000), 5_000)
+            UserDefaults.standard.set(goalMl, forKey: "dailyFluidGoalMl")
+            updateMenuBarText()
+        }
+    }
 
     private let coef: Coefficients
     private let logIngestor = LocalLogIngestor()
@@ -202,8 +215,11 @@ final class RaceStore: ObservableObject {
         pledgeEnabled = UserDefaults.standard.bool(forKey: "pledgeEnabled")
         let savedPledge = UserDefaults.standard.double(forKey: "pledgePerLiter")
         pledgePerLiter = savedPledge > 0 ? min(max(savedPledge, 1), 10_000) : 10
+        let savedGoal = UserDefaults.standard.double(forKey: "dailyFluidGoalMl")
+        goalMl = savedGoal > 0 ? min(max(savedGoal, 1_000), 5_000) : 2_000
         gentleNotificationsEnabled = UserDefaults.standard.bool(forKey: "gentleNotificationsEnabled")
         menuBarNudgesEnabled = UserDefaults.standard.object(forKey: "menuBarNudgesEnabled") as? Bool ?? true
+        floatingWidgetEnabled = UserDefaults.standard.object(forKey: "floatingWidgetEnabled") as? Bool ?? true
         let savedMenuBarInterval = UserDefaults.standard.integer(forKey: "menuBarNudgeIntervalMinutes")
         let initialMenuBarInterval = [30, 45, 60, 90, 120].contains(savedMenuBarInterval)
             ? savedMenuBarInterval : 60
@@ -333,7 +349,7 @@ final class RaceStore: ObservableObject {
             updateMenuBarText()
             if gentleNotificationsEnabled {
                 Task { await self.notificationService?.consider(
-                    userMl: payload.userMl, aiMl: payload.aiMl
+                    userMl: payload.userMl, aiMl: payload.aiMl, goalMl: self.goalMl
                 ) }
             }
             isRefreshing = false
@@ -403,12 +419,16 @@ final class RaceStore: ObservableObject {
         }
         menuBarEvent = nil
         if menuBarNudgesEnabled, now >= nextMenuBarNudge {
-            menuBarEvent = ("Time for a sip", now.addingTimeInterval(90))
-            nextMenuBarNudge = now.addingTimeInterval(TimeInterval(menuBarNudgeIntervalMinutes * 60))
-            menuBarText = "Time for a sip"
-            return
+            if HydrationPacing.shouldNudge(now: now, userMl: Double(userMl), goalMl: goalMl) {
+                let nudge = MenuBarStatus.sipNudge(userMl: userMl, goalMl: goalMl)
+                menuBarEvent = (nudge, now.addingTimeInterval(90))
+                nextMenuBarNudge = now.addingTimeInterval(TimeInterval(menuBarNudgeIntervalMinutes * 60))
+                menuBarText = nudge
+                return
+            }
+            nextMenuBarNudge = now.addingTimeInterval(15 * 60)
         }
-        menuBarText = MenuBarStatus.stats(userMl: userMl, aiMl: aiMl)
+        menuBarText = MenuBarStatus.stats(userMl: userMl, aiMl: aiMl, goalMl: goalMl)
     }
 
     private var restingBuddyActivity: BuddyActivity {

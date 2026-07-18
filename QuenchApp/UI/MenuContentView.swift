@@ -85,6 +85,15 @@ struct MenuContentView: View {
             }
             RaceBarView(userMl: Double(store.userMl), aiMl: store.aiMl,
                         goalMl: store.goalMl, theme: store.theme)
+            HStack {
+                Label("Daily fluid goal", systemImage: "target")
+                Spacer()
+                Text("\(MenuBarStatus.compactMilliliters(Double(store.userMl))) of \(MenuBarStatus.compactMilliliters(store.goalMl))")
+                    .monospacedDigit()
+            }
+            .font(.caption.weight(.semibold))
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Daily fluid goal. \(store.userMl) of \(Int(store.goalMl)) milliliters logged.")
             HStack(spacing: 8) {
                 statChip(icon: "flame.fill", text: "\(store.userWinStreak) day streak")
                 if let model = store.thirstiestModel {

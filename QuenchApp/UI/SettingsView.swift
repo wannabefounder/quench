@@ -409,6 +409,10 @@ private struct GeneralSettingsView: View {
     var body: some View {
         Form {
             Section("App") {
+                Toggle("Always-on-top mini status", isOn: $store.floatingWidgetEnabled)
+                Text("A draggable pixel-style panel shows only your fluid progress, AI water, and a +250 mL button. It stays above windows and across Spaces without reading anything on screen.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Toggle("Open Quench when I log in", isOn: launchAtLogin.binding)
                     .disabled(launchAtLogin.isChanging || !launchAtLogin.isAvailable)
                 if let message = launchAtLogin.message {
@@ -453,6 +457,10 @@ private struct GeneralSettingsView: View {
             }
 
             Section("Gentle nudges") {
+                Stepper(value: $store.goalMl, in: 1_000...5_000, step: 250) {
+                    LabeledContent("Daily fluid goal",
+                                   value: MenuBarStatus.compactMilliliters(store.goalMl))
+                }
                 Toggle("Menu bar sip reminders", isOn: $store.menuBarNudgesEnabled)
                 if store.menuBarNudgesEnabled {
                     Picker("Menu bar interval", selection: $store.menuBarNudgeIntervalMinutes) {
@@ -463,11 +471,13 @@ private struct GeneralSettingsView: View {
                         Text("2 hours").tag(120)
                     }
                 }
-                Text("The always-visible menu bar rotates from private daily stats to “AI just drank” updates and a short sip reminder. No notification permission is needed.")
+                Text("Quench spreads your chosen goal across 08:00–20:00 and only reminds you when you are at least one 250 mL glass behind that pace. The goal is a personal aid, not medical advice; needs vary with food, activity, climate, pregnancy, and health.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Link("Read the NHS hydration guide", destination: URL(string: "https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/water-drinks-nutrition/")!)
+                    .font(.caption)
                 Toggle("Hydration notifications", isOn: store.gentleNotificationsBinding)
-                Text("Opt-in, passive, and silent. At most two per day between 10:00 and 18:00, only when AI is at least 250 mL ahead. macOS Focus settings remain in control.")
+                Text("Opt-in, passive, and silent. At most two per day between 08:00 and 20:00 when you are behind your pace or AI is at least 250 mL ahead. macOS Focus settings remain in control.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

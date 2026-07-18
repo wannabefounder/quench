@@ -5,7 +5,9 @@ your AI usage**. Personality invites attention; the numbers, labels, and open me
 
 ## Experience hierarchy
 
-1. The menu-bar buddy is always visible and moves subtly without requiring a click.
+1. A tiny draggable pixel-buddy panel stays above normal windows and shows only human goal progress,
+   AI water, and the one-click log action. The native menu-bar icon remains the entry point because
+   macOS may suppress or collapse custom status-item text.
 2. The main window and menu-bar popover lead with the same live character reaction and one
    plain-language status sentence, so launching the app is never a blank or hidden experience.
 3. Two labeled lanes—You and Your AI—show the race without relying on color alone.
@@ -32,10 +34,13 @@ surface treatment; the live Axel character remains native SwiftUI for motion and
   main window and whenever the popover or theme gallery is visible.
 - An increase in AI water triggers the AI-drinking state automatically; logging water triggers a
   short celebration. Resting expression follows the race state.
-- Interaction never waits for animation. The menu bar uses the standard monochrome smiling-face
+- Interaction never waits for animation. The menu bar uses the standard monochrome water-drop
   symbol beside calm, always-visible stats. It briefly rotates to “AI just drank” when new usage is
   found and to a configurable local sip reminder. Custom colored SwiftUI icons flatten into an
   unreadable black oval on macOS 26, while frame-rate timer labels trigger an AppKit layout loop.
+- The always-on-top panel uses a non-activating native `NSPanel`, joins every Space, never observes
+  other windows, and can be disabled in Settings. Its deliberately pixelated buddy communicates
+  character without a frame-rate animation loop.
 - With macOS Reduce Motion enabled, ongoing translation/rotation pauses; expression, glyph, and
   color changes preserve meaning.
 

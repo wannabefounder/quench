@@ -10,7 +10,8 @@ local/API sources have independent race-inclusion controls.
 M6 DONE: Chromium MV3 + strict native bridge + event-driven browser receipt ingestion;
 count-only messages, canonical rewrite, owner-only inbox. Safari is out of scope by user decision.
 M7: history/freeze/nudges/Wrapped comparisons/private pledge plus four buddy themes shipped.
-M8 underway: packaged app, original icon, and opt-in SMAppService launch-at-login are implemented.
+M8 underway: packaged app, original icon, opt-in SMAppService launch-at-login, and a verified
+always-on-top pixel status fallback are implemented.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,
@@ -34,7 +35,8 @@ M8 underway: packaged app, original icon, and opt-in SMAppService launch-at-logi
 
 ## TODO / open
 - Packaged coefficients and fallback are verified; app launch/icon/restart passed on this Mac.
-- Manual UI check remains for Settings twice, theme switching, water log, and launch-at-login restart.
+- Settings close/reopen and mini-widget water logging are verified on the packaged app. Manual UI
+  checks remain for all-theme Reduce Motion behavior and launch-at-login restart.
 - This Mac's default CLT SDK alias (26.2) mismatches its Swift compiler build. App builds with the
   installed MacOSX15.4 SDK; README documents cache cleanup and the temporary SDKROOT workaround.
 - gpt-4o-mini output coef set below gpt-4o by size-prior (benchmark's mini figure looked anomalous).

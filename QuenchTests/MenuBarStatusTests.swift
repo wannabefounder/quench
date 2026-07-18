@@ -3,8 +3,10 @@ import XCTest
 
 final class MenuBarStatusTests: XCTestCase {
     func testCompactStatsStayReadable() {
-        XCTAssertEqual(MenuBarStatus.stats(userMl: 750, aiMl: 18.4), "AI 18 mL · You 750 mL")
-        XCTAssertEqual(MenuBarStatus.stats(userMl: 1_250, aiMl: 12_540), "AI 13 L · You 1.3 L")
+        XCTAssertEqual(MenuBarStatus.stats(userMl: 750, aiMl: 18.4, goalMl: 2_000),
+                       "You 750 mL/2.0 L · AI 18 mL")
+        XCTAssertEqual(MenuBarStatus.stats(userMl: 1_250, aiMl: 12_540, goalMl: 2_000),
+                       "You 1.3 L/2.0 L · AI 13 L")
     }
 
     func testAIEventExplainsTheChange() {
@@ -14,5 +16,10 @@ final class MenuBarStatusTests: XCTestCase {
 
     func testNegativeValuesNeverLeakIntoStatus() {
         XCTAssertEqual(MenuBarStatus.compactMilliliters(-20), "0 mL")
+    }
+
+    func testSipNudgeShowsUnderstandableAmountLeft() {
+        XCTAssertEqual(MenuBarStatus.sipNudge(userMl: 1_250, goalMl: 2_000),
+                       "Sip break · 750 mL left")
     }
 }

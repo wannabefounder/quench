@@ -12,11 +12,11 @@ final class HydrationNudgePolicyTests: XCTestCase {
         DateComponents(calendar: calendar, year: 2026, month: 7, day: 18, hour: hour).date!
     }
 
-    func testNudgeRequiresDaytimeAndMeaningfulLead() {
+    func testNudgeRequiresDaytimeAndMeaningfulHydrationOrAIGap() {
         XCTAssertFalse(HydrationNudgePolicy.shouldSend(
-            now: date(hour: 9), userMl: 0, aiMl: 1000, state: nil, calendar: calendar))
+            now: date(hour: 7), userMl: 0, aiMl: 1000, state: nil, calendar: calendar))
         XCTAssertFalse(HydrationNudgePolicy.shouldSend(
-            now: date(hour: 18), userMl: 0, aiMl: 1000, state: nil, calendar: calendar))
+            now: date(hour: 20), userMl: 0, aiMl: 1000, state: nil, calendar: calendar))
         XCTAssertFalse(HydrationNudgePolicy.shouldSend(
             now: date(hour: 12), userMl: 800, aiMl: 900, state: nil, calendar: calendar))
         XCTAssertTrue(HydrationNudgePolicy.shouldSend(

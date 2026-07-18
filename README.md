@@ -2,9 +2,11 @@
 
 A free, open-source macOS menu-bar app that races your daily water intake against the water your AI usage "drinks" in data centers. Privacy-first: local by default, with explicit provider connections.
 
-Four character themes keep that race visible: an axolotl scientist, capybara gardener, astronaut
-otter, or robot koi animates continuously in the menu bar and reacts when AI adds water or you log a
-glass. The interface remains fully labeled and respects Reduce Motion.
+Four character themes keep that race friendly: an axolotl scientist, capybara gardener, astronaut
+otter, or robot koi animates continuously in Quench and reacts when AI adds water or you log a
+glass. A draggable, always-on-top pixel panel keeps the essential `You / goal`, `AI`, and `+250 mL`
+controls visible even when macOS collapses custom menu-bar content. The interface remains fully
+labeled and respects Reduce Motion.
 
 **Status: M7 complete; M8 release work in progress.** The menu-bar race and local water log are backed by an
 EcoLogits-faithful estimation engine with open coefficients. Private Claude Code and Codex log
@@ -29,14 +31,14 @@ ID. Its documented API does not provide bulk account history, and Quench never c
 separate stored-content endpoint. Settings independently control which retained sources count in
 the race, making API/local overlap visible and reversible without deleting history.
 
-M6 has started with a development-preview Chromium companion in [`BrowserExtension`](BrowserExtension).
+M6 provides a development-preview Chromium companion in [`BrowserExtension`](BrowserExtension).
 It estimates tokens inside ChatGPT/Claude tabs and passes only validated count receipts through a
 local native-messaging bridge. It has no telemetry or network backend, and bridge-side canonical
 rewriting prevents unexpected page fields from reaching disk. ChatGPT and Claude adapters have
 versioned CI fixtures, and new receipts are ingested while Quench is running without polling or a
 manual refresh. Safari is intentionally out of scope.
 
-M7 has started with private daily race summaries, a gap-aware hydration win streak, and a History
+M7 provides private daily race summaries, a gap-aware hydration win streak, and a History
 tab. Historical winners use the Standard water scope so changing the currently displayed scope does
 not make consecutive days incomparable. One automatic grace-day freeze can bridge a missing day but
 never an explicit loss, and the weekly Thirst Index identifies the model with the largest estimated
@@ -45,6 +47,12 @@ to two daytime reminders when AI is meaningfully ahead. They remain off until th
 enables them. Shift-Command-D logs a 250 mL glass while the menu is open.
 Notifications require a packaged macOS application; raw `swift run` development launches safely
 leave them unavailable.
+
+The daily fluid goal defaults to 2 L and is editable from 1–5 L. Quench shows progress in plain
+numbers and only offers a sip reminder when the user is at least one 250 mL glass behind an even
+08:00–20:00 pace. This is a general habit aid, not medical advice: food and other drinks count toward
+fluid intake, and individual needs vary with activity, climate, pregnancy, illness, and health. See
+the [NHS hydration guide](https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/water-drinks-nutrition/).
 
 Weekly, monthly, and yearly AI Water Wrapped cards are rendered locally in square or Story format.
 The share sheet receives a temporary PNG containing aggregate totals only; Quench does not upload it.

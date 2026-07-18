@@ -57,6 +57,16 @@ Hydration notifications are off by default and require explicit macOS permission
 the local day, reminder count, and last-reminder time needed to enforce its daily cap and cooldown.
 Notification content contains a rounded hydration gap, never conversation or provider content.
 
+The always-on-top mini status is a native non-activating panel. It displays values already held by
+Quench and does not inspect other windows, take screenshots, record the screen, or request
+Accessibility access. Its visibility preference and the user's editable daily fluid goal are kept
+in UserDefaults on this Mac.
+
+Hydration pacing is a general habit aid, not medical advice. Quench spreads the user's chosen goal
+between 08:00 and 20:00 and considers a reminder only when the logged amount is at least 250 mL
+behind that pace. The default 2 L fluid goal reflects the NHS's general 6–8 cup guide, but remains
+editable because needs vary with food, activity, climate, pregnancy, illness, and individual health.
+
 AI Water Wrapped images are rendered locally from aggregate daily totals. Choosing Share creates a
 temporary PNG and hands it to the standard macOS share sheet; Quench does not upload or retain a
 remote copy.

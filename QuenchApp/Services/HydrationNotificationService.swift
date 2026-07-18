@@ -24,14 +24,24 @@ final class HydrationNotificationService {
         (try? await center.requestAuthorization(options: [.alert])) ?? false
     }
 
-    func consider(userMl: Int, aiMl: Double, now: Date = Date(), calendar: Calendar = .current) async {
+    func consider(userMl: Int, aiMl: Double, goalMl: Double,
+                  now: Date = Date(), calendar: Calendar = .current) async {
         let state = savedState()
         guard HydrationNudgePolicy.shouldSend(now: now, userMl: Double(userMl), aiMl: aiMl,
-                                              state: state, calendar: calendar) else { return }
-        let lead = max(0, Int(aiMl) - userMl)
+                                              goalMl: goalMl, state: state,
+                                              calendar: calendar) else { return }
         let content = UNMutableNotificationContent()
-        content.title = "Your AI is \(lead) mL ahead"
-        content.body = "A glass of water puts you back in the race."
+        if HydrationPacing.shouldNudge(now: now, userMl: Double(userMl), goalMl: goalMl,
+                                      calendar: calendar) {
+            let remaining = Int(HydrationPacing.remainingMl(
+                userMl: Double(userMl), goalMl: goalMl).rounded())
+            content.title = "A gentle sip break"
+            content.body = "About \(remaining) mL remains in your personal fluid goal."
+        } else {
+            let lead = max(0, Int(aiMl) - userMl)
+            content.title = "Your AI is \(lead) mL ahead"
+            content.body = "A glass of water puts you back in the race."
+        }
         content.interruptionLevel = .passive
         do {
             try await center.add(UNNotificationRequest(
