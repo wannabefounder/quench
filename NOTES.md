@@ -19,9 +19,7 @@ always-on-top pixel status fallback are implemented.
 - METHODOLOGY.md — water-math write-up (sources cited). CLAUDE.md — records Section 6 override.
 - QuenchApp/Engine/WaterMath.swift — PURE: UsageSample, WaterMode, Coefficients(Decodable),
   energyWh, waterMl, waterRange, totalWaterMl, model/provider mapping, EcoLogits param formula.
-- QuenchApp/Engine/RaceEngine.swift — race state + aiWaterMl() wrapper.
-- QuenchApp/Models/Database.swift — added todayUsageSamples() (usage_events -> [UsageSample]).
-- QuenchApp/QuenchApp.swift — RaceStore loads coefficients + computes aiMl via WaterMath.
+- RaceEngine.swift + Database.swift + QuenchApp.swift — race state, stored usage, and live water totals.
 - QuenchTests/WaterMathTests.swift — 20 tests vs real JSON. RaceEngineTests.swift — 6 tests.
 - UsageLogParser.swift + UsageLogParserTests.swift — metadata-only Claude/Codex/Gemini parsers.
 - LocalLogIngestor.swift + DB v2 — byte cursors, rotation generations, unique external IDs.

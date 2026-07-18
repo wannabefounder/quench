@@ -122,7 +122,8 @@ The SDK override is a local development workaround, not a Quench runtime require
 Privacy: no telemetry or conversation content. Network features may refresh public scientific data
 or improve estimates, with minimal disclosed metadata and a safe local fallback. Read the
 [methodology](METHODOLOGY.md), [privacy principles](PRIVACY.md), [project guide](AGENTS.md),
-[design system](DESIGN.md), and [contribution guide](CONTRIBUTING.md).
+[design system](DESIGN.md), [governance](GOVERNANCE.md), [funding packet](FUNDING.md),
+[completion audit](COMPLETION_AUDIT.md), and [contribution guide](CONTRIBUTING.md).
 
 ## Why Quench
 

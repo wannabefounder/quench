@@ -52,7 +52,7 @@ then sends counts only to the local bridge.
 
 - Enroll in the Apple Developer Program and add the GitHub release secrets in `RELEASING.md`.
 - Choose and apply to a fiscal sponsor; do not add donation collection before approval and a public
-  funds-use policy exist.
+  funds-use policy exist. `FUNDING.md` contains the current readiness gaps and application copy.
 - Create a Homebrew tap or submit the generated cask after the first notarized release supplies a
   permanent URL and SHA-256.
 - Rotate the GitHub token that was exposed in the development conversation before public launch.
