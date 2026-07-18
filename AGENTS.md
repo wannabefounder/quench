@@ -104,8 +104,9 @@ or provider credentials to Quench or third-party analytics.
 
 The API at `https://api.ecologits.ai/v1beta` can discover providers/models and electricity-mix zones
 and return range estimates from provider, model, output-token count, optional latency, and region.
-Use it for catalog refreshes, coefficient validation, research tooling, or an explicitly disclosed
-enhanced-estimation mode. Cache only non-personal catalog data by default. A runtime estimator must:
+Quench implements an explicit catalog-only refresh: it calls only the pinned provider/model GET
+endpoints, caches owner-only public architecture data, and merges it solely into unknown-model
+fallbacks. Bundled reviewed coefficients win. A future usage-bearing runtime estimator must:
 
 - clearly disclose the exact metadata sent and offer a local-only setting;
 - send no prompt/response content and no credentials belonging to another provider;

@@ -48,6 +48,11 @@ for permission in NSCameraUsageDescription NSMicrophoneUsageDescription \
   fi
 done
 jq empty "$APP/Contents/Resources/coefficients.json"
+grep -F 'https://api.ecologits.ai/v1beta' QuenchApp/Services/EcoLogitsCatalogModel.swift >/dev/null \
+  || fail "EcoLogits catalog API version is not pinned"
+if rg -n '/estimations' QuenchApp >/dev/null; then
+  fail "runtime EcoLogits integration must remain catalog-only"
+fi
 pass "bundle identity, deployment target, resources, and permission surface"
 
 for asset in manifest.json background.js content.js site-adapters.js popup.html popup.js README.md; do

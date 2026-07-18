@@ -20,10 +20,14 @@ feature must disclose its purpose and the categories of metadata sent. Quench wi
 responses, local file paths, or provider credentials to analytics or environmental-estimation
 services. Useful local behavior remains available when a network service is unavailable.
 
-Quench's current EcoLogits-faithful water estimate runs locally. It does not call EcoLogits' live
-estimation endpoint, because that would disclose provider, model, output-token count, and electricity
-region to another service. A future public model-catalog refresh may retrieve catalog data without
-sending AI usage; any usage-bearing live estimate must remain separately disclosed and opt-in.
+Quench's EcoLogits-faithful water estimate runs locally. It does not call EcoLogits' live estimation
+endpoint, because that would disclose provider, model, output-token count, and electricity region to
+another service. The optional **Refresh public catalog** action calls only the pinned `v1beta`
+provider/model catalog endpoints. It sends no usage, region, credential, identity, or device
+identifier. Quench caches public model architecture sizes in an owner-only local file and uses them
+only for unknown-model fallback math; reviewed bundled coefficients always take precedence.
+Like any HTTPS service, EcoLogits can observe the connecting IP address and standard connection
+metadata. Quench adds no account, installation, or analytics identifier to the request.
 
 ## Credentials
 

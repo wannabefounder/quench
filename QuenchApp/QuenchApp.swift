@@ -153,7 +153,8 @@ final class RaceStore: ObservableObject {
         }
     }
 
-    private let coef: Coefficients
+    private let baseCoef: Coefficients
+    private var coef: Coefficients
     private let logIngestor = LocalLogIngestor()
     private let providerSync = ProviderSyncService()
     private let notificationService = HydrationNotificationService.makeIfAvailable()
@@ -161,6 +162,7 @@ final class RaceStore: ObservableObject {
     private var timer: Timer?
     private var needsRefresh = false
     private var credentialObserver: NSObjectProtocol?
+    private var ecoLogitsCatalogObserver: NSObjectProtocol?
     private var browserReceiptWatcher: BrowserReceiptWatcher?
     private var buddyActivityTask: Task<Void, Never>?
     private var activityProxy: ActivityProxyService?
@@ -199,7 +201,9 @@ final class RaceStore: ObservableObject {
 
     init() {
         let coefficients = RaceStore.loadCoefficients()
-        coef = coefficients
+        baseCoef = coefficients
+        coef = coefficients.mergingCatalogActiveParameters(
+            EcoLogitsCatalogCache.load()?.activeParametersByModel ?? [:])
         waterMode = WaterMode(rawValue: UserDefaults.standard.string(forKey: "waterMode") ?? "")
             ?? .standard
         let savedRegion = UserDefaults.standard.string(forKey: "region")
@@ -233,6 +237,16 @@ final class RaceStore: ObservableObject {
             forName: .providerCredentialsChanged, object: nil, queue: .main
         ) { [weak self] _ in
             Task { @MainActor in self?.refresh(forceProviderSync: true) }
+        }
+        ecoLogitsCatalogObserver = NotificationCenter.default.addObserver(
+            forName: .ecoLogitsCatalogChanged, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                self.coef = self.baseCoef.mergingCatalogActiveParameters(
+                    EcoLogitsCatalogCache.load()?.activeParametersByModel ?? [:])
+                self.refresh()
+            }
         }
         browserReceiptWatcher = BrowserReceiptWatcher { [weak self] in
             Task { @MainActor in self?.refresh() }

@@ -14,6 +14,11 @@ ingestion includes durable cursors, deduplication, rotation handling, and visibl
 First-run onboarding, per-source privacy controls, diagnostics, and persistent scope/region settings
 make every estimate's assumptions and collection state visible.
 
+Settings can optionally refresh EcoLogits' public `v1beta` provider/model catalog. This sends no AI
+usage or identity; Quench caches only public architecture sizes and uses them to improve its local
+fallback for newly released models. The reviewed bundled coefficients always take precedence, and
+the app remains fully useful offline.
+
 Exact local ingestion supports Claude Code, Codex, and Gemini CLI session logs. Quench normalizes
 only timestamps, model names, and token totals; prompts, responses, thoughts, tool arguments, local
 paths, and session content are never copied into its database.

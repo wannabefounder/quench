@@ -8,9 +8,9 @@ because the honest answer spans an order of magnitude depending on scope and loc
 
 All the numbers live in [`coefficients.json`](QuenchApp/Resources/coefficients.json) — a versioned,
 human-readable file. The app bundles a reviewed copy so estimates work offline and can be audited
-and improved through normal pull requests and releases. Quench does not silently replace calculation
-data at runtime; any future catalog refresh must be schema-validated, integrity-protected, disclosed,
-and retain the bundled fallback.
+and improved through normal pull requests and releases. Quench does not silently replace reviewed
+calculation data at runtime. Its optional catalog refresh can add active-parameter sizes only for
+models absent from the bundled tables; schema validation and the bundled fallback remain mandatory.
 
 ## Step 1 — Energy (Wh)
 
@@ -88,13 +88,22 @@ server energy as `E_server × [WUE_onsite + PUE × WUE_offsite]`; because Quench
 coefficients are already facility-level, the algebraically equivalent form above divides only the
 on-site term by PUE.
 
-## Optional EcoLogits API enhancement
+## Optional EcoLogits catalog refresh
 
-EcoLogits also publishes a beta HTTP API at `https://api.ecologits.ai/v1beta`. Quench may use it to
-refresh public provider/model catalogs, retrieve country electricity-mix factors, and validate
-bundled estimates. The app remains useful when the service is unavailable. Any runtime comparison
-must disclose that provider, model, output-token count, optional latency, and region are sent; it
-must never send prompts, responses, local paths, user identity, or AI-provider credentials.
+EcoLogits publishes a beta HTTP API at `https://api.ecologits.ai/v1beta`. When the user chooses
+**Refresh public catalog**, Quench calls only `GET /providers` and `GET /models/{provider}`. It pins
+the API version, validates response sizes and schemas, uses bounded timeouts, and stores the public
+snapshot in an owner-only local file. No model the user used, token count, prompt, response, region,
+credential, or identifier is sent.
+As with any HTTPS request, the service can observe the connecting IP address and standard transport
+metadata; Quench adds no account, installation, or analytics identifier.
+
+The catalog's active-parameter ranges feed the same local EcoLogits fallback formula for models not
+already reviewed in `coefficients.json`. Catalog values never override a bundled per-token
+coefficient or reviewed parameter entry. Failed refreshes retain the previous valid cache, and an
+empty cache falls back to the bundled estimates. Quench deliberately does not call
+`POST /estimations`, because that would disclose usage metadata for little benefit over its fuller
+on-device calculation.
 
 ## Why estimates, and how to challenge them
 

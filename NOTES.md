@@ -10,15 +10,14 @@ local/API sources have independent race-inclusion controls.
 M6 DONE: packaged Chromium MV3 + Settings-guided Chrome/Brave/Edge connection + strict native bridge;
 count-only live ingestion and owner-only inbox. Safari is out of scope by user decision.
 M7: history/freeze/nudges/Wrapped comparisons/private pledge plus four buddy themes shipped.
-M8 underway: packaged app, original icon, opt-in SMAppService launch-at-login, and a verified
-always-on-top animated pixel water-drop status fallback are implemented.
+M8 underway: packaged app, original icon, launch-at-login, verified pixel water-drop status, and
+privacy-safe EcoLogits catalog freshness are implemented.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,
   per-provider WUE/PUE, per-region grid water, 3 modes. Calibrated to arXiv:2505.09598.
 - METHODOLOGY.md — water-math write-up (sources cited). CLAUDE.md — records Section 6 override.
-- QuenchApp/Engine/WaterMath.swift — PURE: UsageSample, WaterMode, Coefficients(Decodable),
-  energyWh, waterMl, waterRange, totalWaterMl, model/provider mapping, EcoLogits param formula.
+- WaterMath.swift + EcoLogitsCatalog.swift — pure local math plus validated unknown-model catalog.
 - RaceEngine.swift + Database.swift + QuenchApp.swift — race state, stored usage, and live water totals.
 - QuenchTests/WaterMathTests.swift — 20 tests vs real JSON. RaceEngineTests.swift — 6 tests.
 - UsageLogParser.swift + UsageLogParserTests.swift — metadata-only Claude/Codex/Gemini parsers.

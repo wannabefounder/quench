@@ -1,4 +1,4 @@
-# Quench browser companion (development preview)
+# Quench browser companion
 
 This Manifest V3 extension estimates input/output tokens on `chatgpt.com` and `claude.ai`, then sends
 only a count-only receipt to the native Quench bridge. Page text is used transiently inside the tab

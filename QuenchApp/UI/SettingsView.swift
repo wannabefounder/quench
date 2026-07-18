@@ -6,6 +6,7 @@ struct SettingsView: View {
     @StateObject private var credentials = ProviderCredentialsModel()
     @StateObject private var launchAtLogin = LaunchAtLoginModel()
     @StateObject private var browserCompanion = BrowserCompanionModel()
+    @StateObject private var ecoLogitsCatalog = EcoLogitsCatalogModel()
     @State private var selection: SettingsSection = .appearance
 
     var body: some View {
@@ -23,7 +24,8 @@ struct SettingsView: View {
                 case .appearance: AppearanceSettingsView(store: store)
                 case .estimation: GeneralSettingsView(
                     store: store, launchAtLogin: launchAtLogin,
-                    browserCompanion: browserCompanion)
+                    browserCompanion: browserCompanion,
+                    ecoLogitsCatalog: ecoLogitsCatalog)
                 case .providers: ProviderSettingsView(model: credentials)
                 case .history: HistorySettingsView(store: store)
                 case .wrapped: WrappedSettingsView(store: store)
@@ -409,6 +411,7 @@ private struct GeneralSettingsView: View {
     @ObservedObject var store: RaceStore
     @ObservedObject var launchAtLogin: LaunchAtLoginModel
     @ObservedObject var browserCompanion: BrowserCompanionModel
+    @ObservedObject var ecoLogitsCatalog: EcoLogitsCatalogModel
 
     var body: some View {
         Form {
@@ -458,6 +461,37 @@ private struct GeneralSettingsView: View {
                 Text("All current usage ingestion and water calculation happens on this Mac.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+
+            Section("EcoLogits model catalog") {
+                HStack {
+                    Button(action: { ecoLogitsCatalog.refresh() }) {
+                        if ecoLogitsCatalog.isRefreshing {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Label("Refresh public catalog", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                    }
+                    .disabled(ecoLogitsCatalog.isRefreshing)
+                    Spacer()
+                    if let updated = ecoLogitsCatalog.lastUpdatedText {
+                        Text(updated).font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                Text(ecoLogitsCatalog.message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if ecoLogitsCatalog.warningCount > 0 {
+                    Text("\(ecoLogitsCatalog.warningCount) catalog models use EcoLogits' approximate architecture data. Reviewed built-in Quench coefficients always win.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text("This optional download sends no model you used, token count, prompt, response, region, credential, or Quench identifier. Like any web request, EcoLogits receives your IP address and standard connection metadata. Quench caches only public architecture data and improves local fallback estimates for new models.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Link("View EcoLogits API documentation",
+                     destination: URL(string: "https://api.ecologits.ai/docs")!)
+                    .font(.caption)
             }
 
             Section("Gentle nudges") {
