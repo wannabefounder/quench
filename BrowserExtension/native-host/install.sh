@@ -7,9 +7,14 @@ if [ "$#" -ne 1 ]; then
 fi
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-BRIDGE="$ROOT/.build/release/QuenchBrowserBridge"
+PACKAGED_BRIDGE="/Applications/Quench.app/Contents/Helpers/QuenchBrowserBridge"
+if [ -x "$PACKAGED_BRIDGE" ]; then
+  BRIDGE="$PACKAGED_BRIDGE"
+else
+  BRIDGE="$ROOT/.build/release/QuenchBrowserBridge"
+fi
 if [ ! -x "$BRIDGE" ]; then
-  echo "Build the bridge first: swift build -c release --product QuenchBrowserBridge" >&2
+  echo "Install Quench.app or build the bridge first: swift build -c release --product QuenchBrowserBridge" >&2
   exit 1
 fi
 

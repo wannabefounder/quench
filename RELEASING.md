@@ -26,6 +26,19 @@ create the GitHub release.
    glass, switch all four themes, and test launch at login after explicit opt-in.
 6. Update the Homebrew tap with the published archive URL and SHA-256.
 
+Before tagging, maintainers can reproduce CI's non-credential release gate locally:
+
+```sh
+./scripts/package-app.sh
+./scripts/archive-app.sh
+./scripts/verify-release-readiness.sh
+```
+
+The verifier checks the tracked secret scan, required public documents, bundle identity and minimum
+OS, sensitive permission surface, bundled coefficients and browser companion, code signatures and
+entitlements, Homebrew cask syntax, ZIP integrity, and SHA-256. The tagged workflow additionally
+requires Gatekeeper assessment after Apple notarization and stapling.
+
 The workflow intentionally cannot publish until the project owner supplies Apple Developer
 credentials. Fiscal-sponsor enrollment and Apple Developer membership are owner/legal actions, not
 automated repository changes.

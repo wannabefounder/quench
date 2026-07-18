@@ -20,3 +20,7 @@ jobs:
         run: node BrowserExtension/tests/site-adapters.test.js
       - name: Validate packaged app
         run: CONFIGURATION=debug ./scripts/package-app.sh
+      - name: Archive and release-readiness gate
+        run: |
+          ./scripts/archive-app.sh
+          ./scripts/verify-release-readiness.sh

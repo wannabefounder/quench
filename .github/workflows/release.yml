@@ -52,9 +52,12 @@ jobs:
             --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$APPLE_TEAM_ID"
           xcrun stapler staple dist/Quench.app
           xcrun stapler validate dist/Quench.app
+          spctl --assess --type execute --verbose=2 dist/Quench.app
 
       - name: Archive and checksum
-        run: ./scripts/archive-app.sh
+        run: |
+          ./scripts/archive-app.sh
+          ./scripts/verify-release-readiness.sh
 
       - name: Publish GitHub release
         env:

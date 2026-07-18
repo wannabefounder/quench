@@ -52,15 +52,18 @@ local receipt ID, timestamp, site name, optional model name, and input/output in
 Chrome native messaging. The bridge validates and re-encodes those exact fields before storing an
 owner-only local JSONL receipt; unknown fields are discarded. There is no localhost server, trusted
 certificate, Quench cloud relay, remotely downloaded selector code, or extension analytics.
+Connecting from Settings writes one owner-only native-host manifest inside the selected browser's
+local Application Support folder. It contains only the extension ID and the absolute path to the
+signed bridge bundled in Quench.app. Disconnect removes that manifest.
 
 Hydration notifications are off by default and require explicit macOS permission. Quench stores only
 the local day, reminder count, and last-reminder time needed to enforce its daily cap and cooldown.
 Notification content contains a rounded hydration gap, never conversation or provider content.
 
-The always-on-top mini status is a native non-activating panel. It displays values already held by
-Quench and does not inspect other windows, take screenshots, record the screen, or request
-Accessibility access. Its visibility preference and the user's editable daily fluid goal are kept
-in UserDefaults on this Mac.
+The always-on-top mini status is a native non-activating panel with an animated pixel water drop. It
+displays values already held by Quench and does not inspect other windows, take screenshots, record
+the screen, or request Accessibility access. Its visibility preference and the user's editable
+daily fluid goal are kept in UserDefaults on this Mac.
 
 Hydration pacing is a general habit aid, not medical advice. Quench spreads the user's chosen goal
 between 08:00 and 20:00 and considers a reminder only when the logged amount is at least 250 mL

@@ -15,11 +15,15 @@ swift build -c "$CONFIGURATION" --product QuenchBrowserBridge
 BIN_DIR="$(swift build -c "$CONFIGURATION" --show-bin-path)"
 
 rm -rf "$APP" "$ICONSET"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Helpers" "$ICONSET"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/BrowserExtension" \
+    "$APP/Contents/Helpers" "$ICONSET"
 cp "$BIN_DIR/QuenchApp" "$APP/Contents/MacOS/QuenchApp"
 cp "$BIN_DIR/QuenchBrowserBridge" "$APP/Contents/Helpers/QuenchBrowserBridge"
 cp "$ROOT/Packaging/Info.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/QuenchApp/Resources/coefficients.json" "$APP/Contents/Resources/coefficients.json"
+for file in manifest.json background.js content.js site-adapters.js popup.html popup.js README.md; do
+    cp "$ROOT/BrowserExtension/$file" "$APP/Contents/Resources/BrowserExtension/$file"
+done
 /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP/Contents/Info.plist"
 

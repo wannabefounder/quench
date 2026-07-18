@@ -5,6 +5,7 @@ struct SettingsView: View {
     @ObservedObject var store: RaceStore
     @StateObject private var credentials = ProviderCredentialsModel()
     @StateObject private var launchAtLogin = LaunchAtLoginModel()
+    @StateObject private var browserCompanion = BrowserCompanionModel()
     @State private var selection: SettingsSection = .appearance
 
     var body: some View {
@@ -20,7 +21,9 @@ struct SettingsView: View {
             Group {
                 switch selection {
                 case .appearance: AppearanceSettingsView(store: store)
-                case .estimation: GeneralSettingsView(store: store, launchAtLogin: launchAtLogin)
+                case .estimation: GeneralSettingsView(
+                    store: store, launchAtLogin: launchAtLogin,
+                    browserCompanion: browserCompanion)
                 case .providers: ProviderSettingsView(model: credentials)
                 case .history: HistorySettingsView(store: store)
                 case .wrapped: WrappedSettingsView(store: store)
@@ -405,6 +408,7 @@ private struct ProviderCredentialCard: View {
 private struct GeneralSettingsView: View {
     @ObservedObject var store: RaceStore
     @ObservedObject var launchAtLogin: LaunchAtLoginModel
+    @ObservedObject var browserCompanion: BrowserCompanionModel
 
     var body: some View {
         Form {
@@ -492,6 +496,35 @@ private struct GeneralSettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Text("Disabled sources are not scanned. Previously normalized counts remain in your local history.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Browser companion") {
+                Picker("Browser", selection: $browserCompanion.browser) {
+                    ForEach(ChromiumBrowser.allCases) { browser in
+                        Text(browser.rawValue).tag(browser)
+                    }
+                }
+                Button("Open companion folder") { browserCompanion.revealCompanionFolder() }
+                Text("In your browser, open Extensions, enable Developer mode, choose Load unpacked, and select the opened BrowserExtension folder. Then copy its ID below.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                TextField("32-character extension ID", text: $browserCompanion.extensionID)
+                    .textFieldStyle(.roundedBorder)
+                HStack {
+                    Button("Connect locally") { browserCompanion.connect() }
+                        .buttonStyle(.borderedProminent)
+                    if browserCompanion.isConnected {
+                        Button("Disconnect") { browserCompanion.disconnect() }
+                    }
+                    Spacer()
+                    Label(browserCompanion.message, systemImage: browserCompanion.isConnected
+                          ? "checkmark.circle.fill" : "link.badge.plus")
+                        .font(.caption)
+                        .foregroundStyle(browserCompanion.isConnected ? .green : .secondary)
+                }
+                Text("The connection is a local manifest pointing only to Quench's signed count-only bridge. No prompts, responses, browsing history, or Quench cloud service are involved.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

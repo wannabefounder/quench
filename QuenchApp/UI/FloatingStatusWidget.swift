@@ -82,7 +82,7 @@ private struct FloatingStatusWidget: View {
     var body: some View {
         HStack(spacing: 10) {
             Button { FloatingStatusPanelController.shared.openDashboard() } label: {
-                PixelBuddy(theme: store.theme, activity: store.buddyActivity)
+                PixelWaterDrop(theme: store.theme, activity: store.buddyActivity)
                     .frame(width: 42, height: 42)
             }
             .buttonStyle(.plain)
@@ -132,45 +132,55 @@ private struct FloatingStatusWidget: View {
     }
 }
 
-private struct PixelBuddy: View {
+private struct PixelWaterDrop: View {
     let theme: QuenchTheme
     let activity: BuddyActivity
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isFloating = false
 
-    private let face: [[Int]] = [
-        [0, 1, 1, 1, 1, 0],
-        [1, 1, 1, 1, 1, 1],
-        [1, 2, 1, 1, 2, 1],
-        [1, 1, 1, 1, 1, 1],
-        [1, 1, 3, 3, 1, 1],
-        [0, 1, 1, 1, 1, 0]
+    private let drop: [[Int]] = [
+        [0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0],
+        [0, 1, 1, 2, 1, 1, 0],
+        [0, 1, 2, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 1, 1, 1, 0, 0]
     ]
 
     var body: some View {
         GeometryReader { geometry in
-            let pixel = min(geometry.size.width, geometry.size.height) / 7
+            let pixel = min(geometry.size.width, geometry.size.height) / 9
             VStack(spacing: 1) {
-                ForEach(face.indices, id: \.self) { row in
+                ForEach(drop.indices, id: \.self) { row in
                     HStack(spacing: 1) {
-                        ForEach(face[row].indices, id: \.self) { column in
+                        ForEach(drop[row].indices, id: \.self) { column in
                             Rectangle()
-                                .fill(color(face[row][column]))
+                                .fill(color(drop[row][column]))
                                 .frame(width: pixel, height: pixel)
                         }
                     }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .scaleEffect(activity == .userDrinking ? 1.08 : 1)
+            .offset(y: reduceMotion ? 0 : (isFloating ? -2 : 2))
+            .scaleEffect(activity == .userDrinking ? 1.1 : 1)
             .animation(.easeInOut(duration: 0.25), value: activity)
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeInOut(duration: 1.15).repeatForever(autoreverses: true)) {
+                    isFloating = true
+                }
+            }
         }
         .accessibilityHidden(true)
     }
 
     private func color(_ code: Int) -> Color {
         switch code {
-        case 1: theme.accent
-        case 2: .primary
-        case 3: activity == .aiDrinking ? theme.secondaryAccent : .primary
+        case 1: activity == .aiDrinking ? theme.secondaryAccent : theme.accent
+        case 2: .white.opacity(0.8)
         default: .clear
         }
     }

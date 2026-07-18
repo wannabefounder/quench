@@ -6,11 +6,15 @@ to calculate an estimate; it is never included in a message, written to disk, or
 
 ## Local installation
 
-1. Build the native host: `swift build -c release --product QuenchBrowserBridge`.
-2. Open `chrome://extensions`, enable Developer mode, and choose **Load unpacked**. Select this folder.
-3. Copy the extension ID shown by Chrome.
-4. Run `BrowserExtension/native-host/install.sh EXTENSION_ID`.
-5. Restart Chrome and open ChatGPT or Claude.
+1. In Quench Settings → Estimation, choose **Open companion folder**.
+2. Open your browser's Extensions page, enable Developer mode, and choose **Load unpacked**. Select
+   the opened `BrowserExtension` folder.
+3. Copy the extension ID shown by the browser, paste it into Quench, and choose **Connect locally**.
+4. Restart the browser once, then open ChatGPT or Claude.
+
+Repository developers may instead build the bridge and run
+`BrowserExtension/native-host/install.sh EXTENSION_ID`. The script prefers the helper inside an
+installed `/Applications/Quench.app` and otherwise uses `.build/release`.
 
 The bridge validates and rewrites every receipt before appending it to
 `~/Library/Application Support/Quench/browser-events.jsonl` with owner-only permissions. Quench reads

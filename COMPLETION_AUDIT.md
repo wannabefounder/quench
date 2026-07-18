@@ -22,7 +22,7 @@ it does not mean a future public release or partnership exists.
 | Relatable cups/bottles/showers | Complete | `WrappedInsights.relatableComparison`, deterministic tests |
 | Per-liter clean-water pledge | Complete with safe deviation | Private calculator and independent links; no payment or partnership claim |
 | Four animated character themes | Complete | `QuenchTheme.swift`, `BuddyView.swift`, theme gallery, Reduce Motion handling |
-| Always-visible status | Complete with platform adaptation | Native drop icon plus default floating pixel panel; timer-driven status icon was removed after a reproduced macOS 26 launch hang |
+| Always-visible status | Complete with platform adaptation | Native drop icon plus default floating animated pixel water drop; timer-driven status icon was removed after a reproduced macOS 26 launch hang |
 
 ## Collection architecture
 
@@ -30,7 +30,7 @@ it does not mean a future public release or partnership exists.
 |---|---|---|
 | 1 — provider endpoints | Complete where official endpoints exist | OpenAI and Anthropic organization Admin APIs; OpenRouter generation-by-ID metadata; Keychain credentials, pagination and normalization tests |
 | Gemini quota API named by report | Correctly not invented | No verified official consumer history endpoint; Gemini CLI exact local token summaries are supported instead |
-| 2 — browser companion | Complete for Chromium | MV3 ChatGPT/Claude adapters, native bridge, count-only canonical receipts, fixtures and live event watcher |
+| 2 — browser companion | Complete for Chromium | Packaged MV3 ChatGPT/Claude companion, Settings-guided Chrome/Brave/Edge connection, native bridge, count-only canonical receipts, fixtures and live event watcher |
 | Safari companion | Superseded by owner | Explicitly removed from scope July 18, 2026 |
 | 3 — local logs | Complete | Claude Code, Codex, Gemini CLI; cursors, rotation/truncation recovery, DB uniqueness and parser tests |
 | 4 — activity proxy | Complete, opt-in | NSWorkspace foreground activation only, rough label, no Accessibility/window/content access |
@@ -43,7 +43,7 @@ it does not mean a future public release or partnership exists.
 | No accounts, Quench telemetry, or conversation storage | Complete | `PRIVACY.md`, parser/bridge allowlists, local SQLite schema |
 | Per-source controls and visible accuracy | Complete | Onboarding, Estimation, Providers, Diagnostics, race-inclusion toggles |
 | Source isolation and deduplication | Complete | `LocalLogIngestor`, provider sync, stable external IDs and database constraints |
-| Native packaged macOS app | Complete | `scripts/package-app.sh`; signature, bundle and plist validation pass |
+| Native packaged macOS app | Complete | `scripts/package-app.sh`, `scripts/verify-release-readiness.sh`; bundle, privacy surface, signature, archive and checksum gates |
 | Launch at login | Implemented; final restart check external | `SMAppService.mainApp`, packaged-only availability |
 | CI | Complete and authoritative | [Run 29639719881](https://github.com/wannabefounder/quench/actions/runs/29639719881): 71 Swift tests, browser fixtures, and package validation passed |
 | Developer ID notarization | Automation complete; credentials external | `release.yml`, `RELEASING.md`; cannot run without owner Apple membership/secrets |
@@ -85,9 +85,9 @@ The following checks passed through the real accessibility interface:
 
 - main dashboard appears and remains responsive;
 - the native menu entry is present; its packaged SwiftUI label is configured with `drop.fill`;
-- closing the dashboard leaves the pixel mini status visible;
+- closing the dashboard leaves the animated pixel water drop status visible;
 - the mini status displays `You / goal` and AI totals and its +250 mL action updates immediately;
-- clicking the pixel buddy recreates the dashboard after the original SwiftUI window was destroyed;
+- clicking the pixel water drop recreates the dashboard after the original SwiftUI window was destroyed;
 - Aqua Lab, Forest Flow, Cosmic Sip, and Solar Splash each select their named buddy;
 - Settings opens, closes, and opens again on the newest build.
 

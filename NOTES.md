@@ -7,11 +7,11 @@ M5 DONE: OpenAI + Anthropic Admin usage auto-syncs with Keychain credentials, bo
 pagination, 15-minute throttle, stable bucket upserts, isolated failures, and diagnostics status.
 OpenRouter generation metadata imports are supported by ID (no bulk history/content calls); all
 local/API sources have independent race-inclusion controls.
-M6 DONE: Chromium MV3 + strict native bridge + event-driven browser receipt ingestion;
-count-only messages, canonical rewrite, owner-only inbox. Safari is out of scope by user decision.
+M6 DONE: packaged Chromium MV3 + Settings-guided Chrome/Brave/Edge connection + strict native bridge;
+count-only live ingestion and owner-only inbox. Safari is out of scope by user decision.
 M7: history/freeze/nudges/Wrapped comparisons/private pledge plus four buddy themes shipped.
 M8 underway: packaged app, original icon, opt-in SMAppService launch-at-login, and a verified
-always-on-top pixel status fallback are implemented.
+always-on-top animated pixel water-drop status fallback are implemented.
 
 ## Files
 - QuenchApp/Resources/coefficients.json — bundled EcoLogits-style data: per-model energy, param fallback,
@@ -29,7 +29,7 @@ always-on-top pixel status fallback are implemented.
 - ProviderUsage.swift + tests — Tier 1 response normalization and pagination cursors.
 - Services/ — Keychain credentials, bounded OpenAI/Anthropic sync, OpenRouter receipt imports.
 - ProviderSyncService + DB v3 — scheduled/forced import, upsert, throttling, sanitized health.
-- BrowserExtension + QuenchBrowserBridge — Tier 2 count-only native messaging preview.
+- BrowserExtension + QuenchBrowserBridge — packaged Tier 2 count-only native messaging.
 
 ## TODO / open
 - Packaged coefficients and fallback are verified; app launch/icon/restart passed on this Mac.

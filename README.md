@@ -4,7 +4,7 @@ A free, open-source macOS menu-bar app that races your daily water intake agains
 
 Four character themes keep that race friendly: an axolotl scientist, capybara gardener, astronaut
 otter, or robot koi animates continuously in Quench and reacts when AI adds water or you log a
-glass. A draggable, always-on-top pixel panel keeps the essential `You / goal`, `AI`, and `+250 mL`
+glass. A draggable, always-on-top animated pixel water drop keeps the essential `You / goal`, `AI`, and `+250 mL`
 controls visible even when macOS collapses custom menu-bar content. The interface remains fully
 labeled and respects Reduce Motion.
 
@@ -31,7 +31,8 @@ ID. Its documented API does not provide bulk account history, and Quench never c
 separate stored-content endpoint. Settings independently control which retained sources count in
 the race, making API/local overlap visible and reversible without deleting history.
 
-M6 provides a development-preview Chromium companion in [`BrowserExtension`](BrowserExtension).
+M6 provides an optional Chromium companion in [`BrowserExtension`](BrowserExtension). The packaged
+app includes the extension files and a Settings-guided local connection for Chrome, Brave, and Edge.
 It estimates tokens inside ChatGPT/Claude tabs and passes only validated count receipts through a
 local native-messaging bridge. It has no telemetry or network backend, and bridge-side canonical
 rewriting prevents unexpected page fields from reaching disk. ChatGPT and Claude adapters have
@@ -71,7 +72,7 @@ Opening Quench shows its race window and Dock icon. Closing the window leaves th
 the macOS menu bar so the daily race remains one click away.
 
 Create a normal macOS application bundle (including the app icon, bundled methodology data,
-native browser bridge, and an ad-hoc development signature):
+native browser bridge and companion files, and an ad-hoc development signature):
 
 ```sh
 ./scripts/package-app.sh
